@@ -4,186 +4,280 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complementarity View</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Libre+Franklin:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --color-void: #08080c;
+            --color-surface: #0e0e14;
+            --color-surface-elevated: #14141c;
+            --color-border: rgba(255, 220, 180, 0.08);
+            --color-text: #f5f0e8;
+            --color-text-dim: rgba(245, 240, 232, 0.5);
+            --color-light: #ffecd2;
+            --color-light-core: #fff8f0;
+            --color-ai: #7dd3fc;
+            --color-ai-dim: rgba(125, 211, 252, 0.6);
+            --color-human: #a3e635;
+            --color-human-dim: rgba(163, 230, 53, 0.6);
+            --color-unobservable: #fbbf24;
+            --color-unobservable-dim: rgba(251, 191, 36, 0.5);
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Libre Franklin', sans-serif;
         }
 
-        html, body {
-            height: 100%;
-            width: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; }
 
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a0a0f;
-            color: #fff;
+            font-family: var(--font-body);
+            background: var(--color-void);
+            color: var(--color-text);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.5rem;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        /* Film grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
         }
 
         .card {
-            background: #0f0f14;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 2px;
             width: 100%;
-            max-width: 960px;
+            max-width: 1000px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            box-shadow:
+                0 0 0 1px rgba(0,0,0,0.5),
+                0 25px 50px -12px rgba(0,0,0,0.8),
+                0 0 100px -20px rgba(255, 236, 210, 0.1);
         }
 
         .card-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 2rem 2.5rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 2rem;
         }
 
-        .card-header h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 0.3rem;
-        }
-
-        .card-header .subtitle {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.5);
+        .header-left h1 {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
             font-weight: 400;
+            letter-spacing: 0.02em;
+            color: var(--color-light);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-left .subtitle {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: var(--color-text-dim);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            text-align: right;
+            max-width: 280px;
+        }
+
+        .header-right .epigraph {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--color-text-dim);
+            line-height: 1.6;
+        }
+
+        .header-right .attribution {
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            color: rgba(245, 240, 232, 0.3);
+            margin-top: 0.5rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .card-body {
             position: relative;
             padding: 0;
+            background: var(--color-void);
         }
 
         canvas {
             display: block;
             width: 100%;
-            height: 480px;
-            cursor: pointer;
+            height: 520px;
         }
 
-        /* Detail Panel */
+        /* Detail Panel - cinematic card */
         .detail-panel {
             position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            width: 240px;
-            background: rgba(18, 18, 24, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 1rem;
+            top: 2rem;
+            right: 2rem;
+            width: 260px;
+            background: rgba(14, 14, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--color-border);
+            border-radius: 2px;
+            padding: 1.5rem;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
+            transform: translateY(8px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
+            box-shadow:
+                0 0 0 1px rgba(0,0,0,0.3),
+                0 20px 40px -10px rgba(0,0,0,0.6);
         }
 
         .detail-panel.active {
             opacity: 1;
             visibility: visible;
+            transform: translateY(0);
         }
 
         .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
         }
 
         .panel-title {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.95rem;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
             font-weight: 600;
+            letter-spacing: 0.02em;
         }
 
         .panel-close {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            color: rgba(255,255,255,0.5);
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-dim);
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .panel-close:hover {
-            background: rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.05);
+            color: var(--color-text);
+            border-color: rgba(255,255,255,0.2);
         }
 
         .panel-content {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.8rem;
-            line-height: 1.6;
-            color: rgba(255,255,255,0.65);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--color-text-dim);
         }
 
         .card-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 1.25rem 2.5rem;
+            border-top: 1px solid var(--color-border);
+            background: var(--color-surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .legend {
             display: flex;
-            justify-content: center;
             gap: 2rem;
-            margin-bottom: 0.5rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
+            gap: 0.6rem;
         }
 
-        .legend-dot {
-            width: 10px;
-            height: 10px;
+        .legend-marker {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
         }
 
-        .legend-dot--ai { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.5); }
-        .legend-dot--human { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
-        .legend-dot--unobservable { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.5); }
-
-        .hint {
-            text-align: center;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.35);
+        .legend-marker--ai {
+            background: var(--color-ai);
+            box-shadow: 0 0 12px var(--color-ai-dim);
+        }
+        .legend-marker--human {
+            background: var(--color-human);
+            box-shadow: 0 0 12px var(--color-human-dim);
+        }
+        .legend-marker--unobservable {
+            background: var(--color-unobservable);
+            box-shadow: 0 0 12px var(--color-unobservable-dim);
         }
 
-        @media (max-width: 700px) {
+        .legend-label {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--color-text-dim);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .footer-hint {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: rgba(245, 240, 232, 0.3);
+        }
+
+        @media (max-width: 800px) {
             body { padding: 1rem; }
-            canvas { height: 380px; }
-            .legend { flex-direction: column; align-items: center; gap: 0.5rem; }
-            .detail-panel { width: 200px; right: 1rem; top: 1rem; }
+            .card-header { flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+            .header-right { text-align: left; max-width: 100%; margin-top: 1rem; }
+            canvas { height: 400px; }
+            .card-footer { flex-direction: column; gap: 1rem; }
+            .legend { flex-wrap: wrap; justify-content: center; }
+            .detail-panel { width: 220px; right: 1rem; top: 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="card">
         <header class="card-header">
-            <h1>COMPLEMENTARITY VIEW</h1>
-            <p class="subtitle">What are the model unobservables and how can they be balanced with human capability?</p>
+            <div class="header-left">
+                <h1>The Complementarity View</h1>
+                <p class="subtitle">What AI Cannot See</p>
+            </div>
+            <div class="header-right">
+                <p class="epigraph">"A drunk man searches for his keys under a streetlamp—not because he lost them there, but because that's where the light is."</p>
+                <p class="attribution">— The Streetlight Effect</p>
+            </div>
         </header>
 
         <div class="card-body">
@@ -200,19 +294,19 @@
         <footer class="card-footer">
             <div class="legend">
                 <div class="legend-item">
-                    <span class="legend-dot legend-dot--ai"></span>
-                    <span>AI's Observable Data</span>
+                    <span class="legend-marker legend-marker--ai"></span>
+                    <span class="legend-label">Observable Data</span>
                 </div>
                 <div class="legend-item">
-                    <span class="legend-dot legend-dot--human"></span>
-                    <span>Human Perception</span>
+                    <span class="legend-marker legend-marker--human"></span>
+                    <span class="legend-label">Human Perception</span>
                 </div>
                 <div class="legend-item">
-                    <span class="legend-dot legend-dot--unobservable"></span>
-                    <span>Model Unobservables</span>
+                    <span class="legend-marker legend-marker--unobservable"></span>
+                    <span class="legend-label">Model Unobservables</span>
                 </div>
             </div>
-            <p class="hint">Click on figures or particles to explore</p>
+            <p class="footer-hint">Click to explore</p>
         </footer>
     </div>
 
@@ -225,37 +319,44 @@
         const panelContent = document.getElementById('panelContent');
         const panelClose = document.getElementById('panelClose');
 
-        // Colors
+        // Cinematic color palette
         const colors = {
-            ai: { main: '#3b82f6', light: '#60a5fa', glow: 'rgba(59,130,246,0.5)' },
-            human: { main: '#22c55e', light: '#4ade80', glow: 'rgba(34,197,94,0.5)' },
-            unobservable: { main: '#f59e0b', light: '#fbbf24', glow: 'rgba(245,158,11,0.5)' }
+            void: '#08080c',
+            light: { core: '#fff8f0', mid: '#ffecd2', dim: 'rgba(255, 236, 210, 0.15)' },
+            ai: { main: '#7dd3fc', glow: 'rgba(125, 211, 252, 0.4)' },
+            human: { main: '#a3e635', glow: 'rgba(163, 230, 53, 0.4)' },
+            unobservable: { main: '#fbbf24', glow: 'rgba(251, 191, 36, 0.35)' },
+            text: { main: '#f5f0e8', dim: 'rgba(245, 240, 232, 0.5)' }
         };
 
-        // Content data
+        // Content
         const contentData = {
             ai: {
-                title: 'AI System',
-                content: 'Operates within the bounds of its training data. Can only see what enters the data pipeline. Has scale and speed advantages within the observable zone.'
+                title: 'The AI System',
+                content: 'Confined to the cone of observable data. Powerful within its bounds—pattern recognition at superhuman scale—but fundamentally blind to everything outside the training distribution.',
+                color: colors.ai.main
             },
             human: {
                 title: 'Human Expert',
-                content: 'Accesses both observable data AND tacit, contextual knowledge that never enters any database. Uniquely positioned at the boundary between known and unknown.'
+                content: 'Stands at the boundary between light and shadow. Accesses tacit knowledge, contextual signals, and situational awareness that never enters any database. The irreplaceable bridge.',
+                color: colors.human.main
             },
             observable: {
                 title: 'Observable Data',
-                content: 'Structured information captured in training data. AI excels here with pattern recognition at scale. But this represents only a fraction of relevant knowledge.'
+                content: 'What enters the pipeline. Structured, measurable, scalable. AI\'s domain of excellence. But remember: the streetlight illuminates only where we chose to point it.',
+                color: colors.ai.main
             },
             unobservable: {
-                title: 'Model Unobservables',
-                content: 'Contextual, tacit, situational knowledge. The 90% that shapes expert judgment but never enters any data. Body language, institutional memory, unwritten rules.'
+                title: 'The Unobservables',
+                content: 'The 90% that shapes expert judgment. Body language. Institutional memory. Unwritten rules. The feeling that something is off. Knowledge that exists but was never recorded.',
+                color: colors.unobservable.main
             }
         };
 
         let W, H, dpr;
         let time = 0;
         let particles = [];
-        let currentSelection = null;
+        let dustMotes = [];
 
         // Particle class
         class Particle {
@@ -267,37 +368,35 @@
 
             reset() {
                 if (this.zone === 'light') {
-                    // Light cone zone (left side)
-                    this.x = 0.12 + Math.random() * 0.28;
-                    this.y = 0.15 + Math.random() * 0.55;
+                    this.x = 0.08 + Math.random() * 0.32;
+                    this.y = 0.12 + Math.random() * 0.58;
                 } else {
-                    // Dark zone (right side)
-                    this.x = 0.55 + Math.random() * 0.35;
-                    this.y = 0.15 + Math.random() * 0.55;
+                    this.x = 0.52 + Math.random() * 0.42;
+                    this.y = 0.12 + Math.random() * 0.58;
                 }
-                this.size = 4 + Math.random() * 6;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.size = 3 + Math.random() * 5;
                 this.phase = Math.random() * Math.PI * 2;
-                this.speedX = 0.2 + Math.random() * 0.4;
-                this.speedY = 0.3 + Math.random() * 0.5;
-                this.ampX = 8 + Math.random() * 12;
-                this.ampY = 10 + Math.random() * 15;
-                this.opacity = 0.6 + Math.random() * 0.4;
+                this.speed = 0.15 + Math.random() * 0.25;
+                this.amp = 6 + Math.random() * 10;
+                this.opacity = 0.5 + Math.random() * 0.5;
             }
 
             update(t) {
-                this.offsetX = Math.sin(t * this.speedX + this.phase) * this.ampX;
-                this.offsetY = Math.cos(t * this.speedY + this.phase * 1.3) * this.ampY;
+                this.x = this.baseX + Math.sin(t * this.speed + this.phase) * (this.amp / W) * 0.8;
+                this.y = this.baseY + Math.cos(t * this.speed * 0.7 + this.phase) * (this.amp / H) * 0.8;
             }
 
             draw(ctx, W, H) {
-                const x = this.x * W + this.offsetX;
-                const y = this.y * H + this.offsetY;
+                const x = this.x * W;
+                const y = this.y * H;
                 const color = this.type === 'observable' ? colors.ai : colors.unobservable;
 
-                // Glow
+                // Outer glow
                 ctx.beginPath();
-                ctx.arc(x, y, this.size * 2, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(x, y, 0, x, y, this.size * 2);
+                ctx.arc(x, y, this.size * 3, 0, Math.PI * 2);
+                const grad = ctx.createRadialGradient(x, y, 0, x, y, this.size * 3);
                 grad.addColorStop(0, color.glow);
                 grad.addColorStop(1, 'transparent');
                 ctx.fillStyle = grad;
@@ -313,36 +412,71 @@
             }
 
             hitTest(mx, my, W, H) {
-                const x = this.x * W + this.offsetX;
-                const y = this.y * H + this.offsetY;
-                const dist = Math.sqrt((mx - x) ** 2 + (my - y) ** 2);
-                return dist < this.size + 10;
+                const x = this.x * W;
+                const y = this.y * H;
+                return Math.hypot(mx - x, my - y) < this.size + 15;
             }
         }
 
-        // Figure class
+        // Dust mote for atmosphere
+        class DustMote {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random();
+                this.y = Math.random() * 0.75;
+                this.size = 0.5 + Math.random() * 1.5;
+                this.speed = 0.0002 + Math.random() * 0.0003;
+                this.drift = (Math.random() - 0.5) * 0.0001;
+                this.opacity = 0.1 + Math.random() * 0.3;
+                this.phase = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                this.y -= this.speed;
+                this.x += this.drift + Math.sin(time * 0.5 + this.phase) * 0.00005;
+                if (this.y < 0 || this.x < 0 || this.x > 1) this.reset();
+            }
+
+            draw(ctx, W, H) {
+                const x = this.x * W;
+                const y = this.y * H;
+
+                // Only visible in light cone area
+                const inLight = this.x < 0.45 && this.y > 0.05;
+                if (!inLight) return;
+
+                ctx.beginPath();
+                ctx.arc(x, y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 248, 240, ${this.opacity * 0.5})`;
+                ctx.fill();
+            }
+        }
+
+        // Figure
         class Figure {
-            constructor(type, xPercent) {
+            constructor(type, xPct) {
                 this.type = type;
-                this.xPercent = xPercent;
+                this.xPct = xPct;
                 this.color = type === 'ai' ? colors.ai : colors.human;
             }
 
             draw(ctx, W, H, groundY) {
-                const x = this.xPercent * W;
-                const headRadius = 18;
-                const bodyWidth = 32;
-                const bodyHeight = 40;
+                const x = this.xPct * W;
+                const headR = W * 0.022;
+                const bodyW = W * 0.038;
+                const bodyH = W * 0.05;
 
-                // Position from ground
-                const footY = groundY - 10;
-                const bodyY = footY - bodyHeight;
-                const headY = bodyY - headRadius - 2;
+                const footY = groundY - W * 0.015;
+                const bodyY = footY - bodyH;
+                const headY = bodyY - headR * 0.8;
 
-                // Glow
+                // Ambient glow
                 ctx.beginPath();
-                ctx.arc(x, headY, headRadius * 2.5, 0, Math.PI * 2);
-                const glowGrad = ctx.createRadialGradient(x, headY, 0, x, headY, headRadius * 2.5);
+                ctx.arc(x, headY, headR * 4, 0, Math.PI * 2);
+                const glowGrad = ctx.createRadialGradient(x, headY, 0, x, headY, headR * 4);
                 glowGrad.addColorStop(0, this.color.glow);
                 glowGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = glowGrad;
@@ -350,39 +484,35 @@
 
                 // Body
                 ctx.beginPath();
-                ctx.roundRect(x - bodyWidth/2, bodyY, bodyWidth, bodyHeight, 6);
+                ctx.roundRect(x - bodyW/2, bodyY, bodyW, bodyH, 4);
                 ctx.fillStyle = this.color.main;
+                ctx.globalAlpha = 0.9;
                 ctx.fill();
+                ctx.globalAlpha = 1;
 
                 // Head
                 ctx.beginPath();
-                ctx.arc(x, headY, headRadius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color.light;
+                ctx.arc(x, headY, headR, 0, Math.PI * 2);
+                ctx.fillStyle = this.color.main;
                 ctx.fill();
 
                 // Label
-                ctx.font = '600 13px "DM Sans", sans-serif';
+                ctx.font = `500 ${W * 0.012}px 'Libre Franklin', sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.fillStyle = this.color.main;
-                ctx.fillText(this.type === 'ai' ? 'AI' : 'Human', x, footY + 18);
+                ctx.fillText(this.type === 'ai' ? 'AI' : 'HUMAN', x, footY + W * 0.025);
 
-                // Store bounds for hit testing
-                this.bounds = {
-                    x: x - bodyWidth/2 - 10,
-                    y: headY - headRadius - 10,
-                    width: bodyWidth + 20,
-                    height: (footY - headY + headRadius) + 20
-                };
+                this.bounds = { x: x - bodyW, y: headY - headR * 2, w: bodyW * 2, h: footY - headY + headR * 2 + W * 0.03 };
             }
 
             hitTest(mx, my) {
                 if (!this.bounds) return false;
-                return mx >= this.bounds.x && mx <= this.bounds.x + this.bounds.width &&
-                       my >= this.bounds.y && my <= this.bounds.y + this.bounds.height;
+                return mx > this.bounds.x && mx < this.bounds.x + this.bounds.w &&
+                       my > this.bounds.y && my < this.bounds.y + this.bounds.h;
             }
         }
 
-        const aiFigure = new Figure('ai', 0.22);
+        const aiFigure = new Figure('ai', 0.20);
         const humanFigure = new Figure('human', 0.42);
 
         function resize() {
@@ -395,126 +525,134 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        function initParticles() {
+        function init() {
             particles = [];
-            // Observable particles (blue, in light)
-            for (let i = 0; i < 12; i++) {
-                particles.push(new Particle('observable', 'light'));
-            }
-            // Unobservable particles (orange, in dark)
-            for (let i = 0; i < 16; i++) {
-                particles.push(new Particle('unobservable', 'dark'));
-            }
+            dustMotes = [];
+
+            for (let i = 0; i < 10; i++) particles.push(new Particle('observable', 'light'));
+            for (let i = 0; i < 14; i++) particles.push(new Particle('unobservable', 'dark'));
+            for (let i = 0; i < 60; i++) dustMotes.push(new DustMote());
         }
 
         function drawLightCone(ctx, W, H) {
-            const sourceX = W * 0.27;
-            const sourceY = 20;
-            const groundY = H - 70;
+            const sourceX = W * 0.24;
+            const sourceY = H * 0.02;
+            const groundY = H * 0.82;
+            const coneLeft = W * 0.02;
+            const coneRight = W * 0.46;
 
-            // Light cone beam
+            // Volumetric light cone
             ctx.beginPath();
             ctx.moveTo(sourceX, sourceY);
-            ctx.lineTo(W * 0.05, groundY);
-            ctx.lineTo(W * 0.48, groundY);
+            ctx.lineTo(coneLeft, groundY);
+            ctx.lineTo(coneRight, groundY);
             ctx.closePath();
 
             const coneGrad = ctx.createLinearGradient(sourceX, sourceY, sourceX, groundY);
-            coneGrad.addColorStop(0, 'rgba(255,255,255,0.12)');
-            coneGrad.addColorStop(0.5, 'rgba(255,255,255,0.06)');
-            coneGrad.addColorStop(1, 'rgba(255,255,255,0.02)');
+            coneGrad.addColorStop(0, 'rgba(255, 248, 240, 0.18)');
+            coneGrad.addColorStop(0.3, 'rgba(255, 236, 210, 0.08)');
+            coneGrad.addColorStop(0.7, 'rgba(255, 236, 210, 0.03)');
+            coneGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = coneGrad;
             ctx.fill();
 
-            // Light source glow
+            // Edge highlights
             ctx.beginPath();
-            ctx.arc(sourceX, sourceY, 30, 0, Math.PI * 2);
-            const sourceGlow = ctx.createRadialGradient(sourceX, sourceY, 0, sourceX, sourceY, 30);
-            sourceGlow.addColorStop(0, 'rgba(255,255,255,0.8)');
-            sourceGlow.addColorStop(0.3, 'rgba(255,255,255,0.3)');
-            sourceGlow.addColorStop(1, 'transparent');
-            ctx.fillStyle = sourceGlow;
-            ctx.fill();
+            ctx.moveTo(sourceX, sourceY);
+            ctx.lineTo(coneLeft, groundY);
+            ctx.strokeStyle = 'rgba(255, 248, 240, 0.06)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
 
-            // Light source point
             ctx.beginPath();
-            ctx.arc(sourceX, sourceY, 6, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255,255,255,0.95)';
-            ctx.fill();
+            ctx.moveTo(sourceX, sourceY);
+            ctx.lineTo(coneRight, groundY);
+            ctx.stroke();
 
-            // Label
-            ctx.font = '600 11px "Space Grotesk", sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            // Light source bloom
+            for (let i = 3; i >= 0; i--) {
+                ctx.beginPath();
+                ctx.arc(sourceX, sourceY, 8 + i * 12, 0, Math.PI * 2);
+                const bloomGrad = ctx.createRadialGradient(sourceX, sourceY, 0, sourceX, sourceY, 8 + i * 12);
+                bloomGrad.addColorStop(0, i === 0 ? colors.light.core : 'transparent');
+                bloomGrad.addColorStop(0.3, `rgba(255, 248, 240, ${0.4 - i * 0.1})`);
+                bloomGrad.addColorStop(1, 'transparent');
+                ctx.fillStyle = bloomGrad;
+                ctx.fill();
+            }
+
+            // Zone labels
+            ctx.font = `600 ${W * 0.011}px 'Libre Franklin', sans-serif`;
+            ctx.letterSpacing = '0.15em';
+            ctx.fillStyle = 'rgba(255, 248, 240, 0.4)';
             ctx.textAlign = 'center';
-            ctx.fillText("AI'S OBSERVABLE ZONE", sourceX, sourceY + 50);
-        }
+            ctx.fillText('OBSERVABLE ZONE', sourceX, sourceY + H * 0.12);
 
-        function drawDarkZone(ctx, W, H) {
-            const groundY = H - 70;
-
-            // Dark zone label
-            ctx.font = '600 11px "Space Grotesk", sans-serif';
             ctx.fillStyle = colors.unobservable.main;
-            ctx.textAlign = 'center';
-            ctx.fillText('UNOBSERVABLES', W * 0.75, groundY / 2);
+            ctx.globalAlpha = 0.7;
+            ctx.fillText('UNOBSERVABLES', W * 0.74, H * 0.45);
+            ctx.globalAlpha = 1;
+
+            return groundY;
         }
 
-        function drawGround(ctx, W, H) {
-            const groundY = H - 70;
-
-            // Ground gradient
-            const groundGrad = ctx.createLinearGradient(0, groundY, 0, H);
-            groundGrad.addColorStop(0, '#1a1a2e');
-            groundGrad.addColorStop(1, '#0f0f14');
-            ctx.fillStyle = groundGrad;
+        function drawGround(ctx, W, H, groundY) {
+            const grad = ctx.createLinearGradient(0, groundY, 0, H);
+            grad.addColorStop(0, '#12121a');
+            grad.addColorStop(1, colors.void);
+            ctx.fillStyle = grad;
             ctx.fillRect(0, groundY, W, H - groundY);
 
             // Ground line
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(W, groundY);
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.strokeStyle = 'rgba(255, 236, 210, 0.08)';
             ctx.lineWidth = 1;
             ctx.stroke();
-
-            return groundY;
         }
 
         function drawInsight(ctx, W, H, groundY) {
             const text = 'Humans access information the model never had';
-            ctx.font = 'italic 13px "DM Sans", sans-serif';
-            const metrics = ctx.measureText(text);
-            const padding = 16;
-            const pillWidth = metrics.width + padding * 2;
-            const pillHeight = 28;
-            const x = W / 2 - pillWidth / 2;
-            const y = groundY + 20;
+            ctx.font = `italic ${W * 0.014}px 'Cormorant Garamond', serif`;
 
-            // Pill background
+            const metrics = ctx.measureText(text);
+            const padX = W * 0.025;
+            const padY = H * 0.015;
+            const pillW = metrics.width + padX * 2;
+            const pillH = H * 0.045;
+            const x = W * 0.5 - pillW / 2;
+            const y = groundY + H * 0.05;
+
             ctx.beginPath();
-            ctx.roundRect(x, y, pillWidth, pillHeight, pillHeight / 2);
-            ctx.fillStyle = 'rgba(10,10,20,0.9)';
+            ctx.roundRect(x, y, pillW, pillH, pillH / 2);
+            ctx.fillStyle = 'rgba(8, 8, 12, 0.9)';
             ctx.fill();
-            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.strokeStyle = 'rgba(255, 236, 210, 0.1)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Text
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.fillStyle = colors.text.dim;
             ctx.textAlign = 'center';
-            ctx.fillText(text, W / 2, y + pillHeight / 2 + 4);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, W * 0.5, y + pillH / 2);
         }
 
         function draw() {
             time += 0.016;
-            ctx.fillStyle = '#0f0f14';
+
+            // Clear with void color
+            ctx.fillStyle = colors.void;
             ctx.fillRect(0, 0, W, H);
 
-            // Draw light cone
-            drawLightCone(ctx, W, H);
+            // Draw light cone first
+            const groundY = drawLightCone(ctx, W, H);
 
-            // Draw dark zone label
-            drawDarkZone(ctx, W, H);
+            // Update and draw dust motes (atmosphere)
+            dustMotes.forEach(d => {
+                d.update();
+                d.draw(ctx, W, H);
+            });
 
             // Update and draw particles
             particles.forEach(p => {
@@ -523,7 +661,7 @@
             });
 
             // Draw ground
-            const groundY = drawGround(ctx, W, H);
+            drawGround(ctx, W, H, groundY);
 
             // Draw figures
             aiFigure.draw(ctx, W, H, groundY);
@@ -540,18 +678,13 @@
             if (!data) return;
 
             panelTitle.textContent = data.title;
-            panelTitle.style.color = type === 'ai' ? colors.ai.main :
-                                     type === 'human' ? colors.human.main :
-                                     type === 'observable' ? colors.ai.main :
-                                     colors.unobservable.main;
+            panelTitle.style.color = data.color;
             panelContent.textContent = data.content;
             detailPanel.classList.add('active');
-            currentSelection = type;
         }
 
         function hidePanel() {
             detailPanel.classList.remove('active');
-            currentSelection = null;
         }
 
         canvas.addEventListener('click', (e) => {
@@ -559,17 +692,9 @@
             const mx = e.clientX - rect.left;
             const my = e.clientY - rect.top;
 
-            // Check figures
-            if (aiFigure.hitTest(mx, my)) {
-                showPanel('ai');
-                return;
-            }
-            if (humanFigure.hitTest(mx, my)) {
-                showPanel('human');
-                return;
-            }
+            if (aiFigure.hitTest(mx, my)) { showPanel('ai'); return; }
+            if (humanFigure.hitTest(mx, my)) { showPanel('human'); return; }
 
-            // Check particles
             for (const p of particles) {
                 if (p.hitTest(mx, my, W, H)) {
                     showPanel(p.type);
@@ -583,14 +708,10 @@
             const mx = e.clientX - rect.left;
             const my = e.clientY - rect.top;
 
-            let hovering = false;
-            if (aiFigure.hitTest(mx, my) || humanFigure.hitTest(mx, my)) {
-                hovering = true;
-            }
-            for (const p of particles) {
-                if (p.hitTest(mx, my, W, H)) {
-                    hovering = true;
-                    break;
+            let hovering = aiFigure.hitTest(mx, my) || humanFigure.hitTest(mx, my);
+            if (!hovering) {
+                for (const p of particles) {
+                    if (p.hitTest(mx, my, W, H)) { hovering = true; break; }
                 }
             }
             canvas.style.cursor = hovering ? 'pointer' : 'default';
@@ -598,13 +719,10 @@
 
         panelClose.addEventListener('click', hidePanel);
 
-        // Initialize
         resize();
-        initParticles();
+        init();
         draw();
-        window.addEventListener('resize', () => {
-            resize();
-        });
+        window.addEventListener('resize', () => { resize(); });
     })();
     </script>
 </body>

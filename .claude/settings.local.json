@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(/Users/idstuart/.claude/local/claude:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
