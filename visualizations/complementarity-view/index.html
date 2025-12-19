@@ -1,660 +1,345 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="system">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Complementarity View</title>
+    <title>The Complementarity View | What AI Cannot See</title>
 
-    <!-- Google Fonts -->
+    <!-- Fonts: Playfair Display (titles) + Source Sans Pro (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Design System -->
-    <link rel="stylesheet" href="../../shared/design-system.css">
+    <!-- Three.js -->
+    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
 
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        /* ========================================
-           Page Layout
-           ======================================== */
+        :root {
+            /* Colors */
+            --color-bg: #08080c;
+            --color-light: #fef9e7;
+            --color-light-warm: #fbbf24;
+            --color-ai: #22d3ee;
+            --color-ai-dim: rgba(34, 211, 238, 0.3);
+            --color-human: #34d399;
+            --color-human-dim: rgba(52, 211, 153, 0.2);
+            --color-unobservable: #f59e0b;
+            --color-text: #f5f5f4;
+            --color-text-muted: rgba(245, 245, 244, 0.6);
+            --color-text-dim: rgba(245, 245, 244, 0.35);
+
+            /* Typography */
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         html, body {
             height: 100%;
-            width: 100%;
+            overflow: hidden;
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-body);
         }
 
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: var(--space-8);
-        }
-
-        /* ========================================
-           Card Customizations
-           ======================================== */
-        .viz-card {
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        /* ========================================
-           Header Layout
-           ======================================== */
+        /* Header */
         .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            gap: var(--space-8);
+            align-items: flex-start;
+            padding: 1.5rem 2rem;
+            pointer-events: none;
         }
 
-        .header-title {
-            margin-bottom: var(--space-2);
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
         }
 
-        .header-quote {
-            max-width: 280px;
+        .header .subtitle {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .quote {
             text-align: right;
-        }
-
-        .header-quote blockquote {
-            margin-bottom: var(--space-2);
-        }
-
-        /* ========================================
-           Canvas Area
-           ======================================== */
-        #canvas {
-            height: 500px;
-        }
-
-        /* ========================================
-           Info Panel
-           ======================================== */
-        .info-panel {
-            position: absolute;
-            top: var(--space-6);
-            right: var(--space-6);
-            width: 260px;
-            padding: var(--space-5);
+            max-width: 300px;
             opacity: 0;
-            visibility: hidden;
-            transform: translateY(8px);
-            transition: all var(--duration-200) var(--ease-out);
+            transition: opacity 1s ease;
         }
 
-        .info-panel.visible {
+        .quote.visible { opacity: 1; }
+
+        .quote p {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            line-height: 1.5;
+        }
+
+        .quote cite {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-style: normal;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* Main Canvas */
+        .viz-container {
+            position: fixed;
+            inset: 0;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Figure Labels (AI, Human) */
+        .figure-label {
+            position: fixed;
+            z-index: 50;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        /* Unobservable Labels */
+        .unobservable-label {
+            position: fixed;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .unobservable-label.hovered {
             opacity: 1;
-            visibility: visible;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .unobservable-label .symbol {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--color-unobservable);
+            text-shadow: 0 0 15px var(--color-unobservable);
+        }
+
+        .unobservable-label .title {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-unobservable);
+            white-space: nowrap;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            z-index: 200;
+            max-width: 280px;
+            padding: 1rem 1.25rem;
+            background: rgba(8, 8, 12, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
             transform: translateY(0);
         }
 
-        /* ========================================
-           Footer Layout
-           ======================================== */
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-hint {
+        .tooltip__title {
             font-family: var(--font-display);
-            font-size: var(--text-sm);
-            font-style: italic;
-            color: var(--foreground-subtle);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--color-unobservable);
+            margin-bottom: 0.5rem;
         }
 
-        /* ========================================
-           Responsive Adjustments
-           ======================================== */
-        @media (max-width: 800px) {
-            body {
-                padding: var(--space-4);
-            }
+        .tooltip__text {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 300;
+            line-height: 1.6;
+            color: var(--color-text-muted);
+        }
 
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--space-4);
-            }
+        /* Legend */
+        .legend {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(8, 8, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
 
-            .header-quote {
-                text-align: left;
-                max-width: 100%;
-            }
+        .legend.visible { opacity: 1; }
 
-            #canvas {
-                height: 400px;
-            }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--color-text-muted);
+        }
 
-            .footer {
-                flex-direction: column;
-                gap: var(--space-4);
-            }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
 
-            .legend {
-                justify-content: center;
-            }
+        .legend-dot--ai {
+            background: var(--color-ai);
+            box-shadow: 0 0 8px var(--color-ai);
+        }
 
-            .info-panel {
-                width: 220px;
-                right: var(--space-4);
-                top: var(--space-4);
-            }
+        .legend-dot--human {
+            background: var(--color-human);
+            box-shadow: 0 0 8px var(--color-human);
+        }
+
+        .legend-dot--unobservable {
+            background: var(--color-unobservable);
+            box-shadow: 0 0 8px var(--color-unobservable);
+        }
+
+        /* Footer Quote */
+        .footer-quote {
+            position: fixed;
+            bottom: 5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--color-text-dim);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .footer-quote.visible { opacity: 1; }
+
+        /* Scene explanation labels */
+        .scene-label {
+            position: fixed;
+            z-index: 80;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            pointer-events: none;
+        }
+
+        .scene-label--light {
+            bottom: 30%;
+            left: 20%;
+            color: rgba(251, 191, 36, 0.5);
+        }
+
+        .scene-label--dark {
+            bottom: 30%;
+            right: 15%;
+            color: rgba(245, 158, 11, 0.4);
         }
     </style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <div class="theme-toggle">
-        <button class="theme-toggle-btn" data-theme="light" aria-label="Light theme">
-            <i class="ph ph-sun"></i>
-        </button>
-        <button class="theme-toggle-btn active" data-theme="system" aria-label="System theme">
-            <i class="ph ph-monitor"></i>
-        </button>
-        <button class="theme-toggle-btn" data-theme="dark" aria-label="Dark theme">
-            <i class="ph ph-moon"></i>
-        </button>
+    <header class="header">
+        <div class="title-group">
+            <h1>The Complementarity View</h1>
+            <p class="subtitle">What AI cannot observe</p>
+        </div>
+        <blockquote class="quote" id="quote">
+            <p>"Humans access information the model never had"</p>
+            <cite>Ken Holstein</cite>
+        </blockquote>
+    </header>
+
+    <div class="viz-container" id="vizContainer">
+        <canvas id="canvas"></canvas>
     </div>
 
-    <!-- Main Visualization Card -->
-    <article class="card viz-card">
-        <header class="card-header header">
-            <div>
-                <h1 class="header-title">The Complementarity View</h1>
-                <p class="overline">What AI Cannot See</p>
-            </div>
-            <div class="header-quote">
-                <blockquote>"A drunk searches for his keys under a streetlamp—not because he lost them there, but because that's where the light is."</blockquote>
-                <cite>— The Streetlight Effect</cite>
-            </div>
-        </header>
+    <!-- Scene labels -->
+    <div class="scene-label scene-label--light">Observable Data</div>
+    <div class="scene-label scene-label--dark">The Unobservable</div>
 
-        <div class="card-body canvas-container">
-            <canvas id="canvas"></canvas>
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip__title" id="tooltipTitle"></div>
+        <div class="tooltip__text" id="tooltipText"></div>
+    </div>
 
-            <aside class="panel info-panel" id="panel">
-                <div class="panel-header">
-                    <h2 class="panel-title" id="panelTitle">Title</h2>
-                    <button class="panel-close" id="panelClose">✕</button>
-                </div>
-                <p class="panel-content" id="panelContent"></p>
-            </aside>
+    <div class="legend" id="legend">
+        <div class="legend-item">
+            <span class="legend-dot legend-dot--ai"></span>
+            <span>AI's Observable Data</span>
         </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot--human"></span>
+            <span>Human Perception</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot--unobservable"></span>
+            <span>Unobservables</span>
+        </div>
+    </div>
 
-        <footer class="card-footer footer">
-            <ul class="legend">
-                <li class="legend-item">
-                    <span class="legend-dot legend-dot--primary"></span>
-                    <span class="legend-label">Observable Data</span>
-                </li>
-                <li class="legend-item">
-                    <span class="legend-dot legend-dot--secondary"></span>
-                    <span class="legend-label">Human Perception</span>
-                </li>
-                <li class="legend-item">
-                    <span class="legend-dot legend-dot--tertiary"></span>
-                    <span class="legend-label">Model Unobservables</span>
-                </li>
-            </ul>
-            <p class="footer-hint">Click elements to explore</p>
-        </footer>
-    </article>
+    <div class="footer-quote" id="footerQuote">
+        Humans access information the model never had
+    </div>
 
-    <script>
-    (function() {
-        'use strict';
-
-        // ========================================
-        // Theme Management
-        // ========================================
-        const Theme = {
-            init() {
-                const saved = localStorage.getItem('theme') || 'system';
-                this.set(saved);
-
-                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-                    btn.addEventListener('click', () => this.set(btn.dataset.theme));
-                });
-
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                    if (document.documentElement.dataset.theme === 'system') {
-                        Colors.update();
-                    }
-                });
-            },
-
-            set(theme) {
-                document.documentElement.dataset.theme = theme;
-                localStorage.setItem('theme', theme);
-
-                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.theme === theme);
-                });
-
-                Colors.update();
-            }
-        };
-
-        // ========================================
-        // Dynamic Colors from CSS Variables
-        // ========================================
-        const Colors = {
-            cache: {},
-
-            update() {
-                // Small delay to let CSS variables settle after theme change
-                requestAnimationFrame(() => {
-                    const s = getComputedStyle(document.documentElement);
-                    this.cache = {
-                        background: s.getPropertyValue('--background').trim(),
-                        backgroundElevated: s.getPropertyValue('--background-elevated').trim(),
-                        foreground: s.getPropertyValue('--foreground').trim(),
-                        foregroundMuted: s.getPropertyValue('--foreground-muted').trim(),
-                        foregroundSubtle: s.getPropertyValue('--foreground-subtle').trim(),
-                        accentAi: s.getPropertyValue('--accent-ai').trim(),
-                        accentAiGlow: s.getPropertyValue('--accent-ai-glow').trim(),
-                        accentHuman: s.getPropertyValue('--accent-human').trim(),
-                        accentHumanGlow: s.getPropertyValue('--accent-human-glow').trim(),
-                        accentUnobservable: s.getPropertyValue('--accent-unobservable').trim(),
-                        accentUnobservableGlow: s.getPropertyValue('--accent-unobservable-glow').trim(),
-                        canvasBg: s.getPropertyValue('--canvas-bg').trim(),
-                        coneStart: s.getPropertyValue('--canvas-cone-start').trim(),
-                        coneMid: s.getPropertyValue('--canvas-cone-mid').trim(),
-                        coneEnd: s.getPropertyValue('--canvas-cone-end').trim(),
-                        groundTop: s.getPropertyValue('--canvas-ground-top').trim(),
-                        groundBottom: s.getPropertyValue('--canvas-ground-bottom').trim()
-                    };
-
-                    // Update figure colors
-                    if (window.aiFigure) {
-                        window.aiFigure.color = { main: this.cache.accentAi, glow: this.cache.accentAiGlow };
-                    }
-                    if (window.humanFigure) {
-                        window.humanFigure.color = { main: this.cache.accentHuman, glow: this.cache.accentHumanGlow };
-                    }
-                });
-            },
-
-            get(key) {
-                return this.cache[key] || '#fff';
-            },
-
-            isDark() {
-                const bg = this.cache.background || '';
-                return bg.includes('0f0e0d') || bg.includes('#0f0e0d');
-            }
-        };
-
-        // ========================================
-        // Canvas Setup
-        // ========================================
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let W, H, dpr;
-
-        function resize() {
-            const rect = canvas.getBoundingClientRect();
-            dpr = window.devicePixelRatio || 1;
-            W = rect.width;
-            H = rect.height;
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
-
-        // ========================================
-        // Particle System
-        // ========================================
-        class Particle {
-            constructor(type, zone) {
-                this.type = type;
-                this.zone = zone;
-                this.init();
-            }
-
-            init() {
-                if (this.zone === 'light') {
-                    this.x = 0.08 + Math.random() * 0.30;
-                    this.y = 0.12 + Math.random() * 0.55;
-                } else {
-                    this.x = 0.54 + Math.random() * 0.38;
-                    this.y = 0.12 + Math.random() * 0.55;
-                }
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.size = 3 + Math.random() * 5;
-                this.phase = Math.random() * Math.PI * 2;
-                this.speed = 0.12 + Math.random() * 0.2;
-                this.amp = 5 + Math.random() * 8;
-                this.opacity = 0.5 + Math.random() * 0.5;
-            }
-
-            update(t) {
-                this.x = this.baseX + Math.sin(t * this.speed + this.phase) * (this.amp / W);
-                this.y = this.baseY + Math.cos(t * this.speed * 0.8 + this.phase) * (this.amp / H);
-            }
-
-            draw() {
-                const x = this.x * W;
-                const y = this.y * H;
-                const isObs = this.type === 'observable';
-                const color = isObs ? Colors.get('accentAi') : Colors.get('accentUnobservable');
-                const glow = isObs ? Colors.get('accentAiGlow') : Colors.get('accentUnobservableGlow');
-
-                // Glow
-                ctx.beginPath();
-                ctx.arc(x, y, this.size * 2.5, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(x, y, 0, x, y, this.size * 2.5);
-                grad.addColorStop(0, glow);
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.fill();
-
-                // Core
-                ctx.beginPath();
-                ctx.arc(x, y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.globalAlpha = this.opacity;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-
-            hitTest(mx, my) {
-                const x = this.x * W;
-                const y = this.y * H;
-                return Math.hypot(mx - x, my - y) < this.size + 12;
-            }
-        }
-
-        // ========================================
-        // Figure Class
-        // ========================================
-        class Figure {
-            constructor(type, xPct) {
-                this.type = type;
-                this.xPct = xPct;
-                this.color = type === 'ai'
-                    ? { main: Colors.get('accentAi'), glow: Colors.get('accentAiGlow') }
-                    : { main: Colors.get('accentHuman'), glow: Colors.get('accentHumanGlow') };
-                this.bounds = null;
-            }
-
-            draw(groundY) {
-                const x = this.xPct * W;
-                const headR = W * 0.02;
-                const bodyW = W * 0.034;
-                const bodyH = W * 0.045;
-                const footY = groundY - W * 0.012;
-                const bodyY = footY - bodyH;
-                const headY = bodyY - headR * 0.6;
-
-                // Glow
-                ctx.beginPath();
-                ctx.arc(x, headY, headR * 3.5, 0, Math.PI * 2);
-                const grad = ctx.createRadialGradient(x, headY, 0, x, headY, headR * 3.5);
-                grad.addColorStop(0, this.color.glow);
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.fill();
-
-                // Body
-                ctx.beginPath();
-                ctx.roundRect(x - bodyW / 2, bodyY, bodyW, bodyH, 4);
-                ctx.fillStyle = this.color.main;
-                ctx.fill();
-
-                // Head
-                ctx.beginPath();
-                ctx.arc(x, headY, headR, 0, Math.PI * 2);
-                ctx.fillStyle = this.color.main;
-                ctx.fill();
-
-                // Label
-                ctx.font = `500 ${W * 0.011}px 'Outfit', sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.fillStyle = this.color.main;
-                ctx.fillText(this.type === 'ai' ? 'AI' : 'HUMAN', x, footY + W * 0.022);
-
-                this.bounds = {
-                    x: x - bodyW,
-                    y: headY - headR * 1.5,
-                    w: bodyW * 2,
-                    h: footY - headY + headR * 1.5 + W * 0.025
-                };
-            }
-
-            hitTest(mx, my) {
-                if (!this.bounds) return false;
-                const b = this.bounds;
-                return mx > b.x && mx < b.x + b.w && my > b.y && my < b.y + b.h;
-            }
-        }
-
-        // ========================================
-        // Drawing Functions
-        // ========================================
-        function drawLightCone() {
-            const srcX = W * 0.24;
-            const srcY = H * 0.02;
-            const groundY = H * 0.82;
-            const leftX = W * 0.02;
-            const rightX = W * 0.46;
-
-            // Cone fill
-            ctx.beginPath();
-            ctx.moveTo(srcX, srcY);
-            ctx.lineTo(leftX, groundY);
-            ctx.lineTo(rightX, groundY);
-            ctx.closePath();
-
-            const grad = ctx.createLinearGradient(srcX, srcY, srcX, groundY);
-            grad.addColorStop(0, Colors.get('coneStart'));
-            grad.addColorStop(0.4, Colors.get('coneMid'));
-            grad.addColorStop(1, Colors.get('coneEnd'));
-            ctx.fillStyle = grad;
-            ctx.fill();
-
-            // Light source bloom
-            for (let i = 3; i >= 0; i--) {
-                ctx.beginPath();
-                ctx.arc(srcX, srcY, 6 + i * 10, 0, Math.PI * 2);
-                const bloom = ctx.createRadialGradient(srcX, srcY, 0, srcX, srcY, 6 + i * 10);
-                const isDark = Colors.isDark();
-                bloom.addColorStop(0, i === 0 ? (isDark ? '#fef3c7' : '#fbbf24') : 'transparent');
-                bloom.addColorStop(0.4, isDark ? `rgba(254,243,199,${0.4 - i * 0.1})` : `rgba(251,191,36,${0.5 - i * 0.12})`);
-                bloom.addColorStop(1, 'transparent');
-                ctx.fillStyle = bloom;
-                ctx.fill();
-            }
-
-            // Zone labels
-            ctx.font = `600 ${W * 0.01}px 'Outfit', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.fillStyle = Colors.get('foregroundMuted');
-            ctx.fillText('OBSERVABLE ZONE', srcX, srcY + H * 0.11);
-
-            ctx.fillStyle = Colors.get('accentUnobservable');
-            ctx.globalAlpha = 0.85;
-            ctx.fillText('UNOBSERVABLES', W * 0.74, H * 0.45);
-            ctx.globalAlpha = 1;
-
-            return groundY;
-        }
-
-        function drawGround(groundY) {
-            const grad = ctx.createLinearGradient(0, groundY, 0, H);
-            grad.addColorStop(0, Colors.get('groundTop'));
-            grad.addColorStop(1, Colors.get('groundBottom'));
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, groundY, W, H - groundY);
-
-            ctx.beginPath();
-            ctx.moveTo(0, groundY);
-            ctx.lineTo(W, groundY);
-            ctx.strokeStyle = Colors.isDark() ? 'rgba(240,237,232,0.06)' : 'rgba(0,0,0,0.08)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
-
-        function drawInsight(groundY) {
-            const text = 'Humans access information the model never had';
-            ctx.font = `italic ${W * 0.013}px 'Cormorant Garamond', serif`;
-            const metrics = ctx.measureText(text);
-            const padX = W * 0.022;
-            const pillW = metrics.width + padX * 2;
-            const pillH = H * 0.042;
-            const x = W * 0.5 - pillW / 2;
-            const y = groundY + H * 0.048;
-
-            ctx.beginPath();
-            ctx.roundRect(x, y, pillW, pillH, pillH / 2);
-            ctx.fillStyle = Colors.isDark() ? 'rgba(15,14,13,0.9)' : 'rgba(255,255,255,0.9)';
-            ctx.fill();
-            ctx.strokeStyle = Colors.isDark() ? 'rgba(240,237,232,0.08)' : 'rgba(0,0,0,0.08)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            ctx.fillStyle = Colors.get('foregroundMuted');
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, W * 0.5, y + pillH / 2);
-            ctx.textBaseline = 'alphabetic';
-        }
-
-        // ========================================
-        // Panel Management
-        // ========================================
-        const panelData = {
-            ai: {
-                title: 'The AI System',
-                text: 'Confined to the cone of observable data. Powerful within its bounds—pattern recognition at superhuman scale—but fundamentally blind to everything outside the training distribution.',
-                colorVar: '--accent-ai'
-            },
-            human: {
-                title: 'Human Expert',
-                text: 'Stands at the boundary between light and shadow. Accesses tacit knowledge, contextual signals, and situational awareness that never enters any database.',
-                colorVar: '--accent-human'
-            },
-            observable: {
-                title: 'Observable Data',
-                text: 'What enters the pipeline. Structured, measurable, scalable. AI\'s domain of excellence. But remember: the streetlight illuminates only where we chose to point it.',
-                colorVar: '--accent-ai'
-            },
-            unobservable: {
-                title: 'The Unobservables',
-                text: 'The 90% that shapes expert judgment. Body language. Institutional memory. Unwritten rules. The feeling that something is off.',
-                colorVar: '--accent-unobservable'
-            }
-        };
-
-        const panel = document.getElementById('panel');
-        const panelTitle = document.getElementById('panelTitle');
-        const panelContent = document.getElementById('panelContent');
-        const panelClose = document.getElementById('panelClose');
-
-        function showPanel(key) {
-            const data = panelData[key];
-            if (!data) return;
-            panelTitle.textContent = data.title;
-            panelTitle.style.color = `var(${data.colorVar})`;
-            panelContent.textContent = data.text;
-            panel.classList.add('visible');
-        }
-
-        function hidePanel() {
-            panel.classList.remove('visible');
-        }
-
-        panelClose.addEventListener('click', hidePanel);
-
-        // ========================================
-        // Initialize
-        // ========================================
-        const particles = [];
-        window.aiFigure = new Figure('ai', 0.20);
-        window.humanFigure = new Figure('human', 0.42);
-        let time = 0;
-
-        function init() {
-            particles.length = 0;
-            for (let i = 0; i < 10; i++) particles.push(new Particle('observable', 'light'));
-            for (let i = 0; i < 14; i++) particles.push(new Particle('unobservable', 'dark'));
-        }
-
-        // ========================================
-        // Render Loop
-        // ========================================
-        function draw() {
-            time += 0.016;
-
-            // Clear with canvas background
-            ctx.fillStyle = Colors.get('canvasBg');
-            ctx.fillRect(0, 0, W, H);
-
-            const groundY = drawLightCone();
-
-            particles.forEach(p => {
-                p.update(time);
-                p.draw();
-            });
-
-            drawGround(groundY);
-            window.aiFigure.draw(groundY);
-            window.humanFigure.draw(groundY);
-            drawInsight(groundY);
-
-            requestAnimationFrame(draw);
-        }
-
-        // ========================================
-        // Event Handlers
-        // ========================================
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-
-            if (window.aiFigure.hitTest(mx, my)) { showPanel('ai'); return; }
-            if (window.humanFigure.hitTest(mx, my)) { showPanel('human'); return; }
-
-            for (const p of particles) {
-                if (p.hitTest(mx, my)) {
-                    showPanel(p.type);
-                    return;
-                }
-            }
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mx = e.clientX - rect.left;
-            const my = e.clientY - rect.top;
-
-            let hover = window.aiFigure.hitTest(mx, my) || window.humanFigure.hitTest(mx, my);
-            if (!hover) {
-                for (const p of particles) {
-                    if (p.hitTest(mx, my)) { hover = true; break; }
-                }
-            }
-            canvas.style.cursor = hover ? 'pointer' : 'default';
-        });
-
-        window.addEventListener('resize', resize);
-
-        // ========================================
-        // Start
-        // ========================================
-        Theme.init();
-        Colors.update();
-        resize();
-        init();
-        draw();
-    })();
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
