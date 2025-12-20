@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>We Are Choosing By Not Choosing | Interactive Visualizations</title>
+  <title>We Are Choosing By Not Choosing | A Five-Part Series on Intentional AI</title>
+  <meta name="description" content="The default path of AI automation is already being laid. This five-part series offers frameworks for leaders who want to choose deliberately.">
 
   <!-- Fonts: Fraunces (display) + DM Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,19 +17,27 @@
        ============================================================ */
     :root {
       /* Colors - Observatory palette */
-      --color-void: #07070a;
-      --color-deep: #0c0c12;
-      --color-surface: #13131c;
-      --color-elevated: #1a1a26;
+      --color-void: #050507;
+      --color-deep: #0a0a0f;
+      --color-surface: #111118;
+      --color-elevated: #18181f;
 
       --color-text: #f4f3f1;
-      --color-text-muted: rgba(244, 243, 241, 0.6);
-      --color-text-dim: rgba(244, 243, 241, 0.35);
+      --color-text-secondary: rgba(244, 243, 241, 0.75);
+      --color-text-muted: rgba(244, 243, 241, 0.5);
+      --color-text-dim: rgba(244, 243, 241, 0.3);
 
       --color-accent-warm: #fbbf24;
       --color-accent-ai: #22d3ee;
       --color-accent-human: #34d399;
       --color-accent-amber: #f59e0b;
+
+      /* Part-specific glow colors */
+      --glow-friction: rgba(251, 191, 36, 0.4);
+      --glow-abstraction: rgba(99, 102, 241, 0.4);
+      --glow-streetlight: rgba(245, 158, 11, 0.5);
+      --glow-seams: rgba(52, 211, 153, 0.4);
+      --glow-pace: rgba(139, 92, 246, 0.4);
 
       /* Typography */
       --font-display: 'Fraunces', Georgia, serif;
@@ -44,6 +53,7 @@
       --space-3xl: 4rem;
       --space-4xl: 6rem;
       --space-5xl: 8rem;
+      --space-6xl: 12rem;
 
       /* Transitions */
       --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -73,7 +83,7 @@
     }
 
     /* ============================================================
-       STARFIELD BACKGROUND
+       STARFIELD BACKGROUND - MULTI-LAYER PARALLAX
        ============================================================ */
     .starfield {
       position: fixed;
@@ -87,16 +97,35 @@
       height: 100%;
     }
 
-    /* Gradient overlay for depth */
+    /* Gradient overlay for depth - enhanced opacity */
     .atmosphere {
       position: fixed;
       inset: 0;
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(251, 191, 36, 0.03) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(34, 211, 238, 0.02) 0%, transparent 40%),
-        radial-gradient(ellipse 50% 30% at 80% 60%, rgba(52, 211, 153, 0.02) 0%, transparent 40%);
+        radial-gradient(ellipse 100% 60% at 50% 0%, rgba(251, 191, 36, 0.035) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 90%, rgba(34, 211, 238, 0.025) 0%, transparent 40%),
+        radial-gradient(ellipse 70% 40% at 85% 70%, rgba(139, 92, 246, 0.02) 0%, transparent 40%),
+        radial-gradient(ellipse 60% 30% at 10% 30%, rgba(52, 211, 153, 0.02) 0%, transparent 40%);
+    }
+
+    /* Mouse-follow ambient glow */
+    .cursor-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.03) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    body:hover .cursor-glow {
+      opacity: 1;
     }
 
     /* ============================================================
@@ -120,7 +149,7 @@
     }
 
     .hero__content {
-      max-width: 900px;
+      max-width: 850px;
       margin: 0 auto;
     }
 
@@ -139,11 +168,11 @@
 
     .hero__title {
       font-family: var(--font-display);
-      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
       font-weight: 400;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      margin-bottom: var(--space-xl);
+      margin-bottom: var(--space-2xl);
       opacity: 0;
       transform: translateY(30px);
       animation: revealUp 1.2s var(--ease-out-expo) 0.5s forwards;
@@ -151,10 +180,10 @@
 
     .hero__title em {
       font-style: italic;
-      color: var(--color-text-muted);
+      color: var(--color-text-secondary);
     }
 
-    .hero__subtitle {
+    .hero__lede {
       font-family: var(--font-body);
       font-size: clamp(1.1rem, 2.5vw, 1.35rem);
       font-weight: 300;
@@ -172,12 +201,12 @@
       align-items: center;
       gap: var(--space-sm);
       font-family: var(--font-body);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       color: var(--color-text);
       text-decoration: none;
-      padding: var(--space-md) var(--space-lg);
-      border: 1px solid rgba(244, 243, 241, 0.15);
+      padding: var(--space-md) var(--space-xl);
+      border: 1px solid rgba(244, 243, 241, 0.12);
       border-radius: 100px;
       background: rgba(244, 243, 241, 0.03);
       transition: all 0.4s var(--ease-out-quart);
@@ -187,14 +216,14 @@
     }
 
     .hero__cta:hover {
-      background: rgba(244, 243, 241, 0.08);
-      border-color: rgba(244, 243, 241, 0.25);
+      background: rgba(244, 243, 241, 0.07);
+      border-color: rgba(244, 243, 241, 0.2);
       transform: translateY(-2px);
     }
 
     .hero__cta svg {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       transition: transform 0.3s var(--ease-out-quart);
     }
 
@@ -213,7 +242,7 @@
       align-items: center;
       gap: var(--space-sm);
       color: var(--color-text-dim);
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       opacity: 0;
@@ -229,29 +258,26 @@
 
     @keyframes scrollPulse {
       0%, 100% { opacity: 0.3; transform: scaleY(1); }
-      50% { opacity: 0.6; transform: scaleY(1.1); }
+      50% { opacity: 0.6; transform: scaleY(1.15); }
     }
 
     /* ============================================================
        THESIS SECTION
        ============================================================ */
     .thesis {
-      padding: var(--space-5xl) var(--space-xl);
+      padding: var(--space-6xl) var(--space-xl);
       position: relative;
     }
 
     .thesis__container {
-      max-width: 1100px;
+      max-width: 900px;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: var(--space-4xl);
-      align-items: center;
     }
 
     .thesis__quote {
       position: relative;
       padding-left: var(--space-xl);
+      margin-bottom: var(--space-4xl);
     }
 
     .thesis__quote::before {
@@ -261,15 +287,15 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: linear-gradient(to bottom, var(--color-accent-warm), transparent);
+      background: linear-gradient(to bottom, var(--color-accent-warm), var(--color-accent-warm), transparent);
     }
 
     .thesis__quote-text {
       font-family: var(--font-display);
-      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-size: clamp(1.6rem, 3.5vw, 2.25rem);
       font-weight: 400;
       font-style: italic;
-      line-height: 1.5;
+      line-height: 1.4;
       color: var(--color-text);
       margin-bottom: var(--space-lg);
     }
@@ -277,163 +303,199 @@
     .thesis__quote-cite {
       font-family: var(--font-body);
       font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--color-text-dim);
+      font-weight: 400;
+      color: var(--color-text-muted);
     }
 
-    .thesis__content h2 {
-      font-family: var(--font-display);
-      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    .thesis__quote-cite strong {
+      color: var(--color-text-secondary);
       font-weight: 500;
-      margin-bottom: var(--space-lg);
-      color: var(--color-text);
+    }
+
+    .thesis__content {
+      display: grid;
+      gap: var(--space-xl);
     }
 
     .thesis__content p {
-      font-size: 1rem;
-      line-height: 1.8;
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-md);
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--color-text-secondary);
     }
 
-    .thesis__content p:last-child {
-      margin-bottom: 0;
+    .thesis__content p strong {
+      color: var(--color-text);
+      font-weight: 500;
     }
 
     /* ============================================================
-       JOURNEY SECTION (The 5 Parts)
+       SERIES SECTION (The Five Parts) - CARD GRID
        ============================================================ */
-    .journey {
+    .series {
       padding: var(--space-5xl) var(--space-xl);
       position: relative;
     }
 
-    .journey__header {
+    .series__header {
       max-width: 700px;
       margin: 0 auto var(--space-4xl);
       text-align: center;
     }
 
-    .journey__overline {
+    .series__overline {
       font-family: var(--font-body);
       font-size: 0.7rem;
       font-weight: 500;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: var(--color-accent-ai);
+      color: var(--color-accent-warm);
       margin-bottom: var(--space-md);
     }
 
-    .journey__title {
+    .series__title {
       font-family: var(--font-display);
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-size: clamp(1.6rem, 4vw, 2.25rem);
       font-weight: 400;
       margin-bottom: var(--space-lg);
+      line-height: 1.3;
     }
 
-    .journey__description {
+    .series__description {
       font-size: 1rem;
       color: var(--color-text-muted);
       line-height: 1.7;
     }
 
-    /* Chapters Grid */
-    .chapters {
-      max-width: 1200px;
+    /* Parts Grid - BENTO LAYOUT */
+    .parts {
+      max-width: 1100px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: var(--space-xl);
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(80px, auto);
+      gap: var(--space-lg);
     }
 
-    .chapter {
+    /* Bento positioning - puzzle-like arrangement */
+    .part:nth-child(1) { grid-column: span 7; grid-row: span 4; }
+    .part:nth-child(2) { grid-column: span 5; grid-row: span 4; }
+    .part:nth-child(3) { grid-column: span 12; grid-row: span 5; } /* Featured - full width */
+    .part:nth-child(4) { grid-column: span 5; grid-row: span 4; }
+    .part:nth-child(5) { grid-column: span 7; grid-row: span 4; }
+
+    .part {
+      --chapter-glow: var(--glow-friction);
       position: relative;
       background: var(--color-surface);
       border: 1px solid rgba(244, 243, 241, 0.06);
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
       transition: all 0.5s var(--ease-out-expo);
       opacity: 0;
       transform: translateY(40px);
     }
 
-    .chapter.revealed {
+    .part.revealed {
       opacity: 1;
       transform: translateY(0);
     }
 
-    .chapter:hover {
+    .part:hover {
       border-color: rgba(244, 243, 241, 0.12);
-      transform: translateY(-4px);
+      background: var(--color-elevated);
+      transform: translateY(-6px);
       box-shadow:
-        0 20px 40px -15px rgba(0, 0, 0, 0.5),
-        0 0 60px -20px var(--chapter-glow, rgba(251, 191, 36, 0.15));
+        0 30px 60px -20px var(--chapter-glow),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     }
 
-    .chapter--featured {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-    }
-
-    .chapter__preview {
+    /* Part preview area - themed gradient */
+    .part__preview {
       aspect-ratio: 16 / 10;
-      background: var(--color-deep);
       position: relative;
       overflow: hidden;
+      min-height: 140px;
     }
 
-    .chapter--featured .chapter__preview {
-      aspect-ratio: auto;
-      min-height: 300px;
-    }
-
-    .chapter__preview-inner {
+    .part__preview-bg {
       position: absolute;
       inset: 0;
+      opacity: 0.7;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .part:hover .part__preview-bg {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    /* Theme-specific preview backgrounds */
+    .part--friction .part__preview-bg {
       background:
-        radial-gradient(circle at 30% 50%, var(--chapter-glow, rgba(251, 191, 36, 0.1)) 0%, transparent 50%);
+        radial-gradient(circle at 30% 70%, rgba(251, 191, 36, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(245, 158, 11, 0.2) 0%, transparent 40%),
+        linear-gradient(135deg, var(--color-deep) 0%, #1a1510 100%);
+    }
+
+    .part--abstraction .part__preview-bg {
+      background:
+        radial-gradient(circle at 50% 80%, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.15) 0%, transparent 40%),
+        linear-gradient(135deg, var(--color-deep) 0%, #0f1020 100%);
+    }
+
+    .part--streetlight .part__preview-bg {
+      background:
+        radial-gradient(ellipse 40% 80% at 50% 0%, rgba(251, 191, 36, 0.5) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.9) 0%, transparent 70%),
+        linear-gradient(180deg, #1a1608 0%, var(--color-void) 100%);
+    }
+
+    .part--seams .part__preview-bg {
+      background:
+        repeating-linear-gradient(90deg, transparent 0px, transparent 40px, rgba(52, 211, 153, 0.1) 40px, rgba(52, 211, 153, 0.1) 41px),
+        radial-gradient(circle at 70% 50%, rgba(52, 211, 153, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, var(--color-deep) 0%, #0a1510 100%);
+    }
+
+    .part--pace .part__preview-bg {
+      background:
+        linear-gradient(0deg, rgba(139, 92, 246, 0.15) 0%, transparent 20%),
+        linear-gradient(0deg, rgba(99, 102, 241, 0.1) 20%, transparent 40%),
+        linear-gradient(0deg, rgba(34, 211, 238, 0.08) 40%, transparent 60%),
+        linear-gradient(0deg, rgba(52, 211, 153, 0.05) 60%, transparent 80%),
+        linear-gradient(135deg, var(--color-deep) 0%, #100a18 100%);
+    }
+
+    /* Glow pulse on preview */
+    .part__preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, var(--chapter-glow), transparent 70%);
+      opacity: 0;
       transition: opacity 0.5s ease;
     }
 
-    .chapter:hover .chapter__preview-inner {
-      opacity: 0.7;
+    .part:hover .part__preview::after {
+      opacity: 0.3;
+      animation: glowPulse 2s ease-in-out infinite;
     }
 
-    .chapter__status {
-      position: absolute;
-      top: var(--space-md);
-      right: var(--space-md);
-      padding: var(--space-xs) var(--space-sm);
-      border-radius: 100px;
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Part content */
+    .part__body {
+      padding: var(--space-lg) var(--space-xl) var(--space-xl);
+    }
+
+    .part__number {
+      font-family: var(--font-body);
       font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .chapter__status--ready {
-      background: rgba(52, 211, 153, 0.15);
-      color: var(--color-accent-human);
-      border: 1px solid rgba(52, 211, 153, 0.3);
-    }
-
-    .chapter__status--coming {
-      background: rgba(244, 243, 241, 0.05);
-      color: var(--color-text-dim);
-      border: 1px solid rgba(244, 243, 241, 0.1);
-    }
-
-    .chapter__content {
-      padding: var(--space-xl);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chapter__part {
-      font-size: 0.7rem;
       font-weight: 600;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -441,70 +503,243 @@
       margin-bottom: var(--space-sm);
     }
 
-    .chapter__title {
+    .part__title {
       font-family: var(--font-display);
       font-size: 1.35rem;
       font-weight: 500;
-      margin-bottom: var(--space-sm);
       line-height: 1.3;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
     }
 
-    .chapter--featured .chapter__title {
-      font-size: 1.75rem;
-    }
-
-    .chapter__description {
+    .part__description {
       font-size: 0.9rem;
       color: var(--color-text-muted);
-      line-height: 1.6;
+      line-height: 1.65;
       margin-bottom: var(--space-lg);
-      flex-grow: 1;
     }
 
-    .chapter__link {
+    .part__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .part__tags {
+      display: flex;
+      gap: var(--space-xs);
+    }
+
+    .part__tag {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-sm);
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--color-text);
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: 100px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .part__tag--ready {
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--color-accent-human);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+
+    .part__tag--coming {
+      background: rgba(244, 243, 241, 0.03);
+      color: var(--color-text-dim);
+      border: 1px solid rgba(244, 243, 241, 0.08);
+    }
+
+    .part__tag--essay {
+      background: rgba(34, 211, 238, 0.08);
+      color: var(--color-accent-ai);
+      border: 1px solid rgba(34, 211, 238, 0.15);
+    }
+
+    .part__action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(244, 243, 241, 0.03);
+      border: 1px solid rgba(244, 243, 241, 0.08);
+      color: var(--color-text-muted);
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.3s var(--ease-out-quart);
     }
 
-    .chapter__link:hover {
-      color: var(--color-accent-warm);
+    .part__action:hover {
+      background: rgba(244, 243, 241, 0.08);
+      border-color: rgba(244, 243, 241, 0.15);
+      color: var(--color-text);
     }
 
-    .chapter__link svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.3s var(--ease-out-quart);
-    }
-
-    .chapter__link:hover svg {
-      transform: translateX(4px);
-    }
-
-    .chapter__link--disabled {
-      opacity: 0.4;
+    .part__action--disabled {
+      opacity: 0.3;
       pointer-events: none;
     }
 
-    /* Chapter accent colors */
-    .chapter[data-part="1"] { --chapter-glow: rgba(251, 191, 36, 0.15); }
-    .chapter[data-part="2"] { --chapter-glow: rgba(34, 211, 238, 0.15); }
-    .chapter[data-part="3"] { --chapter-glow: rgba(52, 211, 153, 0.15); }
-    .chapter[data-part="4"] { --chapter-glow: rgba(245, 158, 11, 0.15); }
-    .chapter[data-part="5"] { --chapter-glow: rgba(251, 191, 36, 0.15); }
+    .part__action svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Featured part (Part 3) */
+    .part--featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: linear-gradient(135deg, var(--color-surface) 0%, rgba(251, 191, 36, 0.03) 100%);
+      border-color: rgba(251, 191, 36, 0.12);
+      --chapter-glow: var(--glow-streetlight);
+    }
+
+    .part--featured .part__preview {
+      aspect-ratio: auto;
+      min-height: 280px;
+    }
+
+    .part--featured .part__body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-2xl);
+    }
+
+    .part--featured .part__number {
+      color: var(--color-accent-warm);
+    }
+
+    .part--featured .part__title {
+      font-size: 1.6rem;
+    }
+
+    .part--featured .part__description {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .part--featured:hover {
+      border-color: rgba(251, 191, 36, 0.25);
+      box-shadow:
+        0 40px 80px -25px var(--glow-streetlight),
+        0 0 0 1px rgba(251, 191, 36, 0.1);
+    }
+
+    .part--featured .part__action {
+      background: rgba(251, 191, 36, 0.1);
+      border-color: rgba(251, 191, 36, 0.2);
+      color: var(--color-accent-warm);
+    }
+
+    .part--featured .part__action:hover {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    /* Set glow colors for each part */
+    .part--friction { --chapter-glow: var(--glow-friction); }
+    .part--abstraction { --chapter-glow: var(--glow-abstraction); }
+    .part--seams { --chapter-glow: var(--glow-seams); }
+    .part--pace { --chapter-glow: var(--glow-pace); }
+
+    /* ============================================================
+       VOICES SECTION
+       ============================================================ */
+    .voices {
+      padding: var(--space-5xl) var(--space-xl);
+      background: var(--color-deep);
+    }
+
+    .voices__container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .voices__header {
+      text-align: center;
+      margin-bottom: var(--space-4xl);
+    }
+
+    .voices__overline {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--color-text-dim);
+      margin-bottom: var(--space-md);
+    }
+
+    .voices__title {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 1.75rem);
+      font-weight: 400;
+    }
+
+    .voices__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .voice {
+      padding: var(--space-xl);
+      background: var(--color-surface);
+      border: 1px solid rgba(244, 243, 241, 0.04);
+      border-radius: 12px;
+      transition: all 0.4s var(--ease-out-quart);
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+    }
+
+    .voice:hover {
+      border-color: rgba(244, 243, 241, 0.08);
+      transform: translateY(-4px);
+    }
+
+    .voice__text {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+      flex: 1;
+    }
+
+    .voice__attribution {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: var(--space-lg);
+    }
+
+    .voice__name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-text);
+    }
+
+    .voice__role {
+      font-size: 0.75rem;
+      color: var(--color-text-dim);
+    }
 
     /* ============================================================
        FOOTER
        ============================================================ */
     .footer {
-      padding: var(--space-4xl) var(--space-xl);
+      padding: var(--space-5xl) var(--space-xl);
       text-align: center;
-      border-top: 1px solid rgba(244, 243, 241, 0.06);
+      border-top: 1px solid rgba(244, 243, 241, 0.04);
     }
 
     .footer__content {
@@ -512,33 +747,34 @@
       margin: 0 auto;
     }
 
-    .footer__title {
+    .footer__quote {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: clamp(1.25rem, 3vw, 1.5rem);
       font-weight: 400;
-      margin-bottom: var(--space-md);
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xl);
     }
 
     .footer__text {
       font-size: 0.9rem;
       color: var(--color-text-muted);
       line-height: 1.7;
-      margin-bottom: var(--space-xl);
+      margin-bottom: var(--space-3xl);
     }
 
     .footer__meta {
       font-size: 0.75rem;
       color: var(--color-text-dim);
+      margin-bottom: var(--space-sm);
     }
 
-    .footer__meta a {
+    .footer__authors {
+      font-size: 0.8rem;
+      font-weight: 500;
       color: var(--color-text-muted);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .footer__meta a:hover {
-      color: var(--color-text);
+      letter-spacing: 0.02em;
     }
 
     /* ============================================================
@@ -561,18 +797,42 @@
        RESPONSIVE
        ============================================================ */
     @media (max-width: 900px) {
-      .thesis__container {
-        grid-template-columns: 1fr;
-        gap: var(--space-2xl);
+      .parts {
+        grid-template-columns: repeat(6, 1fr);
       }
 
-      .chapter--featured {
+      .part:nth-child(1) { grid-column: span 6; grid-row: span 3; }
+      .part:nth-child(2) { grid-column: span 6; grid-row: span 3; }
+      .part:nth-child(3) { grid-column: span 6; grid-row: span 4; }
+      .part:nth-child(4) { grid-column: span 6; grid-row: span 3; }
+      .part:nth-child(5) { grid-column: span 6; grid-row: span 3; }
+
+      .part--featured {
         grid-template-columns: 1fr;
       }
 
-      .chapter--featured .chapter__preview {
-        aspect-ratio: 16 / 9;
-        min-height: auto;
+      .part--featured .part__preview {
+        min-height: 180px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .parts {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+      }
+
+      .part:nth-child(1),
+      .part:nth-child(2),
+      .part:nth-child(3),
+      .part:nth-child(4),
+      .part:nth-child(5) {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+
+      .voices__grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -581,17 +841,25 @@
         padding: var(--space-2xl) var(--space-lg);
       }
 
-      .chapters {
-        grid-template-columns: 1fr;
-      }
-
       .hero__scroll {
         display: none;
+      }
+
+      .thesis {
+        padding: var(--space-4xl) var(--space-lg);
+      }
+
+      .series {
+        padding: var(--space-4xl) var(--space-lg);
+      }
+
+      .part__body {
+        padding: var(--space-lg);
       }
     }
 
     /* ============================================================
-       REVEAL ON SCROLL
+       REVEAL ON SCROLL - STAGGERED
        ============================================================ */
     .reveal {
       opacity: 0;
@@ -603,6 +871,20 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* Stagger delays for cards */
+    .part:nth-child(1) { transition-delay: 0s; }
+    .part:nth-child(2) { transition-delay: 0.1s; }
+    .part:nth-child(3) { transition-delay: 0.15s; }
+    .part:nth-child(4) { transition-delay: 0.2s; }
+    .part:nth-child(5) { transition-delay: 0.25s; }
+
+    .voice:nth-child(1) { transition-delay: 0s; }
+    .voice:nth-child(2) { transition-delay: 0.08s; }
+    .voice:nth-child(3) { transition-delay: 0.16s; }
+    .voice:nth-child(4) { transition-delay: 0.24s; }
+    .voice:nth-child(5) { transition-delay: 0.32s; }
+    .voice:nth-child(6) { transition-delay: 0.4s; }
   </style>
 </head>
 <body>
@@ -611,6 +893,7 @@
     <canvas id="starfield"></canvas>
   </div>
   <div class="atmosphere"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
 
   <main>
     <!-- Hero Section -->
@@ -621,12 +904,11 @@
           We Are Choosing<br>
           <em>By Not Choosing</em>
         </h1>
-        <p class="hero__subtitle">
-          The default path of AI automation is already being laid. Through interactive visualizations,
-          explore the frameworks that reveal what we stand to lose—and what intentional collaboration could look like.
+        <p class="hero__lede">
+          The default path of AI automation is already being laid. Each day, organizations make decisions that seem rational in isolation but create consequences no one selected. This series offers frameworks for those who want to choose deliberately: not frameworks against AI, but frameworks for the human judgment that makes deployment wise rather than merely fast.
         </p>
-        <a href="#journey" class="hero__cta">
-          Begin the Journey
+        <a href="#series" class="hero__cta">
+          Begin Reading
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
@@ -645,165 +927,244 @@
           <p class="thesis__quote-text">
             "Humans access information the model never had."
           </p>
-          <cite class="thesis__quote-cite">Ken Holstein</cite>
+          <cite class="thesis__quote-cite">
+            <strong>Ken Holstein</strong>, Human-Computer Interaction Institute, Carnegie Mellon University
+          </cite>
         </blockquote>
+
         <div class="thesis__content reveal">
-          <h2>The Streetlight Effect</h2>
           <p>
-            We optimize for what we can measure, automating the observable while the unobservable—intuition,
-            trust, timing, the weight of a pause—slips away unnoticed.
+            This single observation anchors everything that follows. AI systems operate under the streetlight. They search where the data is because that is the only place they can search. But the keys are often in the dark: the weight of a pause, the trust built over years, the reasons behind the patterns.
           </p>
           <p>
-            These visualizations make visible what AI cannot see. They are not arguments against automation,
-            but invitations to choose deliberately where humans remain essential.
+            <strong>Seven experts</strong> from McKinsey, Microsoft AI, Carnegie Mellon, Steelcase, Blink UX, IA Collaborative, and Doblin shared what they see at the highest levels of organizational practice. None oppose AI. All use these tools daily. What they share is a commitment to deploying AI with intention rather than momentum.
+          </p>
+          <p>
+            What emerges is not a warning against technology, but an invitation: to ask what friction protects, to understand what AI cannot see, to design systems that keep human judgment where it matters, and to honor the pace at which organizations can actually absorb change.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- Journey Section -->
-    <section class="journey" id="journey">
-      <header class="journey__header reveal">
-        <p class="journey__overline">The Visualizations</p>
-        <h2 class="journey__title">Five Frameworks for Intentional AI</h2>
-        <p class="journey__description">
-          Each visualization illuminates a different dimension of human-AI collaboration.
-          Explore them in order for the full narrative, or dive into what calls to you.
+    <!-- Series Section -->
+    <section class="series" id="series">
+      <header class="series__header reveal">
+        <p class="series__overline">The Series</p>
+        <h2 class="series__title">Five Principles for Intentional AI Deployment</h2>
+        <p class="series__description">
+          Each part builds on the last. Read them in sequence for the full argument, or enter where your questions live.
         </p>
       </header>
 
-      <div class="chapters">
-        <!-- Part 3: Complementarity View (Featured - Ready) -->
-        <article class="chapter chapter--featured" data-part="3">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--ready">Ready</span>
+      <div class="parts">
+        <!-- Part 1: Friction -->
+        <article class="part part--friction">
+          <div class="part__preview">
+            <div class="part__preview-bg"></div>
           </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 3</p>
-            <h3 class="chapter__title">The Complementarity View</h3>
-            <p class="chapter__description">
-              Step into an observatory of knowledge. A street lamp illuminates what AI can observe—data,
-              patterns, the measurable. Beyond its light, eight concepts float in darkness: intuition,
-              trust, timing. What humans access that models never had.
+          <div class="part__body">
+            <span class="part__number">Part 1</span>
+            <h3 class="part__title">The Friction Reduction Principle Always Wins</h3>
+            <p class="part__description">
+              People reach for whatever removes the obstacle in front of them. This creates genuine value, and a default path that leads somewhere whether we are paying attention or not.
             </p>
-            <a href="visualizations/complementarity-view/" class="chapter__link">
-              Enter the Visualization
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
+            <div class="part__meta">
+              <div class="part__tags">
+                <span class="part__tag part__tag--coming">Coming Soon</span>
+              </div>
+              <a href="#" class="part__action part__action--disabled" aria-label="Read Part 1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </article>
 
-        <!-- Part 2: The Four Rungs -->
-        <article class="chapter" data-part="2">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--coming">Coming Soon</span>
+        <!-- Part 2: Abstraction -->
+        <article class="part part--abstraction">
+          <div class="part__preview">
+            <div class="part__preview-bg"></div>
           </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 2</p>
-            <h3 class="chapter__title">The Four Rungs</h3>
-            <p class="chapter__description">
-              The Problem Abstraction Ladder. Outcome and Approach remain human territory;
-              Method and Execution can be delegated. Where does your work live?
+          <div class="part__body">
+            <span class="part__number">Part 2</span>
+            <h3 class="part__title">Before You Automate</h3>
+            <p class="part__description">
+              More than 80 percent of AI projects fail, not because the technology fails, but because organizations optimize at the wrong level. The Problem Abstraction Ladder shows why.
             </p>
-            <span class="chapter__link chapter__link--disabled">
-              Coming Soon
-            </span>
+            <div class="part__meta">
+              <div class="part__tags">
+                <span class="part__tag part__tag--coming">Coming Soon</span>
+              </div>
+              <a href="#" class="part__action part__action--disabled" aria-label="Read Part 2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </article>
 
-        <!-- Part 3: Information Asymmetry -->
-        <article class="chapter" data-part="3">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--coming">Coming Soon</span>
+        <!-- Part 3: Streetlight - FEATURED -->
+        <article class="part part--featured part--streetlight">
+          <div class="part__preview">
+            <div class="part__preview-bg"></div>
           </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 3</p>
-            <h3 class="chapter__title">Information Asymmetry Map</h3>
-            <p class="chapter__description">
-              A 2×2 matrix of visibility. What AI sees that we don't. What we know that AI can't.
-              And the vast territory neither fully grasps.
+          <div class="part__body">
+            <span class="part__number">Part 3</span>
+            <h3 class="part__title">What AI Can't See</h3>
+            <p class="part__description">
+              Stop asking what AI cannot do. Start asking what AI cannot see. The Streetlight Effect reveals the structural limits that determine where human judgment remains essential: not as a placeholder until AI improves, but as the only access point to information the system was never designed to perceive.
             </p>
-            <span class="chapter__link chapter__link--disabled">
-              Coming Soon
-            </span>
+            <div class="part__meta">
+              <div class="part__tags">
+                <span class="part__tag part__tag--ready">Visualization Ready</span>
+              </div>
+              <a href="visualizations/complementarity-view/" class="part__action" aria-label="Explore Part 3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </article>
 
-        <!-- Part 4: Friction Spectrum -->
-        <article class="chapter" data-part="4">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--coming">Coming Soon</span>
+        <!-- Part 4: Seams -->
+        <article class="part part--seams">
+          <div class="part__preview">
+            <div class="part__preview-bg"></div>
           </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 4</p>
-            <h3 class="chapter__title">The Friction Spectrum</h3>
-            <p class="chapter__description">
-              Seams matched to stakes. From seamless automation for the trivial,
-              to human-only domains for the consequential.
+          <div class="part__body">
+            <span class="part__number">Part 4</span>
+            <h3 class="part__title">Designing Around the Gaps</h3>
+            <p class="part__description">
+              The solution is not friction everywhere. It is calibrated friction: seams matched to stakes. Mark Weiser's "beautiful seams" show how to reveal the junction between human and machine precisely where evaluation matters.
             </p>
-            <span class="chapter__link chapter__link--disabled">
-              Coming Soon
-            </span>
+            <div class="part__meta">
+              <div class="part__tags">
+                <span class="part__tag part__tag--coming">Coming Soon</span>
+              </div>
+              <a href="#" class="part__action part__action--disabled" aria-label="Read Part 4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </article>
 
-        <!-- Part 4: Collaboration Framework -->
-        <article class="chapter" data-part="4">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--coming">Coming Soon</span>
+        <!-- Part 5: Pace -->
+        <article class="part part--pace">
+          <div class="part__preview">
+            <div class="part__preview-bg"></div>
           </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 4</p>
-            <h3 class="chapter__title">Collaboration Framework</h3>
-            <p class="chapter__description">
-              Expertise versus consequence. A matrix defining protected human domains,
-              full automation zones, and the hybrid approaches between.
+          <div class="part__body">
+            <span class="part__number">Part 5</span>
+            <h3 class="part__title">The Cost of Speed</h3>
+            <p class="part__description">
+              AI operates at the speed of the fastest layers. Meaning, identity, and purpose move at the pace of the slowest. Stewart Brand's pace layers reveal what happens when organizations move faster than they can absorb.
             </p>
-            <span class="chapter__link chapter__link--disabled">
-              Coming Soon
-            </span>
+            <div class="part__meta">
+              <div class="part__tags">
+                <span class="part__tag part__tag--coming">Coming Soon</span>
+              </div>
+              <a href="#" class="part__action part__action--disabled" aria-label="Read Part 5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </article>
+      </div>
+    </section>
 
-        <!-- Part 5: Pace Layers -->
-        <article class="chapter" data-part="5">
-          <div class="chapter__preview">
-            <div class="chapter__preview-inner"></div>
-            <span class="chapter__status chapter__status--coming">Coming Soon</span>
-          </div>
-          <div class="chapter__content">
-            <p class="chapter__part">Part 5</p>
-            <h3 class="chapter__title">Organizational Pace Layers</h3>
-            <p class="chapter__description">
-              Adapted from Stewart Brand. How cultural debt accumulates when fast layers
-              of technology strain the slow layers of human adaptation.
+    <!-- Voices Section -->
+    <section class="voices">
+      <div class="voices__container">
+        <header class="voices__header reveal">
+          <p class="voices__overline">Seven Experts</p>
+          <h2 class="voices__title">The voices shaping this conversation</h2>
+        </header>
+
+        <div class="voices__grid">
+          <div class="voice reveal">
+            <p class="voice__text">
+              "There's going to be a new humanism emerging at work that we have to define. We all need work. It's our identity."
             </p>
-            <span class="chapter__link chapter__link--disabled">
-              Coming Soon
-            </span>
+            <div class="voice__attribution">
+              <span class="voice__name">Donna Flynn</span>
+              <span class="voice__role">Chief People Officer, Steelcase</span>
+            </div>
           </div>
-        </article>
+
+          <div class="voice reveal">
+            <p class="voice__text">
+              "Very few people are asking what should we apply AI to. It's at a level above 'what problem are we trying to solve with AI.'"
+            </p>
+            <div class="voice__attribution">
+              <span class="voice__name">Ewan Duncan</span>
+              <span class="voice__role">Senior Partner, McKinsey & Company</span>
+            </div>
+          </div>
+
+          <div class="voice reveal">
+            <p class="voice__text">
+              "One of the responsible AI team's advice was to make sure to put that friction in, so people were aware of the interaction with AI at each stage."
+            </p>
+            <div class="voice__attribution">
+              <span class="voice__name">Liz Danzico</span>
+              <span class="voice__role">Design Leader, Microsoft AI</span>
+            </div>
+          </div>
+
+          <div class="voice reveal">
+            <p class="voice__text">
+              "When we're proxying information over and over again, eventually our own brains, they atrophy."
+            </p>
+            <div class="voice__attribution">
+              <span class="voice__name">Kathleen Brandenburg</span>
+              <span class="voice__role">Principal, IA Collaborative</span>
+            </div>
+          </div>
+
+          <div class="voice reveal">
+            <p class="voice__text">
+              "People are deploying AI like it's an IT deployment when it's really a design process."
+            </p>
+            <div class="voice__attribution">
+              <span class="voice__name">Kelly Franznick</span>
+              <span class="voice__role">Chief Innovation Officer, Blink UX</span>
+            </div>
+          </div>
+
+          <div class="voice reveal">
+            <p class="voice__text">
+              "Ripples in the pond, how many different design firms were transformed and design practices inside of big organizations and teachers came out of it."
+            </p>
+            <div class="voice__attribution">
+              <span class="voice__name">Larry Keeley</span>
+              <span class="voice__role">Co-founder, Doblin; Professor, IIT Institute of Design</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
       <div class="footer__content">
-        <h2 class="footer__title">Choose Deliberately</h2>
+        <p class="footer__quote">
+          "The path splits here. One direction follows the default. The other requires deliberate choice at every step. Both lead somewhere. Only one leads where you decide."
+        </p>
         <p class="footer__text">
-          These visualizations are part of a larger invitation: to pause before automating,
-          to ask what we might lose, and to design AI systems that amplify rather than replace
-          human judgment.
+          This series emerged from an independent study on Human-AI collaboration. The frameworks here are not against AI. They are for the human judgment that determines whether AI deployment is wise or merely fast.
         </p>
         <p class="footer__meta">
-          An Independent Study project exploring Human-AI Collaboration
+          Research conducted Fall 2025 at the Institute of Design
+        </p>
+        <p class="footer__authors">
+          Anijo Mathew and Anurag Duddu
         </p>
       </div>
     </footer>
@@ -811,13 +1172,24 @@
 
   <script>
     // ============================================================
-    // STARFIELD ANIMATION
+    // STARFIELD ANIMATION - MULTI-LAYER PARALLAX WITH SHOOTING STARS
     // ============================================================
     (function() {
       const canvas = document.getElementById('starfield');
       const ctx = canvas.getContext('2d');
       let stars = [];
+      let shootingStars = [];
+      let scrollY = 0;
       let animationId;
+
+      // Star color palettes - warm whites, cool blues, occasional amber
+      const starColors = [
+        { r: 244, g: 243, b: 241 },  // Warm white
+        { r: 230, g: 235, b: 255 },  // Cool blue-white
+        { r: 255, g: 248, b: 240 },  // Warm cream
+        { r: 200, g: 220, b: 255 },  // Blue tint
+        { r: 255, g: 230, b: 200 },  // Amber hint
+      ];
 
       function resize() {
         canvas.width = window.innerWidth;
@@ -827,35 +1199,124 @@
 
       function initStars() {
         stars = [];
-        const count = Math.floor((canvas.width * canvas.height) / 8000);
+        // Increased density: ~250 stars
+        const baseCount = Math.floor((canvas.width * canvas.height) / 6000);
 
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < baseCount; i++) {
+          const layer = Math.random();  // 0-1, determines parallax depth
+          const color = starColors[Math.floor(Math.random() * starColors.length)];
+
           stars.push({
             x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            radius: Math.random() * 1.2 + 0.3,
-            opacity: Math.random() * 0.5 + 0.1,
-            twinkleSpeed: Math.random() * 0.02 + 0.005,
-            twinkleOffset: Math.random() * Math.PI * 2
+            y: Math.random() * canvas.height * 2, // Extended for parallax scrolling
+            baseY: 0, // Will be set after
+            radius: Math.random() * 1.2 + 0.3 + (layer * 0.3), // Bigger stars in "front"
+            opacity: Math.random() * 0.5 + 0.15,
+            // Multi-harmonic twinkle for organic feel
+            twinkleSpeed1: Math.random() * 0.008 + 0.002,
+            twinkleSpeed2: Math.random() * 0.015 + 0.005,
+            twinkleOffset1: Math.random() * Math.PI * 2,
+            twinkleOffset2: Math.random() * Math.PI * 2,
+            twinkleIntensity: Math.random() * 0.15 + 0.05,
+            layer: layer, // 0 = far (slow parallax), 1 = near (fast parallax)
+            color: color
           });
         }
+
+        // Set baseY for parallax calculation
+        stars.forEach(star => {
+          star.baseY = star.y;
+        });
+      }
+
+      function createShootingStar() {
+        if (Math.random() > 0.003) return; // Rare occurrence
+
+        const startX = Math.random() * canvas.width;
+        const startY = Math.random() * canvas.height * 0.5;
+
+        shootingStars.push({
+          x: startX,
+          y: startY,
+          length: Math.random() * 80 + 40,
+          speed: Math.random() * 8 + 4,
+          angle: Math.PI / 4 + (Math.random() * 0.3 - 0.15), // Mostly diagonal
+          opacity: 1,
+          decay: Math.random() * 0.02 + 0.01
+        });
+      }
+
+      function updateShootingStars() {
+        shootingStars = shootingStars.filter(star => {
+          star.x += Math.cos(star.angle) * star.speed;
+          star.y += Math.sin(star.angle) * star.speed;
+          star.opacity -= star.decay;
+          return star.opacity > 0 && star.x < canvas.width + 100 && star.y < canvas.height + 100;
+        });
+      }
+
+      function drawShootingStars() {
+        shootingStars.forEach(star => {
+          const gradient = ctx.createLinearGradient(
+            star.x, star.y,
+            star.x - Math.cos(star.angle) * star.length,
+            star.y - Math.sin(star.angle) * star.length
+          );
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity})`);
+          gradient.addColorStop(0.3, `rgba(255, 250, 240, ${star.opacity * 0.5})`);
+          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+          ctx.beginPath();
+          ctx.moveTo(star.x, star.y);
+          ctx.lineTo(
+            star.x - Math.cos(star.angle) * star.length,
+            star.y - Math.sin(star.angle) * star.length
+          );
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Bright head
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+          ctx.fill();
+        });
       }
 
       function draw(time) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         stars.forEach(star => {
-          const twinkle = Math.sin(time * star.twinkleSpeed + star.twinkleOffset);
-          const opacity = star.opacity + twinkle * 0.15;
+          // Multi-harmonic twinkle for organic feel
+          const twinkle1 = Math.sin(time * star.twinkleSpeed1 + star.twinkleOffset1);
+          const twinkle2 = Math.sin(time * star.twinkleSpeed2 + star.twinkleOffset2);
+          const combinedTwinkle = (twinkle1 * 0.6 + twinkle2 * 0.4);
+          const opacity = star.opacity + combinedTwinkle * star.twinkleIntensity;
+
+          // Parallax effect - different layers move at different speeds
+          const parallaxSpeed = 0.05 + star.layer * 0.1;
+          const y = (star.baseY - scrollY * parallaxSpeed) % (canvas.height * 1.5);
+          const displayY = y < 0 ? y + canvas.height * 1.5 : y;
 
           ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(244, 243, 241, ${Math.max(0.05, opacity)})`;
+          ctx.arc(star.x, displayY, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${star.color.r}, ${star.color.g}, ${star.color.b}, ${Math.max(0.03, Math.min(0.7, opacity))})`;
           ctx.fill();
         });
 
+        // Shooting stars
+        createShootingStar();
+        updateShootingStars();
+        drawShootingStars();
+
         animationId = requestAnimationFrame(draw);
       }
+
+      // Track scroll for parallax
+      window.addEventListener('scroll', () => {
+        scrollY = window.scrollY;
+      }, { passive: true });
 
       window.addEventListener('resize', resize);
       resize();
@@ -863,32 +1324,55 @@
     })();
 
     // ============================================================
-    // SCROLL REVEAL
+    // CURSOR GLOW EFFECT
     // ============================================================
     (function() {
-      const reveals = document.querySelectorAll('.reveal, .chapter');
+      const cursorGlow = document.getElementById('cursorGlow');
+      let targetX = 0, targetY = 0;
+      let currentX = 0, currentY = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+      });
+
+      function animateGlow() {
+        // Smooth follow with easing
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+
+        cursorGlow.style.left = currentX + 'px';
+        cursorGlow.style.top = currentY + 'px';
+
+        requestAnimationFrame(animateGlow);
+      }
+
+      animateGlow();
+    })();
+
+    // ============================================================
+    // SCROLL REVEAL - STAGGERED
+    // ============================================================
+    (function() {
+      const reveals = document.querySelectorAll('.reveal');
+      const parts = document.querySelectorAll('.part');
+      const voices = document.querySelectorAll('.voice');
 
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Stagger the reveal for chapters
-            const delay = entry.target.classList.contains('chapter')
-              ? index * 100
-              : 0;
-
-            setTimeout(() => {
-              entry.target.classList.add('revealed');
-            }, delay);
-
+            entry.target.classList.add('revealed');
             observer.unobserve(entry.target);
           }
         });
       }, {
-        threshold: 0.1,
+        threshold: 0.15,
         rootMargin: '0px 0px -50px 0px'
       });
 
       reveals.forEach(el => observer.observe(el));
+      parts.forEach(el => observer.observe(el));
+      voices.forEach(el => observer.observe(el));
     })();
 
     // ============================================================

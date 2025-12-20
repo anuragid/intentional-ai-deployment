@@ -21,7 +21,9 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(cd /Users/idstuart/Documents/Semester\\\\ 4/Independent\\\\ Study/interactive-data-viz && git fetch:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git ls-tree:*)",
+      "Skill(pdf)"
     ]
   }
 }
