@@ -10,8 +10,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Three.js -->
-    <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+    <!-- Three.js (using r128 which has stable global OrbitControls) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Three.js OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -90,6 +93,7 @@
             font-size: 0.95rem;
             color: var(--color-text-muted);
             line-height: 1.5;
+            white-space: nowrap;
         }
 
         .quote cite {
@@ -130,40 +134,41 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.8);
         }
 
-        /* Unobservable Labels */
+        /* Unobservable Labels - refined and minimal */
         .unobservable-label {
             position: fixed;
             z-index: 50;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.15rem;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            opacity: 0.5;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0.6;
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
         .unobservable-label.hovered {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: translate(-50%, -50%) scale(1.05);
         }
 
         .unobservable-label .symbol {
             font-family: var(--font-display);
-            font-size: 1.5rem;
+            font-size: 0.9rem;
             color: var(--color-unobservable);
-            text-shadow: 0 0 15px var(--color-unobservable);
+            text-shadow: 0 0 8px var(--color-unobservable);
         }
 
         .unobservable-label .title {
             font-family: var(--font-body);
-            font-size: 0.7rem;
+            font-size: 0.55rem;
             font-weight: 500;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             color: var(--color-unobservable);
             white-space: nowrap;
+            opacity: 0.8;
         }
 
         /* Tooltip */
@@ -237,7 +242,12 @@
             border-radius: 50%;
         }
 
-        .legend-dot--ai {
+        .legend-dot--ai-domain {
+            background: var(--color-light-warm);
+            box-shadow: 0 0 8px var(--color-light-warm);
+        }
+
+        .legend-dot--ai-figure {
             background: var(--color-ai);
             box-shadow: 0 0 8px var(--color-ai);
         }
@@ -270,7 +280,25 @@
 
         .footer-quote.visible { opacity: 1; }
 
-        /* Scene explanation labels */
+        /* Controls Hint */
+        .controls-hint {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--color-text-dim);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .controls-hint.visible { opacity: 1; }
+
+        /* Scene explanation labels - positioned in 3D space */
         .scene-label {
             position: fixed;
             z-index: 80;
@@ -279,20 +307,21 @@
             font-weight: 400;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: var(--color-text-dim);
             pointer-events: none;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+            opacity: 0;
+            transition: opacity 1s ease;
         }
 
+        .scene-label.visible { opacity: 1; }
+
         .scene-label--light {
-            bottom: 30%;
-            left: 20%;
-            color: rgba(251, 191, 36, 0.5);
+            color: rgba(251, 191, 36, 0.7);
         }
 
         .scene-label--dark {
-            bottom: 30%;
-            right: 15%;
-            color: rgba(245, 158, 11, 0.4);
+            color: rgba(245, 158, 11, 0.6);
         }
     </style>
 </head>
@@ -312,9 +341,9 @@
         <canvas id="canvas"></canvas>
     </div>
 
-    <!-- Scene labels -->
-    <div class="scene-label scene-label--light">Observable Data</div>
-    <div class="scene-label scene-label--dark">The Unobservable</div>
+    <!-- Scene labels - positioned in 3D space -->
+    <div class="scene-label scene-label--light" id="labelObservable">Observable Data</div>
+    <div class="scene-label scene-label--dark" id="labelUnobservable">The Unobservable</div>
 
     <div class="tooltip" id="tooltip">
         <div class="tooltip__title" id="tooltipTitle"></div>
@@ -323,8 +352,12 @@
 
     <div class="legend" id="legend">
         <div class="legend-item">
-            <span class="legend-dot legend-dot--ai"></span>
-            <span>AI's Observable Data</span>
+            <span class="legend-dot legend-dot--ai-domain"></span>
+            <span>AI's Observable Domain</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot legend-dot--ai-figure"></span>
+            <span>AI (Context Window)</span>
         </div>
         <div class="legend-item">
             <span class="legend-dot legend-dot--human"></span>
@@ -338,6 +371,14 @@
 
     <div class="footer-quote" id="footerQuote">
         Humans access information the model never had
+    </div>
+
+    <div class="controls-hint" id="controlsHint">
+        <span>Drag to rotate</span>
+        <span>•</span>
+        <span>Scroll to zoom</span>
+        <span>•</span>
+        <span>Right-drag to pan</span>
     </div>
 
     <script src="main.js"></script>

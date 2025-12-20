@@ -8,7 +8,18 @@
       "Bash(pnpm dlx shadcn@latest mcp init:*)",
       "Bash(npx shadcn@latest mcp init:*)",
       "Skill(example-skills:frontend-design)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(cat:*)",
+      "Bash(git -C \"/Users/idstuart/Documents/Semester 4/Independent Study/interactive-data-viz\" log --oneline)",
+      "Bash(cd:*)",
+      "Bash(open:*)",
+      "Bash(git restore visualizations/complementarity-view/index.html visualizations/complementarity-view/styles.css visualizations/complementarity-view/main.js)",
+      "Bash(node --check:*)",
+      "Bash(pkill:*)",
+      "Bash(tree:*)",
+      "Bash(du -sh:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

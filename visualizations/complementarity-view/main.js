@@ -19,31 +19,34 @@ const CONFIG = {
         unobservable: 0xf59e0b,
     },
 
+    // Unobservables positioned in human's perception area (x=0 to x=7, centered at x=3.5)
+    // All OUTSIDE AI's light cone (which ends at x=1.5)
+    // Arranged in a pleasing arc around the human figure
     unobservables: [
         { id: 'intuition', symbol: '◎', title: 'Intuition',
           description: 'Knowing something is wrong before you can articulate why.',
-          position: { x: 4, z: -2 } },
+          position: { x: 2.5, z: -2.5 } },
         { id: 'presence', symbol: '◈', title: 'Physical Presence',
           description: 'The weight of a handshake, the tension in a room.',
-          position: { x: 5.5, z: 1 } },
+          position: { x: 4.5, z: 2 } },
         { id: 'room', symbol: '◇', title: 'Reading the Room',
           description: 'The collective mood. Energy that shifts without anyone speaking.',
-          position: { x: 6, z: -1.5 } },
+          position: { x: 5.5, z: -1.5 } },
         { id: 'trust', symbol: '∞', title: 'Relationship Capital',
           description: 'Trust built through years.',
-          position: { x: 4.5, z: 2 } },
+          position: { x: 3.5, z: 2.5 } },
         { id: 'memory', symbol: '⌘', title: 'Institutional Memory',
           description: 'How things actually work, beyond the org chart.',
-          position: { x: 7, z: 0 } },
+          position: { x: 6, z: 0.5 } },
         { id: 'context', symbol: '⟡', title: 'Contextual Meaning',
           description: 'Understanding what "fine" really means.',
-          position: { x: 5, z: -3 } },
+          position: { x: 4.5, z: -2 } },
         { id: 'timing', symbol: '◐', title: 'Timing & Rhythm',
           description: 'Knowing when to push and when to wait.',
-          position: { x: 6.5, z: 2.5 } },
+          position: { x: 5, z: 1 } },
         { id: 'silence', symbol: '○', title: "What's Not Said",
           description: 'The pause that speaks volumes.',
-          position: { x: 8, z: -2 } },
+          position: { x: 6.5, z: -0.5 } },
     ],
 };
 
@@ -51,7 +54,7 @@ const CONFIG = {
 // Global variables
 // ============================================================
 
-let scene, camera, renderer;
+let scene, camera, renderer, controls;
 let time = 0;
 let mouse = { x: 0, y: 0 };
 let mouseClient = { x: 0, y: 0 };
@@ -71,14 +74,15 @@ function init() {
         // Scene
         scene = new THREE.Scene();
         scene.background = new THREE.Color(CONFIG.colors.bg);
-        scene.fog = new THREE.Fog(CONFIG.colors.bg, 10, 25);
+        scene.fog = new THREE.Fog(CONFIG.colors.bg, 15, 40);
         console.log('Scene created');
 
-        // Camera - 3rd person view (good for embedding)
+        // Camera - isometric corner view
         const aspect = window.innerWidth / window.innerHeight;
         camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
-        camera.position.set(2, 12, 12);
-        camera.lookAt(2, 0, 0);
+        // Position at corner diagonal - adjusted to frame the full scene
+        camera.position.set(12, 12, 14);
+        // Note: camera.lookAt is managed by OrbitControls
         console.log('Camera created');
 
         // Renderer
@@ -98,9 +102,31 @@ function init() {
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         console.log('Renderer created');
 
-        // Lights
-        const ambient = new THREE.AmbientLight(0x404050, 0.5);
+        // OrbitControls for pan/tilt/zoom
+        if (typeof THREE.OrbitControls !== 'undefined') {
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = true;
+            controls.minDistance = 5;
+            controls.maxDistance = 50;
+            controls.maxPolarAngle = Math.PI / 2.1; // Prevent going below ground
+            controls.target.set(2, 0, 0); // Look at center of scene
+            controls.update();
+            console.log('OrbitControls initialized');
+        } else {
+            console.warn('OrbitControls not available - using static camera');
+            camera.lookAt(2, 0, 0);
+        }
+
+        // Lights - brighter for better visibility
+        const ambient = new THREE.AmbientLight(0x606080, 1.2);
         scene.add(ambient);
+
+        // Add directional light for better definition
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight.position.set(10, 15, 10);
+        scene.add(dirLight);
 
         // Create scene elements
         createGround();
@@ -108,6 +134,7 @@ function init() {
         createAIFigure();
         createHumanFigure();
         createUnobservables();
+        createSceneLabels();
 
         // Events
         setupEvents();
@@ -143,8 +170,8 @@ function createGround() {
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Grid
-    const grid = new THREE.GridHelper(30, 60, 0x2a2a34, 0x1f1f28);
+    // Grid - more visible
+    const grid = new THREE.GridHelper(30, 40, 0x3a3a48, 0x2a2a38);
     grid.position.y = 0.01;
     scene.add(grid);
 
@@ -191,13 +218,13 @@ function createStreetLamp() {
     bulb.position.set(1, 3.35, 0);
     lampGroup.add(bulb);
 
-    // Spot light
-    const spotLight = new THREE.SpotLight(CONFIG.colors.lampGlow, 2);
+    // Spot light - brighter
+    const spotLight = new THREE.SpotLight(CONFIG.colors.lampGlow, 4);
     spotLight.position.set(1, 3.3, 0);
-    spotLight.angle = Math.PI / 4;
-    spotLight.penumbra = 0.5;
-    spotLight.decay = 1.5;
-    spotLight.distance = 15;
+    spotLight.angle = Math.PI / 3.5;
+    spotLight.penumbra = 0.4;
+    spotLight.decay = 1.2;
+    spotLight.distance = 18;
     spotLight.castShadow = true;
     spotLight.shadow.mapSize.width = 1024;
     spotLight.shadow.mapSize.height = 1024;
@@ -220,26 +247,33 @@ function createStreetLamp() {
 }
 
 function createLightCone() {
-    const coneGeom = new THREE.ConeGeometry(3, 3.5, 32, 1, true);
+    // Cone starts at lamp bulb and expands DOWN to ground
+    // Lamp bulb is at world position (-2, 3.35, 0)
+    const coneHeight = 3.35;
+    const coneRadius = 3.5;
+
+    const coneGeom = new THREE.ConeGeometry(coneRadius, coneHeight, 32, 1, true);
     const coneMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.lampGlow,
         transparent: true,
-        opacity: 0.08,
+        opacity: 0.15,
         side: THREE.DoubleSide,
         depthWrite: false,
     });
 
     lightCone = new THREE.Mesh(coneGeom, coneMat);
-    lightCone.position.set(-2, 1.75, 0);
-    lightCone.rotation.z = Math.PI;
+    // Position so tip is at bulb (y=3.35) and base is at ground (y=0)
+    // Cone center needs to be at y = coneHeight/2
+    lightCone.position.set(-2, coneHeight / 2, 0);
+    // No rotation needed - cone tip points UP by default, which is towards lamp
     scene.add(lightCone);
 
-    // Ground circle
-    const circleGeom = new THREE.CircleGeometry(3, 32);
+    // Ground circle - matches cone base, this is AI's observable domain
+    const circleGeom = new THREE.CircleGeometry(coneRadius, 32);
     const circleMat = new THREE.MeshBasicMaterial({
         color: CONFIG.colors.lampGlow,
         transparent: true,
-        opacity: 0.1,
+        opacity: 0.2,
     });
     const circle = new THREE.Mesh(circleGeom, circleMat);
     circle.rotation.x = -Math.PI / 2;
@@ -256,10 +290,10 @@ function createAIFigure() {
 
     const bodyMat = new THREE.MeshStandardMaterial({
         color: CONFIG.colors.ai,
-        roughness: 0.3,
-        metalness: 0.7,
+        roughness: 0.2,
+        metalness: 0.8,
         emissive: CONFIG.colors.ai,
-        emissiveIntensity: 0.2,
+        emissiveIntensity: 0.6,
     });
 
     // Body
@@ -311,10 +345,10 @@ function createHumanFigure() {
 
     const bodyMat = new THREE.MeshStandardMaterial({
         color: CONFIG.colors.human,
-        roughness: 0.6,
-        metalness: 0.1,
+        roughness: 0.4,
+        metalness: 0.2,
         emissive: CONFIG.colors.human,
-        emissiveIntensity: 0.1,
+        emissiveIntensity: 0.5,
     });
 
     // Body - use cylinder instead of capsule for compatibility
@@ -353,25 +387,29 @@ function createHumanFigure() {
     rightLeg.position.set(0.1, 0.2, 0);
     humanGroup.add(rightLeg);
 
-    // Perception glow sphere
-    const glowGeom = new THREE.SphereGeometry(2.5, 32, 32);
-    const glowMat = new THREE.MeshBasicMaterial({
-        color: CONFIG.colors.human,
-        transparent: true,
-        opacity: 0.03,
-        side: THREE.BackSide,
-    });
-    humanGlow = new THREE.Mesh(glowGeom, glowMat);
-    humanGlow.position.y = 0.8;
-    humanGlow.position.x = 1;
-    humanGroup.add(humanGlow);
-
-    humanGroup.position.set(1, 0, 0);
-    humanGroup.rotation.y = -Math.PI / 6;
+    // Human is positioned at the edge of AI's light cone
+    // Light cone center is at x=-2, radius 3.5, so boundary is at x=1.5
+    // Human stands at the boundary
+    humanGroup.position.set(2, 0, 0);
+    humanGroup.rotation.y = -Math.PI / 5; // Facing towards AI/light
     scene.add(humanGroup);
 
-    // Label
-    createLabel('Human', new THREE.Vector3(1, 2.2, 0), '#34d399');
+    // Human perception area - ground circle with ~20% overlap with AI's area
+    // AI circle: center x=-2, radius 3.5 (extends to x=1.5)
+    // Human circle: center x=3.5, radius 3.5 → overlaps from x=0 to x=1.5
+    const humanPerceptionGeom = new THREE.CircleGeometry(3.5, 32);
+    const humanPerceptionMat = new THREE.MeshBasicMaterial({
+        color: CONFIG.colors.human,
+        transparent: true,
+        opacity: 0.1,
+    });
+    const humanPerception = new THREE.Mesh(humanPerceptionGeom, humanPerceptionMat);
+    humanPerception.rotation.x = -Math.PI / 2;
+    humanPerception.position.set(3.5, 0.03, 0);
+    scene.add(humanPerception);
+
+    // Label - positioned above the human figure
+    createLabel('Human', new THREE.Vector3(2, 2.2, 0), '#34d399');
 
     console.log('Human figure created');
 }
@@ -384,20 +422,18 @@ function createUnobservables() {
     CONFIG.unobservables.forEach((u, i) => {
         const group = new THREE.Group();
 
-        // Orb
-        const orbGeom = new THREE.SphereGeometry(0.25, 16, 16);
-        const orbMat = new THREE.MeshStandardMaterial({
+        // Minimal, refined orb - small and elegant
+        const orbGeom = new THREE.SphereGeometry(0.1, 16, 16);
+        const orbMat = new THREE.MeshBasicMaterial({
             color: CONFIG.colors.unobservable,
-            emissive: CONFIG.colors.unobservable,
-            emissiveIntensity: 0.5,
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.9,
         });
         const orb = new THREE.Mesh(orbGeom, orbMat);
         group.add(orb);
 
-        // Glow
-        const glowGeom = new THREE.SphereGeometry(0.5, 16, 16);
+        // Subtle glow halo - just enough to make it visible
+        const glowGeom = new THREE.SphereGeometry(0.18, 16, 16);
         const glowMat = new THREE.MeshBasicMaterial({
             color: CONFIG.colors.unobservable,
             transparent: true,
@@ -406,8 +442,8 @@ function createUnobservables() {
         const glow = new THREE.Mesh(glowGeom, glowMat);
         group.add(glow);
 
-        // Position
-        const baseY = 1.2 + i * 0.08;
+        // Position - floating at a low height
+        const baseY = 0.5;
         group.position.set(u.position.x, baseY, u.position.z);
         group.userData = { unobservable: u, index: i, baseY: baseY };
 
@@ -440,6 +476,36 @@ function createUnobservableLabel(u, group) {
 }
 
 // ============================================================
+// Scene Labels (Observable/Unobservable area labels)
+// ============================================================
+
+function createSceneLabels() {
+    // "Observable Data" label - positioned above AI's domain
+    const observableLabel = document.getElementById('labelObservable');
+    if (observableLabel) {
+        labelElements.push({
+            element: observableLabel,
+            position: new THREE.Vector3(-2, 0.5, -3), // Above/behind the light cone
+            isFixed: true,
+            isSceneLabel: true,
+        });
+    }
+
+    // "The Unobservable" label - positioned in human's domain
+    const unobservableLabel = document.getElementById('labelUnobservable');
+    if (unobservableLabel) {
+        labelElements.push({
+            element: unobservableLabel,
+            position: new THREE.Vector3(5, 0.5, -2), // In the unobservable area
+            isFixed: true,
+            isSceneLabel: true,
+        });
+    }
+
+    console.log('Scene labels created');
+}
+
+// ============================================================
 // Labels
 // ============================================================
 
@@ -464,7 +530,7 @@ function updateLabels() {
             pos = label.position.clone();
         } else {
             pos = label.object.position.clone();
-            pos.y += 0.8;
+            pos.y += 0.4; // Smaller offset for smaller orbs
         }
 
         const projected = pos.project(camera);
@@ -535,6 +601,11 @@ function animate() {
 
     time += 0.016;
 
+    // Update OrbitControls for smooth damping
+    if (controls) {
+        controls.update();
+    }
+
     // Light cone flicker
     if (lightCone) {
         lightCone.material.opacity = 0.06 + Math.sin(time * 3) * 0.02;
@@ -550,21 +621,22 @@ function animate() {
         humanArm.rotation.z = -1.2 + Math.sin(time * 0.5) * 0.1;
     }
 
-    // Animate unobservables
+    // Animate unobservables - gentle floating motion
     unobservableObjects.forEach((group, i) => {
         const baseY = group.userData.baseY;
-        group.position.y = baseY + Math.sin(time * 0.7 + i * 0.5) * 0.15;
-        group.rotation.y = time * 0.3 + i;
+        group.position.y = baseY + Math.sin(time * 0.5 + i * 0.7) * 0.08;
 
         const isHovered = hoveredUnobservable === group.userData.unobservable.id;
-        const targetScale = isHovered ? 1.4 : 1.0;
+        const targetScale = isHovered ? 1.3 : 1.0;
         const currentScale = group.scale.x;
         const newScale = currentScale + (targetScale - currentScale) * 0.1;
         group.scale.setScalar(newScale);
 
+        // Animate opacity for hover feedback
         const orb = group.children[0];
-        orb.material.emissiveIntensity = isHovered ? 0.9 : 0.5;
-        orb.material.opacity = isHovered ? 1.0 : 0.8;
+        const glow = group.children[1];
+        orb.material.opacity = isHovered ? 1.0 : 0.9;
+        glow.material.opacity = isHovered ? 0.25 : 0.12;
     });
 
     checkHover();
@@ -612,20 +684,35 @@ function playIntro() {
 
     setTimeout(() => {
         document.getElementById('legend').classList.add('visible');
+        // Show scene labels
+        document.getElementById('labelObservable')?.classList.add('visible');
+        document.getElementById('labelUnobservable')?.classList.add('visible');
     }, 1000);
 
     setTimeout(() => {
         document.getElementById('footerQuote').classList.add('visible');
     }, 1500);
 
-    // Camera animation
+    setTimeout(() => {
+        document.getElementById('controlsHint').classList.add('visible');
+    }, 2500);
+
+    // Camera animation - zoom in from further corner
     if (typeof gsap !== 'undefined') {
-        gsap.from(camera.position, {
-            x: 2,
-            y: 18,
-            z: 18,
-            duration: 2,
+        const startPos = { x: 20, y: 18, z: 22 };
+        camera.position.set(startPos.x, startPos.y, startPos.z);
+
+        gsap.to(camera.position, {
+            x: 12,
+            y: 12,
+            z: 14,
+            duration: 2.5,
             ease: 'power2.out',
+            onUpdate: () => {
+                if (controls) {
+                    controls.update();
+                }
+            }
         });
     }
 }
