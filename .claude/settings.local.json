@@ -19,7 +19,9 @@
       "Bash(tree:*)",
       "Bash(du -sh:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(cd /Users/idstuart/Documents/Semester\\\\ 4/Independent\\\\ Study/interactive-data-viz && git fetch:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }
