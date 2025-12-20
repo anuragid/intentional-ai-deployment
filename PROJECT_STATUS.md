@@ -38,7 +38,7 @@ Each visualization must work in **three contexts**:
 ## Project Structure
 
 ```
-interactive-data-viz/
+intentional-ai-deployment/
 ├── index.html                    # Landing page (observatory aesthetic)
 ├── package.json                  # Dependencies (shadcn for dev)
 ├── PROJECT_STATUS.md             # This file
