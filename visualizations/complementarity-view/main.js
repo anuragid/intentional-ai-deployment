@@ -12,11 +12,11 @@ const CONFIG = {
         bg: 0x08080c,
         ground: 0x1a1a24,
         lampPost: 0x3a3a44,
-        lampLight: 0xfef3c7,
-        lampGlow: 0xfbbf24,
+        lampLight: 0xf0f6ff,    // Cool white LED (slight blue tint)
+        lampGlow: 0xd8e8ff,     // LED blue/white glow
         ai: 0x22d3ee,
         human: 0x34d399,
-        unobservable: 0xf59e0b,
+        unobservable: 0xf59e0b, // Amber - now distinct from lamp
     },
 
     // Unobservables positioned in human's perception area (x=0 to x=7, centered at x=3.5)
@@ -1093,17 +1093,18 @@ let dustParticles = null;
 let dustVelocities = [];
 
 function createDustParticles() {
-    const count = 150;
+    const count = 50; // Reduced from 150 for subtler effect
     const positions = new Float32Array(count * 3);
     dustVelocities = [];
 
     // Light cone parameters: center at (-2, 0, 0), radius 3.5 at ground, height 3.35
+    // Lamp bulb is at top (y = 3.35), cone spreads down to ground (y = 0)
     const coneCenter = new THREE.Vector3(-2, 0, 0);
     const coneRadius = 3.5;
     const coneHeight = 3.35;
 
     for (let i = 0; i < count; i++) {
-        // Random position within cone
+        // Random position within cone (start scattered throughout)
         const y = Math.random() * coneHeight;
         const radiusAtHeight = coneRadius * (1 - y / coneHeight);
         const angle = Math.random() * Math.PI * 2;
@@ -1113,11 +1114,12 @@ function createDustParticles() {
         positions[i * 3 + 1] = y;
         positions[i * 3 + 2] = coneCenter.z + Math.sin(angle) * r;
 
-        // Random velocity (slow drift upward and sideways)
+        // Velocity: slow drift DOWNWARD from lamp, spreading outward to fill cone
+        const outwardSpeed = (Math.random() * 0.001 + 0.0008); // Slower radial expansion
         dustVelocities.push({
-            x: (Math.random() - 0.5) * 0.003,
-            y: Math.random() * 0.005 + 0.002,
-            z: (Math.random() - 0.5) * 0.003
+            angle: angle,
+            outwardSpeed: outwardSpeed,
+            y: -(Math.random() * 0.002 + 0.001), // Slower downward drift
         });
     }
 
@@ -1150,26 +1152,41 @@ function updateDustParticles() {
     for (let i = 0; i < dustVelocities.length; i++) {
         const vel = dustVelocities[i];
 
-        // Update position
-        positions[i * 3] += vel.x;
+        // Get current position relative to cone center
+        const x = positions[i * 3] - coneCenter.x;
+        const z = positions[i * 3 + 2] - coneCenter.z;
+        const currentRadius = Math.sqrt(x * x + z * z);
+
+        // Move outward radially (spread to fill cone)
+        const newRadius = currentRadius + vel.outwardSpeed;
+        if (currentRadius > 0.01) {
+            positions[i * 3] = coneCenter.x + (x / currentRadius) * newRadius;
+            positions[i * 3 + 2] = coneCenter.z + (z / currentRadius) * newRadius;
+        } else {
+            // If at center, pick a direction based on stored angle
+            positions[i * 3] = coneCenter.x + Math.cos(vel.angle) * newRadius;
+            positions[i * 3 + 2] = coneCenter.z + Math.sin(vel.angle) * newRadius;
+        }
+
+        // Move downward
         positions[i * 3 + 1] += vel.y;
-        positions[i * 3 + 2] += vel.z;
 
         const y = positions[i * 3 + 1];
+        const maxRadiusAtHeight = coneRadius * (1 - y / coneHeight);
 
-        // Reset if particle goes above cone or outside bounds
-        if (y > coneHeight) {
-            // Respawn at bottom
+        // Reset if particle hits ground OR exceeds cone boundary
+        if (y < 0 || newRadius > maxRadiusAtHeight) {
+            // Respawn near the lamp bulb (top of cone, small radius)
             const angle = Math.random() * Math.PI * 2;
-            const r = Math.random() * coneRadius;
+            const r = Math.random() * 0.3; // Start with small radius near bulb
             positions[i * 3] = coneCenter.x + Math.cos(angle) * r;
-            positions[i * 3 + 1] = 0;
+            positions[i * 3 + 1] = coneHeight - 0.1; // Just below the bulb
             positions[i * 3 + 2] = coneCenter.z + Math.sin(angle) * r;
 
-            // New velocity
-            vel.x = (Math.random() - 0.5) * 0.003;
-            vel.y = Math.random() * 0.005 + 0.002;
-            vel.z = (Math.random() - 0.5) * 0.003;
+            // New velocity (slow drift)
+            vel.angle = angle;
+            vel.outwardSpeed = (Math.random() * 0.001 + 0.0008);
+            vel.y = -(Math.random() * 0.002 + 0.001);
         }
     }
 
@@ -1335,91 +1352,7 @@ function createAIFigure() {
     // Label
     createLabel('AI', new THREE.Vector3(-2, 2.2, 0), '#22d3ee');
 
-    // Create ambient fog/particles around AI (digital haze)
-    createAIAmbientFog();
-
     console.log('AI figure created');
-}
-
-// ============================================================
-// AI Ambient Fog (particles around AI figure)
-// ============================================================
-
-let aiFogParticles = null;
-let aiFogVelocities = [];
-
-function createAIAmbientFog() {
-    const count = 60;
-    const positions = new Float32Array(count * 3);
-    aiFogVelocities = [];
-
-    // Particles around AI figure at x=-2
-    const center = new THREE.Vector3(-2, 1, 0);
-    const radius = 1.5;
-
-    for (let i = 0; i < count; i++) {
-        // Random position in a cylinder around AI
-        const angle = Math.random() * Math.PI * 2;
-        const r = Math.random() * radius;
-        const y = Math.random() * 2.5;
-
-        positions[i * 3] = center.x + Math.cos(angle) * r;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = center.z + Math.sin(angle) * r;
-
-        // Slow circular drift
-        aiFogVelocities.push({
-            angle: angle,
-            radius: r,
-            ySpeed: (Math.random() - 0.5) * 0.002,
-            angleSpeed: (Math.random() - 0.5) * 0.005
-        });
-    }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const material = new THREE.PointsMaterial({
-        color: CONFIG.colors.ai,
-        size: 0.04,
-        transparent: true,
-        opacity: 0.25,
-        sizeAttenuation: true,
-        depthWrite: false
-    });
-
-    aiFogParticles = new THREE.Points(geometry, material);
-    scene.add(aiFogParticles);
-
-    console.log('AI ambient fog created');
-}
-
-function updateAIFogParticles() {
-    if (!aiFogParticles) return;
-
-    const positions = aiFogParticles.geometry.attributes.position.array;
-    const center = new THREE.Vector3(-2, 1, 0);
-
-    for (let i = 0; i < aiFogVelocities.length; i++) {
-        const vel = aiFogVelocities[i];
-
-        // Update angle for circular motion
-        vel.angle += vel.angleSpeed;
-
-        // Update position
-        positions[i * 3] = center.x + Math.cos(vel.angle) * vel.radius;
-        positions[i * 3 + 1] += vel.ySpeed;
-        positions[i * 3 + 2] = center.z + Math.sin(vel.angle) * vel.radius;
-
-        const y = positions[i * 3 + 1];
-
-        // Reset if particle goes too high or low
-        if (y > 2.5 || y < 0) {
-            vel.ySpeed = -vel.ySpeed;
-        }
-    }
-
-    aiFogParticles.geometry.attributes.position.needsUpdate = true;
 }
 
 // ============================================================
@@ -1507,114 +1440,296 @@ function createHumanFigure() {
 // Unobservables
 // ============================================================
 
-// Orb effect configurations
+// Orb effect configurations - each effect embodies the concept's meaning
+// DESIGN PRINCIPLES:
+// 1. All animations must be continuous, smooth, and cyclic - NO visible resets
+// 2. Colors stay in amber/gold range (hue 0.08-0.12) - NO red tones
+// 3. Each orb has orbiting/external elements for visual distinctiveness
 const ORB_EFFECTS = {
     intuition: {
-        // Irregular pulsing rhythm
-        animate: (group, time) => {
-            const pulse = Math.sin(time * 3) * Math.sin(time * 1.7) * 0.15;
-            group.children[0].scale.setScalar(1 + pulse);
-        }
-    },
-    presence: {
-        // Lower float, slight vibration
-        baseYOffset: -0.15,
-        animate: (group, time) => {
-            group.position.x += Math.sin(time * 15) * 0.002;
-            group.position.z += Math.cos(time * 12) * 0.002;
-        }
-    },
-    room: {
-        // Orbiting small particles (created in setup)
+        // Irregular pulse + spark particles that orbit erratically - gut feeling
         setup: (group) => {
+            // Add 3 spark particles that move unpredictably
             for (let i = 0; i < 3; i++) {
-                const particleGeom = new THREE.SphereGeometry(0.02, 8, 8);
-                const particleMat = new THREE.MeshBasicMaterial({
+                const sparkGeom = new THREE.SphereGeometry(0.012, 6, 6);
+                const sparkMat = new THREE.MeshBasicMaterial({
                     color: CONFIG.colors.unobservable,
                     transparent: true,
                     opacity: 0.6
                 });
+                const spark = new THREE.Mesh(sparkGeom, sparkMat);
+                spark.userData.phase = i * 2.1; // Different starting phases
+                group.add(spark);
+            }
+        },
+        animate: (group, time) => {
+            // Irregular base pulse (two sine waves multiplied)
+            const basePulse = Math.sin(time * 2) * Math.sin(time * 1.3) * 0.1;
+
+            // Occasional sudden flash (using smooth spike)
+            const flashCycle = (time * 0.3) % 1;
+            const flash = flashCycle > 0.9 ? (1 - (flashCycle - 0.9) * 10) * 0.3 : 0;
+
+            group.children[0].scale.setScalar(1 + basePulse + flash);
+            group.children[1].scale.setScalar(1 + basePulse * 0.5 + flash * 1.5);
+
+            if (flash > 0) {
+                group.children[1].material.opacity = 0.12 + flash * 0.4;
+            } else {
+                group.children[1].material.opacity = 0.12;
+            }
+
+            // Animate spark particles - erratic but continuous orbits
+            group.children.slice(2).forEach((spark, i) => {
+                const phase = spark.userData.phase;
+                // Use multiple frequencies for irregular but continuous motion
+                const angle = time * 0.8 + phase + Math.sin(time * 0.3 + phase) * 0.5;
+                const radius = 0.18 + Math.sin(time * 0.5 + phase) * 0.04;
+                const yOffset = Math.sin(time * 0.7 + phase * 2) * 0.06;
+
+                spark.position.x = Math.cos(angle) * radius;
+                spark.position.z = Math.sin(angle) * radius;
+                spark.position.y = yOffset;
+
+                // Fade with flash
+                spark.material.opacity = 0.4 + flash * 0.6;
+            });
+        }
+    },
+    presence: {
+        // Grounded with gravity particles falling around it - weight and mass
+        baseYOffset: -0.2,
+        setup: (group) => {
+            // Add 5 gravity particles that slowly fall around the orb
+            for (let i = 0; i < 5; i++) {
+                const particleGeom = new THREE.SphereGeometry(0.008, 6, 6);
+                const particleMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.4
+                });
                 const particle = new THREE.Mesh(particleGeom, particleMat);
-                particle.userData.orbitAngle = (i / 3) * Math.PI * 2;
-                particle.userData.orbitRadius = 0.25;
+                particle.userData.angle = (i / 5) * Math.PI * 2;
+                particle.userData.fallOffset = i * 0.2; // Stagger the fall
                 group.add(particle);
             }
         },
         animate: (group, time) => {
+            // Slow, heavy breathing
+            const breathCycle = Math.sin(time * 0.4);
+            const breathScale = 1 + breathCycle * 0.05;
+
+            group.children[0].scale.setScalar(breathScale);
+            group.children[1].scale.setScalar(breathScale * 1.1);
+
+            // Gravity particles - continuous falling loop
             group.children.slice(2).forEach((particle, i) => {
-                const angle = particle.userData.orbitAngle + time * 1.5;
-                const radius = particle.userData.orbitRadius;
+                const angle = particle.userData.angle + time * 0.1; // Slow rotation
+                const fallOffset = particle.userData.fallOffset;
+
+                // Continuous fall cycle (0 to 1, loops smoothly)
+                const fallCycle = ((time * 0.15 + fallOffset) % 1);
+                // Start high, fall down, fade out at bottom
+                const y = 0.25 - fallCycle * 0.4;
+                const radius = 0.15 + fallCycle * 0.05; // Slight outward drift
+
                 particle.position.x = Math.cos(angle) * radius;
                 particle.position.z = Math.sin(angle) * radius;
-                particle.position.y = Math.sin(time * 2 + i) * 0.05;
+                particle.position.y = y;
+
+                // Fade as it falls
+                particle.material.opacity = 0.5 * (1 - fallCycle * 0.8);
+            });
+        }
+    },
+    room: {
+        // Orbiting particles with smooth mood shifts - collective energy
+        setup: (group) => {
+            for (let i = 0; i < 4; i++) {
+                const particleGeom = new THREE.SphereGeometry(0.018, 8, 8);
+                const particleMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const particle = new THREE.Mesh(particleGeom, particleMat);
+                particle.userData.orbitAngle = (i / 4) * Math.PI * 2;
+                particle.userData.orbitRadius = 0.22 + (i % 2) * 0.05;
+                particle.userData.baseSpeed = 0.4 + (i * 0.1); // Slightly different base speeds
+                group.add(particle);
+            }
+            group.userData.moodShift = 0;
+            group.userData.targetMoodShift = 0;
+        },
+        animate: (group, time) => {
+            // Smooth mood shift transitions (no jerky resets)
+            const shiftCycle = Math.sin(time * 0.08) * 0.3; // Smooth oscillating mood
+            group.userData.moodShift = shiftCycle;
+
+            group.children.slice(2).forEach((particle, i) => {
+                const baseSpeed = particle.userData.baseSpeed;
+                const speed = baseSpeed + group.userData.moodShift;
+
+                // Continuous angle accumulation (no resets)
+                const angle = particle.userData.orbitAngle + time * speed;
+                const radius = particle.userData.orbitRadius;
+
+                particle.position.x = Math.cos(angle) * radius;
+                particle.position.z = Math.sin(angle) * radius;
+                particle.position.y = Math.sin(time * 0.5 + i) * 0.03;
             });
         }
     },
     trust: {
-        // Infinity ring structure
+        // Two interlinked rings + orbiting bond particles - relationships
         setup: (group) => {
-            const curve = new THREE.Curve();
-            const points = [];
-            for (let t = 0; t <= Math.PI * 2; t += 0.1) {
-                const x = Math.sin(t) * 0.15;
-                const z = Math.sin(t) * Math.cos(t) * 0.15;
-                points.push(new THREE.Vector3(x, 0, z));
+            // First infinity ring
+            const points1 = [];
+            for (let t = 0; t <= Math.PI * 2; t += 0.08) {
+                const x = Math.sin(t) * 0.16;
+                const z = Math.sin(t) * Math.cos(t) * 0.16;
+                points1.push(new THREE.Vector3(x, 0, z));
             }
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const material = new THREE.LineBasicMaterial({
+            const geometry1 = new THREE.BufferGeometry().setFromPoints(points1);
+            const material1 = new THREE.LineBasicMaterial({
                 color: CONFIG.colors.unobservable,
                 transparent: true,
-                opacity: 0.5
+                opacity: 0.6
             });
-            const infinityRing = new THREE.Line(geometry, material);
-            infinityRing.rotation.x = Math.PI / 2;
-            group.add(infinityRing);
+            const ring1 = new THREE.Line(geometry1, material1);
+            ring1.rotation.x = Math.PI / 2;
+            group.add(ring1);
+
+            // Second infinity ring (tilted)
+            const points2 = [];
+            for (let t = 0; t <= Math.PI * 2; t += 0.08) {
+                const x = Math.sin(t) * 0.14;
+                const z = Math.sin(t) * Math.cos(t) * 0.14;
+                points2.push(new THREE.Vector3(x, 0, z));
+            }
+            const geometry2 = new THREE.BufferGeometry().setFromPoints(points2);
+            const material2 = new THREE.LineBasicMaterial({
+                color: CONFIG.colors.unobservable,
+                transparent: true,
+                opacity: 0.45
+            });
+            const ring2 = new THREE.Line(geometry2, material2);
+            ring2.rotation.x = Math.PI / 2;
+            ring2.rotation.z = Math.PI / 3;
+            group.add(ring2);
+
+            // Add 2 bond particles that travel along the infinity paths
+            for (let i = 0; i < 2; i++) {
+                const bondGeom = new THREE.SphereGeometry(0.02, 8, 8);
+                const bondMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const bond = new THREE.Mesh(bondGeom, bondMat);
+                bond.userData.pathOffset = i * Math.PI; // Opposite sides
+                group.add(bond);
+            }
         },
         animate: (group, time) => {
-            const ring = group.children[2];
-            if (ring) {
-                ring.rotation.z = time * 0.5;
-            }
+            const ring1 = group.children[2];
+            const ring2 = group.children[3];
+            if (ring1) ring1.rotation.z = time * 0.15;
+            if (ring2) ring2.rotation.z = Math.PI / 3 + time * 0.12;
+
+            // Bond particles follow infinity path
+            group.children.slice(4).forEach((bond, i) => {
+                const t = time * 0.5 + bond.userData.pathOffset;
+                const x = Math.sin(t) * 0.15;
+                const z = Math.sin(t) * Math.cos(t) * 0.15;
+                const y = Math.sin(t * 2) * 0.02;
+                bond.position.set(x, y, z);
+            });
         }
     },
     memory: {
-        // Nested/layered spheres
+        // Nested layers with orbiting archive particles - knowledge in layers
         setup: (group) => {
-            for (let i = 1; i <= 2; i++) {
-                const layerGeom = new THREE.SphereGeometry(0.1 + i * 0.06, 8, 8);
+            for (let i = 1; i <= 3; i++) {
+                const layerGeom = new THREE.SphereGeometry(0.08 + i * 0.045, 12, 12);
                 const layerMat = new THREE.MeshBasicMaterial({
                     color: CONFIG.colors.unobservable,
                     transparent: true,
-                    opacity: 0.15 - i * 0.04,
+                    opacity: 0.2 - i * 0.05,
                     wireframe: true
                 });
                 const layer = new THREE.Mesh(layerGeom, layerMat);
+                layer.userData.baseOpacity = 0.2 - i * 0.05;
                 group.add(layer);
             }
         },
         animate: (group, time) => {
             group.children.slice(2).forEach((layer, i) => {
-                layer.rotation.y = time * (0.3 + i * 0.2);
-                layer.rotation.x = time * (0.2 - i * 0.1);
+                // Continuous slow rotation
+                layer.rotation.y = time * (0.1 + i * 0.05);
+                layer.rotation.x = time * (0.08 - i * 0.02);
+
+                // Smooth opacity pulse
+                const pulseCycle = Math.sin(time * 0.3 + i * 1.5);
+                const opacityVariation = (i + 1) * 0.03;
+                layer.material.opacity = layer.userData.baseOpacity + pulseCycle * opacityVariation;
             });
         }
     },
     context: {
-        // Iridescent color shift - stays in amber/gold range (hue 0.08-0.12)
+        // Color shift in AMBER range only + orbiting context particles
+        setup: (group) => {
+            // Add 3 small context-shifting particles
+            for (let i = 0; i < 3; i++) {
+                const ctxGeom = new THREE.SphereGeometry(0.015, 8, 8);
+                const ctxMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const ctx = new THREE.Mesh(ctxGeom, ctxMat);
+                ctx.userData.orbitPhase = (i / 3) * Math.PI * 2;
+                group.add(ctx);
+            }
+        },
         animate: (group, time) => {
-            const hue = 0.1 + Math.sin(time * 0.5) * 0.02; // Subtle shift in amber range
-            const color = new THREE.Color().setHSL(hue, 0.85, 0.55);
+            // AMBER ONLY hue range (0.08-0.11) - NO RED
+            const hue = 0.095 + Math.sin(time * 0.4) * 0.015;
+            const saturation = 0.85 + Math.sin(time * 0.6) * 0.1;
+            const color = new THREE.Color().setHSL(hue, saturation, 0.55);
+
             group.children[0].material.color = color;
+            group.children[1].material.color = color;
+
+            // Glow pulses with color shift
+            const glowPulse = 0.12 + Math.sin(time * 0.4) * 0.06;
+            group.children[1].material.opacity = glowPulse;
+
+            // Context particles orbit with different colors (all amber range)
+            group.children.slice(2).forEach((ctx, i) => {
+                const phase = ctx.userData.orbitPhase;
+                const angle = time * 0.6 + phase;
+                const radius = 0.2;
+
+                ctx.position.x = Math.cos(angle) * radius;
+                ctx.position.z = Math.sin(angle) * radius;
+                ctx.position.y = Math.sin(time * 0.4 + phase) * 0.04;
+
+                // Each particle has slightly different amber hue
+                const particleHue = 0.08 + (i * 0.015);
+                ctx.material.color.setHSL(particleHue, 0.9, 0.5);
+            });
         }
     },
     timing: {
-        // Clock-like rotation indicator
+        // Clock hand + orbiting hour markers - knowing when
         setup: (group) => {
-            const handGeom = new THREE.BoxGeometry(0.02, 0.12, 0.01);
+            // Clock hand
+            const handGeom = new THREE.BoxGeometry(0.015, 0.12, 0.008);
             const handMat = new THREE.MeshBasicMaterial({
                 color: CONFIG.colors.unobservable,
                 transparent: true,
-                opacity: 0.7
+                opacity: 0.8
             });
             const hand = new THREE.Mesh(handGeom, handMat);
             hand.position.y = 0.06;
@@ -1622,20 +1737,111 @@ const ORB_EFFECTS = {
             const handPivot = new THREE.Group();
             handPivot.add(hand);
             group.add(handPivot);
+
+            // Add 4 hour markers orbiting
+            for (let i = 0; i < 4; i++) {
+                const markerGeom = new THREE.BoxGeometry(0.02, 0.008, 0.008);
+                const markerMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const marker = new THREE.Mesh(markerGeom, markerMat);
+                marker.userData.hourPosition = (i / 4) * Math.PI * 2;
+                group.add(marker);
+            }
+
+            group.userData.currentAngle = 0;
+            group.userData.targetAngle = 0;
+            group.userData.lastStepTime = 0;
+            group.userData.pauseDuration = 1.5 + Math.random();
         },
         animate: (group, time) => {
             const handPivot = group.children[2];
-            if (handPivot) {
-                handPivot.rotation.z = -time * 0.8;
+            if (!handPivot) return;
+
+            // Discrete steps with pauses - but smooth interpolation
+            const timeSinceLastStep = time - group.userData.lastStepTime;
+
+            if (timeSinceLastStep > group.userData.pauseDuration) {
+                group.userData.targetAngle -= Math.PI / 6; // Step forward
+                group.userData.lastStepTime = time;
+                group.userData.pauseDuration = 1.2 + Math.random() * 1.5;
             }
+
+            // Smooth transition to target (continuous, no reset)
+            group.userData.currentAngle += (group.userData.targetAngle - group.userData.currentAngle) * 0.08;
+            handPivot.rotation.z = group.userData.currentAngle;
+
+            // Hour markers orbit slowly
+            group.children.slice(3).forEach((marker, i) => {
+                const hourPos = marker.userData.hourPosition;
+                const angle = hourPos + time * 0.05; // Very slow orbit
+                const radius = 0.18;
+
+                marker.position.x = Math.cos(angle) * radius;
+                marker.position.z = Math.sin(angle) * radius;
+                marker.position.y = 0;
+                marker.rotation.z = angle; // Point outward
+            });
         }
     },
     silence: {
-        // Fade in/out partially transparent
+        // Fading orb + ghost wisps that drift outward - the unspoken
+        setup: (group) => {
+            // Add 4 ghost wisps that drift outward and fade
+            for (let i = 0; i < 4; i++) {
+                const wispGeom = new THREE.SphereGeometry(0.01, 6, 6);
+                const wispMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.unobservable,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const wisp = new THREE.Mesh(wispGeom, wispMat);
+                wisp.userData.phase = (i / 4); // Stagger the drift cycles
+                wisp.userData.angle = (i / 4) * Math.PI * 2;
+                group.add(wisp);
+            }
+        },
         animate: (group, time) => {
-            const fadeAmount = 0.3 + Math.sin(time * 0.8) * 0.3;
-            group.children[0].material.opacity = fadeAmount + 0.4;
-            group.children[1].material.opacity = fadeAmount * 0.3;
+            // Main orb: asymmetric fade cycle
+            const cycle = (time * 0.25) % 1;
+
+            let opacity;
+            if (cycle < 0.15) {
+                opacity = cycle / 0.15;
+            } else if (cycle < 0.35) {
+                opacity = 1;
+            } else if (cycle < 0.5) {
+                opacity = 1 - ((cycle - 0.35) / 0.15);
+            } else {
+                opacity = 0;
+            }
+
+            group.children[0].material.opacity = 0.15 + opacity * 0.75;
+            group.children[1].material.opacity = opacity * 0.2;
+
+            // Ghost wisps - continuous drift outward and fade, then reset
+            group.children.slice(2).forEach((wisp, i) => {
+                const phase = wisp.userData.phase;
+                const baseAngle = wisp.userData.angle;
+
+                // Continuous cycle (0 to 1)
+                const driftCycle = ((time * 0.2 + phase) % 1);
+
+                // Drift outward from center
+                const radius = driftCycle * 0.35;
+                const angle = baseAngle + time * 0.1;
+                const y = driftCycle * 0.1 - 0.05;
+
+                wisp.position.x = Math.cos(angle) * radius;
+                wisp.position.z = Math.sin(angle) * radius;
+                wisp.position.y = y;
+
+                // Fade as it drifts out
+                const wispOpacity = (1 - driftCycle) * 0.4;
+                wisp.material.opacity = wispOpacity * (0.5 + opacity * 0.5);
+            });
         }
     }
 };
@@ -1727,12 +1933,12 @@ function createSceneLabels() {
         });
     }
 
-    // "The Unobservable" label - positioned in human's domain
+    // "The Unobservable" label - positioned behind "What's Not Said" at human perception boundary
     const unobservableLabel = document.getElementById('labelUnobservable');
     if (unobservableLabel) {
         labelElements.push({
             element: unobservableLabel,
-            position: new THREE.Vector3(6, 3, -1), // Higher position above orbs
+            position: new THREE.Vector3(7, 1.2, -0.5), // Behind "What's Not Said" (6.5, -0.5) at the edge
             isFixed: true,
             isSceneLabel: true,
         });
@@ -1899,8 +2105,7 @@ function animate() {
     // Update dust particles
     updateDustParticles();
 
-    // Update AI fog particles
-    updateAIFogParticles();
+
 
     // Update constellation lines (visible when zoomed out)
     updateConstellationLines();
