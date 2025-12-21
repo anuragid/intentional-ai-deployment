@@ -128,11 +128,78 @@
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 120% 70% at 50% 0%, rgba(251, 191, 36, 0.08) 0%, transparent 55%),
         radial-gradient(ellipse 140% 50% at 50% 100%, rgba(251, 191, 36, 0.04) 0%, transparent 40%),
         radial-gradient(ellipse 90% 60% at 15% 85%, rgba(34, 211, 238, 0.05) 0%, transparent 45%),
         radial-gradient(ellipse 80% 50% at 90% 65%, rgba(139, 92, 246, 0.045) 0%, transparent 45%),
         radial-gradient(ellipse 70% 40% at 5% 25%, rgba(52, 211, 153, 0.04) 0%, transparent 45%);
+    }
+
+    /* God rays emanating from top center */
+    .god-rays {
+      position: fixed;
+      top: -50vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200vw;
+      height: 150vh;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        conic-gradient(
+          from 180deg at 50% 0%,
+          transparent 0deg,
+          rgba(251, 191, 36, 0.04) 8deg,
+          transparent 16deg,
+          transparent 24deg,
+          rgba(251, 191, 36, 0.06) 32deg,
+          transparent 40deg,
+          transparent 52deg,
+          rgba(251, 191, 36, 0.03) 58deg,
+          transparent 64deg,
+          transparent 76deg,
+          rgba(251, 191, 36, 0.05) 82deg,
+          transparent 88deg,
+          transparent 92deg,
+          rgba(251, 191, 36, 0.04) 98deg,
+          transparent 104deg,
+          transparent 116deg,
+          rgba(251, 191, 36, 0.03) 120deg,
+          transparent 126deg,
+          transparent 138deg,
+          rgba(251, 191, 36, 0.05) 144deg,
+          transparent 150deg,
+          transparent 162deg,
+          rgba(251, 191, 36, 0.04) 168deg,
+          transparent 174deg,
+          transparent 180deg
+        );
+      mask-image: radial-gradient(ellipse 100% 80% at 50% 0%, black 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 0%, black 0%, transparent 70%);
+      animation: godRaysPulse 12s ease-in-out infinite;
+    }
+
+    @keyframes godRaysPulse {
+      0%, 100% {
+        opacity: 0.7;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.02);
+      }
+    }
+
+    /* Central glow at the source of god rays */
+    .god-rays::before {
+      content: '';
+      position: absolute;
+      top: 48vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60vw;
+      height: 30vh;
+      background: radial-gradient(ellipse 100% 100% at 50% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 60%);
+      filter: blur(20px);
     }
 
     /* Depth fog at bottom for infinite scroll feeling */
@@ -1084,6 +1151,7 @@
     <canvas id="starfield"></canvas>
   </div>
   <div class="atmosphere"></div>
+  <div class="god-rays"></div>
   <div class="depth-fog" id="depthFog"></div>
   <div class="cursor-glow" id="cursorGlow"></div>
 
