@@ -1495,7 +1495,7 @@
 
             // Spread rays across full width - compress X to widen the cone
             float aspect = u_resolution.x / u_resolution.y;
-            shape_uv.x = shape_uv.x * 0.3 * aspect; // Compress X to spread rays wider
+            shape_uv.x = shape_uv.x * 0.7 * aspect; // Compress X to spread rays wider
             shape_uv.x -= u_offsetX;
             shape_uv.y = -shape_uv.y - u_offsetY; // Flip Y and apply offset
 
