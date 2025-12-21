@@ -1387,7 +1387,7 @@
 
   <script>
     // ============================================================
-    // GOD RAYS - WebGL VOLUMETRIC LIGHT
+    // GOD RAYS - Paper Design Shader (adapted for vanilla Three.js)
     // ============================================================
     (function() {
       const canvas = document.getElementById('godRays');
@@ -1402,12 +1402,24 @@
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
       camera.position.z = 1;
 
-      // God rays shader
+      // Volumetric god rays shader - subtle atmospheric light shafts
       const godRaysShader = {
         uniforms: {
-          uTime: { value: 0 },
-          uResolution: { value: new THREE.Vector2() },
-          uColor: { value: new THREE.Vector3(0.984, 0.749, 0.141) } // Amber color
+          u_time: { value: 0 },
+          u_resolution: { value: new THREE.Vector2() },
+          u_colorBack: { value: new THREE.Vector4(0.02, 0.02, 0.027, 0.0) }, // Transparent dark
+          u_color1: { value: new THREE.Vector4(0.984, 0.749, 0.141, 0.35) }, // Amber - subtle
+          u_color2: { value: new THREE.Vector4(0.961, 0.620, 0.043, 0.25) }, // Deep amber
+          u_color3: { value: new THREE.Vector4(1.0, 0.85, 0.4, 0.18) }, // Light gold
+          u_offsetX: { value: 0.0 },
+          u_offsetY: { value: -1.0 }, // Light source at top edge of viewport
+          u_frequency: { value: 1.5 }, // More rays
+          u_spotty: { value: 0.5 },
+          u_midSize: { value: 0.5 },
+          u_midIntensity: { value: 0.8 },
+          u_density: { value: 0.7 }, // Denser rays
+          u_bloom: { value: 0.9 }, // More glow
+          u_speed: { value: 0.5 }
         },
         vertexShader: `
           varying vec2 vUv;
@@ -1417,75 +1429,171 @@
           }
         `,
         fragmentShader: `
-          uniform float uTime;
-          uniform vec2 uResolution;
-          uniform vec3 uColor;
+          precision highp float;
+
+          uniform float u_time;
+          uniform vec2 u_resolution;
+          uniform vec4 u_colorBack;
+          uniform vec4 u_color1;
+          uniform vec4 u_color2;
+          uniform vec4 u_color3;
+          uniform float u_offsetX;
+          uniform float u_offsetY;
+          uniform float u_frequency;
+          uniform float u_spotty;
+          uniform float u_midSize;
+          uniform float u_midIntensity;
+          uniform float u_density;
+          uniform float u_bloom;
+          uniform float u_speed;
+
           varying vec2 vUv;
 
-          // Noise functions for organic movement
-          float hash(float n) { return fract(sin(n) * 43758.5453123); }
-          float noise(float x) {
-            float i = floor(x);
-            float f = fract(x);
-            return mix(hash(i), hash(i + 1.0), smoothstep(0.0, 1.0, f));
+          #define PI 3.14159265359
+          #define TWO_PI 6.28318530718
+
+          vec2 rotate(vec2 v, float a) {
+            float s = sin(a);
+            float c = cos(a);
+            return mat2(c, -s, s, c) * v;
+          }
+
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+          }
+
+          float valueNoise(vec2 st) {
+            vec2 i = floor(st);
+            vec2 f = fract(st);
+            float a = random(i);
+            float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0));
+            float d = random(i + vec2(1.0, 1.0));
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            float x1 = mix(a, b, u.x);
+            float x2 = mix(c, d, u.x);
+            return mix(x1, x2, u.y);
+          }
+
+          float hash11(float n) {
+            return fract(sin(n) * 43758.5453123);
+          }
+
+          float raysShape(vec2 uv, float r, float freq, float intensity, float radius) {
+            float a = atan(uv.y, uv.x);
+            vec2 left = vec2(a * freq, r);
+            vec2 right = vec2(fract(a / TWO_PI) * TWO_PI * freq, r);
+            float n_left = pow(valueNoise(left), intensity);
+            float n_right = pow(valueNoise(right), intensity);
+            float shape = mix(n_right, n_left, smoothstep(-0.15, 0.15, uv.x));
+            return shape;
           }
 
           void main() {
-            vec2 uv = vUv;
-            vec2 center = vec2(0.5, 0.0); // Top center
-            vec2 dir = uv - center;
+            // Center UV coordinates with offset for positioning light source
+            vec2 shape_uv = (vUv - 0.5) * 2.0;
 
-            // Calculate angle from center
-            float angle = atan(dir.x, dir.y);
-            float dist = length(dir);
+            // Spread rays across full width - compress X to widen the cone
+            float aspect = u_resolution.x / u_resolution.y;
+            shape_uv.x = shape_uv.x * 0.3 * aspect; // Compress X to spread rays wider
+            shape_uv.x -= u_offsetX;
+            shape_uv.y = -shape_uv.y - u_offsetY; // Flip Y and apply offset
 
-            // Create rays with varying intensities
-            float rays = 0.0;
-            float rayCount = 12.0;
+            float t = u_speed * u_time;
+            float radius = length(shape_uv);
+            float spots = 6.5 * abs(u_spotty);
+            float intensity = 3.5; // Fixed intensity for subtlety
 
-            for (float i = 0.0; i < 12.0; i++) {
-              float rayAngle = (i / rayCount) * 3.14159 - 1.5708; // Spread across bottom half
-              float rayWidth = 0.08 + noise(i * 10.0 + uTime * 0.1) * 0.06;
-              float rayIntensity = 0.3 + noise(i * 5.0) * 0.4;
+            // Mid glow - the bright center of the light source
+            float midSize = 10.0 * abs(u_midSize);
+            float ms_lo = 0.02 * midSize;
+            float ms_hi = max(midSize, 0.001);
+            float middleShape = pow(0.8, 0.3) * (1.0 - smoothstep(ms_lo, ms_hi, 3.0 * radius));
+            middleShape = pow(middleShape, 5.0) * u_midIntensity;
 
-              // Animate ray position slightly
-              rayAngle += sin(uTime * 0.2 + i) * 0.02;
+            vec3 accumColor = vec3(0.0);
+            float accumAlpha = 0.0;
 
-              // Calculate ray contribution
-              float angleDiff = abs(angle - rayAngle);
-              angleDiff = min(angleDiff, 3.14159 * 2.0 - angleDiff);
+            // Frequency multiplier
+            float freqMult = u_frequency;
 
-              float ray = smoothstep(rayWidth, 0.0, angleDiff);
-              ray *= rayIntensity;
+            // Layer 1 - Primary rays
+            vec2 rotatedUV1 = rotate(shape_uv, 0.8);
+            float r1_1 = radius * 1.0 - 2.0 * t;
+            float r2_1 = 0.5 * radius * (1.0 + spots) - 1.5 * t;
+            float density = 6.0 * u_density + step(0.5, u_density) * pow(4.5 * (u_density - 0.5), 4.0);
+            float f1 = mix(1.0, 3.0, hash11(0.0)) * density * freqMult;
+            float ray1 = raysShape(rotatedUV1, r1_1, 5.0 * f1, intensity, radius);
+            ray1 *= raysShape(rotatedUV1, r2_1, 4.0 * f1, intensity, radius);
+            ray1 += (1.0 + 3.0 * ray1) * middleShape;
+            ray1 = clamp(ray1, 0.0, 1.0);
+            float srcAlpha1 = u_color1.a * ray1;
+            vec3 srcColor1 = u_color1.rgb * srcAlpha1;
+            accumColor = accumColor + (1.0 - accumAlpha) * srcColor1;
+            accumAlpha = accumAlpha + (1.0 - accumAlpha) * srcAlpha1;
 
-              // Fade with distance from source
-              ray *= smoothstep(1.5, 0.0, dist);
+            // Layer 2 - Secondary rays (offset timing)
+            vec2 rotatedUV2 = rotate(shape_uv, 1.5);
+            float r1_2 = radius * 1.3 - 2.0 * t;
+            float r2_2 = 0.5 * radius * (1.0 + spots) - 1.8 * t;
+            float f2 = mix(1.0, 3.5, hash11(15.0)) * density * freqMult;
+            float ray2 = raysShape(rotatedUV2, r1_2, 5.0 * f2, intensity, radius);
+            ray2 *= raysShape(rotatedUV2, r2_2, 4.0 * f2, intensity, radius);
+            ray2 += (1.0 + 3.0 * ray2) * middleShape;
+            ray2 = clamp(ray2, 0.0, 1.0);
+            float srcAlpha2 = u_color2.a * ray2;
+            vec3 srcColor2 = u_color2.rgb * srcAlpha2;
+            vec3 blend2 = accumColor + (1.0 - accumAlpha) * srcColor2;
+            float blendA2 = accumAlpha + (1.0 - accumAlpha) * srcAlpha2;
+            vec3 add2 = accumColor + srcColor2;
+            float addA2 = accumAlpha + srcAlpha2;
+            accumColor = mix(blend2, add2, u_bloom);
+            accumAlpha = mix(blendA2, addA2, u_bloom);
 
-              // Animate intensity
-              ray *= 0.7 + 0.3 * sin(uTime * 0.3 + i * 0.5);
+            // Layer 3 - Tertiary rays (more offset)
+            vec2 rotatedUV3 = rotate(shape_uv, 2.2);
+            float r1_3 = radius * 1.6 - 2.0 * t;
+            float r2_3 = 0.5 * radius * (1.0 + spots) - 2.1 * t;
+            float f3 = mix(1.0, 4.0, hash11(30.0)) * density * freqMult;
+            float ray3 = raysShape(rotatedUV3, r1_3, 5.0 * f3, intensity, radius);
+            ray3 *= raysShape(rotatedUV3, r2_3, 4.0 * f3, intensity, radius);
+            ray3 += (1.0 + 3.0 * ray3) * middleShape;
+            ray3 = clamp(ray3, 0.0, 1.0);
+            float srcAlpha3 = u_color3.a * ray3;
+            vec3 srcColor3 = u_color3.rgb * srcAlpha3;
+            vec3 blend3 = accumColor + (1.0 - accumAlpha) * srcColor3;
+            float blendA3 = accumAlpha + (1.0 - accumAlpha) * srcAlpha3;
+            vec3 add3 = accumColor + srcColor3;
+            float addA3 = accumAlpha + srcAlpha3;
+            accumColor = mix(blend3, add3, u_bloom);
+            accumAlpha = mix(blendA3, addA3, u_bloom);
 
-              rays += ray;
-            }
+            // Background blend
+            vec3 bgColor = u_colorBack.rgb * u_colorBack.a;
+            vec3 color = accumColor + (1.0 - accumAlpha) * bgColor;
+            float opacity = accumAlpha + (1.0 - accumAlpha) * u_colorBack.a;
 
-            // Add central glow
-            float glow = smoothstep(0.8, 0.0, dist) * 0.4;
-            glow *= 0.8 + 0.2 * sin(uTime * 0.5);
+            // Natural fade - very gradual so rays reach bottom of viewport
+            float distanceFade = 1.0 - smoothstep(0.0, 5.0, radius);
+            opacity *= distanceFade;
+            color *= distanceFade;
 
-            // Combine
-            float intensity = rays * 0.15 + glow;
+            color = clamp(color, 0.0, 1.0);
+            opacity = clamp(opacity, 0.0, 1.0);
 
-            // Fade out at bottom
-            intensity *= smoothstep(1.0, 0.3, uv.y);
-
-            // Output
-            vec3 color = uColor * intensity;
-            gl_FragColor = vec4(color, intensity * 0.8);
+            gl_FragColor = vec4(color, opacity);
           }
         `
       };
 
       const geometry = new THREE.PlaneGeometry(2, 2);
-      const material = new THREE.ShaderMaterial(godRaysShader);
+      const material = new THREE.ShaderMaterial({
+        uniforms: godRaysShader.uniforms,
+        vertexShader: godRaysShader.vertexShader,
+        fragmentShader: godRaysShader.fragmentShader,
+        transparent: true,
+        blending: THREE.AdditiveBlending
+      });
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
@@ -1493,11 +1601,11 @@
         const width = window.innerWidth;
         const height = window.innerHeight;
         renderer.setSize(width, height);
-        material.uniforms.uResolution.value.set(width, height);
+        material.uniforms.u_resolution.value.set(width, height);
       }
 
       function animate(time) {
-        material.uniforms.uTime.value = time * 0.001;
+        material.uniforms.u_time.value = time * 0.001;
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
       }

@@ -207,19 +207,19 @@
             color: var(--color-text-muted);
         }
 
-        /* Legend */
+        /* Legend - Bottom Left, Vertical */
         .legend {
             position: fixed;
             bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 2rem;
             z-index: 100;
             display: flex;
-            gap: 2rem;
-            padding: 0.75rem 1.5rem;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 1rem 1.25rem;
             background: rgba(8, 8, 12, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 100px;
+            border-radius: 12px;
             opacity: 0;
             transition: opacity 0.8s ease;
         }
@@ -231,60 +231,44 @@
             align-items: center;
             gap: 0.5rem;
             font-family: var(--font-body);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 400;
             color: var(--color-text-muted);
         }
 
         .legend-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .legend-dot--ai-domain {
             background: var(--color-light-warm);
-            box-shadow: 0 0 8px var(--color-light-warm);
+            box-shadow: 0 0 6px var(--color-light-warm);
         }
 
         .legend-dot--ai-figure {
             background: var(--color-ai);
-            box-shadow: 0 0 8px var(--color-ai);
+            box-shadow: 0 0 6px var(--color-ai);
         }
 
         .legend-dot--human {
             background: var(--color-human);
-            box-shadow: 0 0 8px var(--color-human);
+            box-shadow: 0 0 6px var(--color-human);
         }
 
         .legend-dot--unobservable {
             background: var(--color-unobservable);
-            box-shadow: 0 0 8px var(--color-unobservable);
+            box-shadow: 0 0 6px var(--color-unobservable);
         }
 
-        /* Footer Quote */
-        .footer-quote {
-            position: fixed;
-            bottom: 5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            font-family: var(--font-body);
-            font-size: 0.9rem;
-            font-weight: 300;
-            color: var(--color-text-dim);
-            text-align: center;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-
-        .footer-quote.visible { opacity: 1; }
-
-        /* Controls Hint */
+        /* Controls Hint - Bottom Center */
         .controls-hint {
             position: fixed;
             bottom: 1.5rem;
-            right: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 100;
             display: flex;
             gap: 0.5rem;
@@ -322,6 +306,238 @@
 
         .scene-label--dark {
             color: rgba(245, 158, 11, 0.6);
+        }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%) translateX(20px);
+            z-index: 150;
+            width: 320px;
+            padding: 2rem;
+            background: rgba(8, 8, 12, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .detail-panel.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .detail-panel__close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .detail-panel__close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+        }
+
+        .detail-panel__symbol {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--color-unobservable);
+            text-shadow: 0 0 20px var(--color-unobservable);
+            margin-bottom: 1rem;
+        }
+
+        .detail-panel__title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--color-unobservable);
+            margin-bottom: 1rem;
+        }
+
+        .detail-panel__description {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-panel__nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .detail-panel__nav-btn {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            background: transparent;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 6px;
+            color: var(--color-unobservable);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .detail-panel__nav-btn:hover {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        /* Unified View Controls - Top Center, Horizontal */
+        .view-controls {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            padding: 0.4rem;
+            background: rgba(8, 8, 12, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+        }
+
+        .view-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.8rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 100px;
+            color: var(--color-text-muted);
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-text);
+        }
+
+        .view-btn--active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+        }
+
+        /* AI View mode indicator */
+        .view-btn--active.view-btn--ai {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--color-ai);
+        }
+
+        /* Human View mode indicator */
+        .view-btn--active.view-btn--human {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--color-human);
+        }
+
+        .view-btn__icon {
+            font-size: 0.85rem;
+        }
+
+        .view-btn__label {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Audio Toggle Button - bottom right corner */
+        .audio-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(8, 8, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--color-text-muted);
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .audio-btn:hover {
+            background: rgba(8, 8, 12, 0.95);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+        }
+
+        .audio-btn--active {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.4);
+            color: var(--color-light-warm);
+        }
+
+        .audio-btn__icon {
+            font-size: 1rem;
+        }
+
+        .audio-btn__label {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Hidden class for embed mode */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Embed Controls (minimal floating buttons) */
+        .embed-controls {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 100;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .embed-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(8, 8, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .embed-btn:hover {
+            background: rgba(8, 8, 12, 0.95);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--color-text);
         }
     </style>
 </head>
@@ -369,17 +585,49 @@
         </div>
     </div>
 
-    <div class="footer-quote" id="footerQuote">
-        Humans access information the model never had
-    </div>
-
     <div class="controls-hint" id="controlsHint">
         <span>Drag to rotate</span>
         <span>•</span>
         <span>Scroll to zoom</span>
         <span>•</span>
         <span>Right-drag to pan</span>
+        <span>•</span>
+        <span>Click orbs to focus</span>
     </div>
+
+    <!-- Detail Panel for focused unobservable -->
+    <div class="detail-panel" id="detailPanel">
+        <button class="detail-panel__close" onclick="exitFocus()">&times;</button>
+        <div class="detail-panel__symbol" id="detailSymbol"></div>
+        <h2 class="detail-panel__title" id="detailTitle"></h2>
+        <p class="detail-panel__description" id="detailDescription"></p>
+        <div class="detail-panel__nav">
+            <button class="detail-panel__nav-btn" onclick="focusNextOrb(-1)">&larr; Previous</button>
+            <button class="detail-panel__nav-btn" onclick="focusNextOrb(1)">Next &rarr;</button>
+        </div>
+    </div>
+
+    <!-- Unified View Controls -->
+    <div class="view-controls" id="viewControls">
+        <button class="view-btn view-btn--active" id="viewNormal" onclick="setViewMode('normal')" title="Normal view (3)">
+            <span class="view-btn__icon">◎</span>
+            <span class="view-btn__label">Overview</span>
+        </button>
+        <button class="view-btn view-btn--ai" id="viewAI" onclick="setViewMode('ai-view')" title="See as AI (1)">
+            <span class="view-btn__icon">◈</span>
+            <span class="view-btn__label">See as AI</span>
+        </button>
+        <button class="view-btn view-btn--human" id="viewHuman" onclick="setViewMode('human-view')" title="See as Human (2)">
+            <span class="view-btn__icon">◉</span>
+            <span class="view-btn__label">See as Human</span>
+        </button>
+    </div>
+
+    <!-- Audio Toggle -->
+    <button class="audio-btn" id="audioToggle" onclick="AudioManager.toggleAmbient()" title="Toggle ambient sound">
+        <span class="audio-btn__icon">♪</span>
+        <span class="audio-btn__label">Sound Off</span>
+    </button>
 
     <script src="main.js"></script>
 </body>
