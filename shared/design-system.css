@@ -16,14 +16,14 @@
    FONTS
    ============================================================
    Display: Cormorant Garamond — elegant serif for headlines
-   Body: Outfit — modern geometric sans-serif
+   Body: IBM Plex Sans — clean, professional sans-serif
 
    NOTE: Fonts should be loaded via <link> tags in HTML for
    better performance. Add this to your HTML <head>:
 
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
    ============================================================ */
 
 /* ============================================================
@@ -32,7 +32,7 @@
 :root {
   /* Font Families */
   --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
   /* Typography Scale (using major third ratio ~1.25) */

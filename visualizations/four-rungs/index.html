@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Four Rungs | Before You Automate</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            /* Deep void background */
+            --color-bg: #08080c;
+            --color-bg-elevated: #0e0e14;
+
+            /* Text - warm cream for elegance */
+            --color-text: #f5f0e8;
+            --color-text-muted: rgba(245, 240, 232, 0.6);
+            --color-text-dim: rgba(245, 240, 232, 0.35);
+
+            /* Human Territory - Warm light */
+            --color-outcome: #e8c496;
+            --color-approach: #d4b07a;
+            --color-human: #e8c496;
+
+            /* AI Territory - Cool precision */
+            --color-method: #7a9cb8;
+            --color-execution: #6889a0;
+            --color-ai: #7a9cb8;
+
+            /* Boundary - Neutral cream dividing line */
+            --color-boundary: #e0d8c8;
+
+            /* Accent - for "current" problematic state */
+            --color-warning: #c4785a;
+
+            /* Typography */
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--color-bg);
+            font-family: var(--font-body);
+            color: var(--color-text);
+        }
+
+        /* Canvas */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Header - Top left */
+        .header {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .header__title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--color-text);
+            margin-bottom: 0.2rem;
+        }
+
+        .header__subtitle {
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+        }
+
+        /* View Controls - Top Center */
+        .view-controls {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.3rem;
+            background: rgba(8, 8, 12, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .view-controls.visible {
+            opacity: 1;
+        }
+
+        .view-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .view-btn:hover {
+            color: var(--color-text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .view-btn.active {
+            color: var(--color-text);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .view-btn__icon {
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+
+        .view-btn__label {
+            text-transform: capitalize;
+        }
+
+        /* Recommended button active state - warm */
+        .view-btn.active[data-mode="recommended"] {
+            color: var(--color-human);
+            border-color: rgba(232, 196, 150, 0.3);
+            background: rgba(232, 196, 150, 0.08);
+        }
+
+        /* Current button active state - warning tone */
+        .view-btn.active[data-mode="current"] {
+            color: var(--color-warning);
+            border-color: rgba(196, 120, 90, 0.3);
+            background: rgba(196, 120, 90, 0.08);
+        }
+
+        /* 3D Labels - Positioned by JS */
+        .label-3d {
+            position: fixed;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform: translate(0, -50%);
+        }
+
+        .label-3d.visible {
+            opacity: 1;
+        }
+
+        .label-3d__name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        .label-3d__question {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-top: 0.1rem;
+            white-space: nowrap;
+        }
+
+        /* Human territory labels */
+        .label-3d--outcome .label-3d__name { color: var(--color-outcome); }
+        .label-3d--approach .label-3d__name { color: var(--color-approach); }
+
+        /* AI territory labels */
+        .label-3d--method .label-3d__name { color: var(--color-method); }
+        .label-3d--execution .label-3d__name { color: var(--color-execution); }
+
+        /* Boundary label - subtle, different treatment */
+        .label-3d--boundary {
+            transform: translate(-50%, -50%);
+        }
+
+        .label-3d--boundary .label-3d__name {
+            font-family: var(--font-body);
+            font-size: 0.55rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--color-boundary);
+            opacity: 0.7;
+        }
+
+        /* Legend - Bottom left */
+        .legend {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            z-index: 100;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .legend.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .legend__section {
+            margin-bottom: 0.6rem;
+        }
+
+        .legend__title {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.3rem;
+        }
+
+        .legend__items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .legend__item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend__dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        .legend__dot--outcome { background: var(--color-outcome); }
+        .legend__dot--approach { background: var(--color-approach); }
+        .legend__dot--method { background: var(--color-method); }
+        .legend__dot--execution { background: var(--color-execution); }
+
+        .legend__label {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+        }
+
+        .legend__divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--color-boundary), transparent);
+            opacity: 0.3;
+            margin: 0.4rem 0;
+        }
+
+        /* Audio Button - Bottom right */
+        .audio-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.7rem;
+            background: rgba(8, 8, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .audio-btn:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            color: var(--color-text);
+        }
+
+        .audio-btn.active {
+            border-color: rgba(201, 168, 108, 0.3);
+            color: var(--color-boundary);
+        }
+
+        .audio-icon {
+            font-size: 0.75rem;
+        }
+
+        /* Controls Hint */
+        .controls-hint {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 90;
+            font-family: var(--font-body);
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 0.03em;
+            color: var(--color-text-dim);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .controls-hint.visible {
+            opacity: 1;
+        }
+
+        /* Insight Overlay - Shows in "current" mode */
+        .insight-overlay {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 100;
+            text-align: right;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateX(10px);
+            max-width: 200px;
+        }
+
+        .insight-overlay.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .insight-overlay__stat {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--color-warning);
+            line-height: 1;
+        }
+
+        .insight-overlay__text {
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 300;
+            line-height: 1.4;
+            color: var(--color-text-muted);
+            margin-top: 0.3rem;
+        }
+
+        .insight-overlay__source {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 300;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* Detail Panel - Right side */
+        .detail-panel {
+            position: fixed;
+            top: 50%;
+            right: 1.5rem;
+            transform: translateY(-50%) translateX(20px);
+            z-index: 200;
+            width: 260px;
+            padding: 1.25rem;
+            background: rgba(8, 8, 12, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .detail-panel.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .detail-panel__close {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background: none;
+            border: none;
+            color: var(--color-text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .detail-panel__close:hover {
+            color: var(--color-text);
+        }
+
+        .detail-panel__territory {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .detail-panel__title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: 0.4rem;
+        }
+
+        .detail-panel__question {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-panel__description {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 300;
+            line-height: 1.55;
+            color: var(--color-text-muted);
+        }
+
+        /* Panel variants */
+        .detail-panel--human {
+            border-color: rgba(232, 196, 150, 0.15);
+        }
+
+        .detail-panel--human .detail-panel__territory {
+            color: var(--color-human);
+        }
+
+        .detail-panel--human .detail-panel__title {
+            color: var(--color-human);
+        }
+
+        .detail-panel--ai {
+            border-color: rgba(122, 156, 184, 0.15);
+        }
+
+        .detail-panel--ai .detail-panel__territory {
+            color: var(--color-ai);
+        }
+
+        .detail-panel--ai .detail-panel__title {
+            color: var(--color-ai);
+        }
+
+        .detail-panel__nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .detail-panel__nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.4rem 0.6rem;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 400;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .detail-panel__nav-btn:hover {
+            color: var(--color-text);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .detail-panel__nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-arrow {
+            font-size: 0.7rem;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .header {
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .header__title {
+                font-size: 1.2rem;
+            }
+
+            .view-controls {
+                top: 1rem;
+            }
+
+            .view-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.6rem;
+            }
+
+            .legend {
+                bottom: 4rem;
+                left: 1rem;
+            }
+
+            .detail-panel {
+                right: 1rem;
+                left: 1rem;
+                width: auto;
+                top: auto;
+                bottom: 1rem;
+                transform: translateY(20px);
+            }
+
+            .detail-panel.visible {
+                transform: translateY(0);
+            }
+
+            .audio-btn {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .controls-hint {
+                bottom: 1rem;
+            }
+
+            .insight-overlay__stat {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <h1 class="header__title">The Four Rungs</h1>
+        <p class="header__subtitle">Before You Automate</p>
+    </header>
+
+    <!-- View Controls - Top Center -->
+    <nav class="view-controls" id="viewControls">
+        <button class="view-btn active" data-mode="recommended">
+            <span class="view-btn__icon">↓</span>
+            <span class="view-btn__label">Recommended</span>
+        </button>
+        <button class="view-btn" data-mode="current">
+            <span class="view-btn__icon">↑</span>
+            <span class="view-btn__label">Current</span>
+        </button>
+    </nav>
+
+    <!-- 3D Labels (positioned by JS) -->
+    <div class="label-3d label-3d--outcome" id="label-outcome">
+        <div class="label-3d__name">Outcome</div>
+        <div class="label-3d__question">What does success look like?</div>
+    </div>
+
+    <div class="label-3d label-3d--approach" id="label-approach">
+        <div class="label-3d__name">Approach</div>
+        <div class="label-3d__question">How will we create value?</div>
+    </div>
+
+    <div class="label-3d label-3d--method" id="label-method">
+        <div class="label-3d__name">Method</div>
+        <div class="label-3d__question">What capabilities will we deploy?</div>
+    </div>
+
+    <div class="label-3d label-3d--execution" id="label-execution">
+        <div class="label-3d__name">Execution</div>
+        <div class="label-3d__question">How will we implement day-to-day?</div>
+    </div>
+
+    <div class="label-3d label-3d--boundary" id="label-boundary">
+        <div class="label-3d__name">Judgment Boundary</div>
+    </div>
+
+    <!-- Legend -->
+    <nav class="legend" id="legend">
+        <div class="legend__section">
+            <div class="legend__title">Human Territory</div>
+            <div class="legend__items">
+                <div class="legend__item">
+                    <span class="legend__dot legend__dot--outcome"></span>
+                    <span class="legend__label">Outcome</span>
+                </div>
+                <div class="legend__item">
+                    <span class="legend__dot legend__dot--approach"></span>
+                    <span class="legend__label">Approach</span>
+                </div>
+            </div>
+        </div>
+        <div class="legend__divider"></div>
+        <div class="legend__section">
+            <div class="legend__title">AI Territory</div>
+            <div class="legend__items">
+                <div class="legend__item">
+                    <span class="legend__dot legend__dot--method"></span>
+                    <span class="legend__label">Method</span>
+                </div>
+                <div class="legend__item">
+                    <span class="legend__dot legend__dot--execution"></span>
+                    <span class="legend__label">Execution</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Controls Hint -->
+    <div class="controls-hint" id="controlsHint">
+        Drag to rotate &middot; Scroll to zoom &middot; Click rings to explore
+    </div>
+
+    <!-- Audio Button -->
+    <button class="audio-btn" id="audioBtn">
+        <span class="audio-icon">♪</span>
+        <span class="audio-label">Sound</span>
+    </button>
+
+    <!-- Insight Overlay - Shows in "current" mode -->
+    <div class="insight-overlay" id="insightOverlay">
+        <div class="insight-overlay__stat">84%</div>
+        <div class="insight-overlay__text">of data scientists cite misunderstanding the problem as the primary cause of AI project failure</div>
+        <div class="insight-overlay__source">RAND Corporation, 2024</div>
+    </div>
+
+    <!-- Detail Panel -->
+    <aside class="detail-panel" id="detailPanel">
+        <button class="detail-panel__close" onclick="closeDetailPanel()">&times;</button>
+        <div class="detail-panel__territory" id="detailTerritory">Human Territory</div>
+        <h2 class="detail-panel__title" id="detailTitle">Outcome</h2>
+        <p class="detail-panel__question" id="detailQuestion">"What does success look like?"</p>
+        <p class="detail-panel__description" id="detailDescription">
+            The destination. What will be different in the world when you succeed?
+        </p>
+        <nav class="detail-panel__nav">
+            <button class="detail-panel__nav-btn" id="prevRungBtn" onclick="navigateRung(-1)">
+                <span class="nav-arrow">↑</span> Previous
+            </button>
+            <button class="detail-panel__nav-btn" id="nextRungBtn" onclick="navigateRung(1)">
+                Next <span class="nav-arrow">↓</span>
+            </button>
+        </nav>
+    </aside>
+
+    <script src="main.js"></script>
+</body>
+</html>
