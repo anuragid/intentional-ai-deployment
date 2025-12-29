@@ -380,14 +380,15 @@
       margin-bottom: var(--space-4xl);
     }
 
-    .thesis__quote::before {
-      content: '';
+    .thesis__quote-line {
       position: absolute;
       left: 0;
       top: 0;
       bottom: 0;
       width: 2px;
       background: linear-gradient(to bottom, var(--color-accent-warm), var(--color-accent-warm), transparent);
+      transform-origin: top;
+      transform: scaleY(0);
     }
 
     .thesis__quote-text {
@@ -491,21 +492,18 @@
       border: 1px solid rgba(244, 243, 241, 0.06);
       border-radius: 16px;
       overflow: hidden;
-      transition: all 0.5s var(--ease-out-expo);
       cursor: pointer;
+      /* Transition only for non-transform properties (colors, shadows) */
+      transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.5s ease;
+      /* Initial state for GSAP - will be animated in */
       opacity: 0;
-      transform: translateY(40px);
-    }
-
-    .part.revealed {
-      opacity: 1;
-      transform: translateY(0);
+      transform-style: preserve-3d;
     }
 
     .part:hover {
       border-color: rgba(244, 243, 241, 0.12);
       background: var(--color-elevated);
-      transform: translateY(-6px);
+      /* Transform handled by GSAP */
       box-shadow:
         0 30px 60px -20px var(--chapter-glow),
         0 0 0 1px rgba(255, 255, 255, 0.05);
@@ -901,15 +899,19 @@
       background: var(--color-surface);
       border: 1px solid rgba(244, 243, 241, 0.04);
       border-radius: 12px;
-      transition: all 0.4s var(--ease-out-quart);
+      /* Transition only for non-transform properties */
+      transition: border-color 0.4s ease, background 0.3s ease;
       display: flex;
       flex-direction: column;
       min-height: 220px;
+      /* Initial state for GSAP */
+      opacity: 0;
+      transform-style: preserve-3d;
     }
 
     .voice:hover {
       border-color: rgba(244, 243, 241, 0.08);
-      transform: translateY(-4px);
+      /* Transform handled by GSAP */
     }
 
     .voice__text {
@@ -1065,32 +1067,40 @@
     }
 
     /* ============================================================
-       REVEAL ON SCROLL - STAGGERED
+       GSAP ANIMATION INITIAL STATES
        ============================================================ */
-    .reveal {
+
+    /* Footer elements - hidden until GSAP reveals */
+    .footer__quote,
+    .footer__text,
+    .footer__meta,
+    .footer__authors {
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.8s var(--ease-out-expo);
     }
 
-    .reveal.revealed {
-      opacity: 1;
-      transform: translateY(0);
+    /* Thesis elements - hidden until GSAP reveals */
+    .thesis__quote-text,
+    .thesis__quote-cite,
+    .thesis__content p {
+      opacity: 0;
+      transform: translateY(25px);
     }
 
-    /* Stagger delays for cards */
-    .part:nth-child(1) { transition-delay: 0s; }
-    .part:nth-child(2) { transition-delay: 0.1s; }
-    .part:nth-child(3) { transition-delay: 0.15s; }
-    .part:nth-child(4) { transition-delay: 0.2s; }
-    .part:nth-child(5) { transition-delay: 0.25s; }
+    /* Series header - hidden until GSAP reveals */
+    .series__overline,
+    .series__title,
+    .series__description {
+      opacity: 0;
+      transform: translateY(25px);
+    }
 
-    .voice:nth-child(1) { transition-delay: 0s; }
-    .voice:nth-child(2) { transition-delay: 0.08s; }
-    .voice:nth-child(3) { transition-delay: 0.16s; }
-    .voice:nth-child(4) { transition-delay: 0.24s; }
-    .voice:nth-child(5) { transition-delay: 0.32s; }
-    .voice:nth-child(6) { transition-delay: 0.4s; }
+    /* Voices header - hidden until GSAP reveals */
+    .voices__overline,
+    .voices__title {
+      opacity: 0;
+      transform: translateY(25px);
+    }
   </style>
 </head>
 <body>
@@ -1135,7 +1145,8 @@
     <!-- Thesis Section -->
     <section class="thesis">
       <div class="thesis__container">
-        <blockquote class="thesis__quote reveal">
+        <blockquote class="thesis__quote">
+          <span class="thesis__quote-line"></span>
           <p class="thesis__quote-text">
             "Humans access information the model never had."
           </p>
@@ -1144,7 +1155,7 @@
           </cite>
         </blockquote>
 
-        <div class="thesis__content reveal">
+        <div class="thesis__content">
           <p>
             This single observation anchors everything that follows. AI systems operate under the streetlight. They search where the data is because that is the only place they can search. But the keys are often in the dark: the weight of a pause, the trust built over years, the reasons behind the patterns.
           </p>
@@ -1160,7 +1171,7 @@
 
     <!-- Series Section -->
     <section class="series" id="series">
-      <header class="series__header reveal">
+      <header class="series__header">
         <p class="series__overline">The Series</p>
         <h2 class="series__title">Five Principles for Intentional AI Deployment</h2>
         <p class="series__description">
@@ -1193,8 +1204,8 @@
           </div>
         </article>
 
-        <!-- Part 2: Abstraction -->
-        <article class="part part--abstraction" data-href="#" data-disabled="true">
+        <!-- Part 2: Abstraction - Four Rungs -->
+        <article class="part part--abstraction" data-href="visualizations/four-rungs/">
           <div class="part__preview">
             <div class="part__preview-bg"></div>
           </div>
@@ -1202,13 +1213,13 @@
             <span class="part__number">Part 2</span>
             <h3 class="part__title">Before You Automate</h3>
             <p class="part__description">
-              More than 80 percent of AI projects fail, not because the technology fails, but because organizations optimize at the wrong level. The Problem Abstraction Ladder shows why.
+              84% of AI projects fail because organizations optimize at the wrong level. The Four Rungs framework shows why most teams start at Method when they should start at Outcome.
             </p>
             <div class="part__meta">
               <div class="part__tags">
-                <span class="part__tag part__tag--coming">Coming Soon</span>
+                <span class="part__tag part__tag--ready">Visualization Ready</span>
               </div>
-              <a href="#" class="part__action part__action--disabled" aria-label="Read Part 2">
+              <a href="visualizations/four-rungs/" class="part__action" aria-label="Explore Part 2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -1294,13 +1305,13 @@
     <!-- Voices Section -->
     <section class="voices">
       <div class="voices__container">
-        <header class="voices__header reveal">
+        <header class="voices__header">
           <p class="voices__overline">Seven Experts</p>
           <h2 class="voices__title">The voices shaping this conversation</h2>
         </header>
 
         <div class="voices__grid">
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "There's going to be a new humanism emerging at work that we have to define. We all need work. It's our identity."
             </p>
@@ -1310,7 +1321,7 @@
             </div>
           </div>
 
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "Very few people are asking what should we apply AI to. It's at a level above 'what problem are we trying to solve with AI.'"
             </p>
@@ -1320,7 +1331,7 @@
             </div>
           </div>
 
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "One of the responsible AI team's advice was to make sure to put that friction in, so people were aware of the interaction with AI at each stage."
             </p>
@@ -1330,7 +1341,7 @@
             </div>
           </div>
 
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "When we're proxying information over and over again, eventually our own brains, they atrophy."
             </p>
@@ -1340,7 +1351,7 @@
             </div>
           </div>
 
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "People are deploying AI like it's an IT deployment when it's really a design process."
             </p>
@@ -1350,7 +1361,7 @@
             </div>
           </div>
 
-          <div class="voice reveal">
+          <div class="voice">
             <p class="voice__text">
               "None of that would happen if we'd had AI back then. I could have stayed with the original small group of seven or eight people. We could have done everything we were trying to do."
             </p>
@@ -1384,6 +1395,10 @@
 
   <!-- Three.js for WebGL god rays -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
   <script>
     // ============================================================
@@ -1821,28 +1836,322 @@
     })();
 
     // ============================================================
-    // SCROLL REVEAL - STAGGERED
+    // GSAP SCROLL ANIMATIONS - ELEGANT REVEALS
     // ============================================================
     (function() {
-      const reveals = document.querySelectorAll('.reveal');
-      const parts = document.querySelectorAll('.part');
-      const voices = document.querySelectorAll('.voice');
+      // Register ScrollTrigger plugin
+      gsap.registerPlugin(ScrollTrigger);
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -50px 0px'
+      // Default ease for all animations
+      const smoothEase = "power3.out";
+      const elegantEase = "power4.out";
+
+      // ============================================================
+      // HERO SECTION - Parallax fade on scroll
+      // ============================================================
+      const heroContent = document.querySelector('.hero__content');
+      const heroScroll = document.querySelector('.hero__scroll');
+
+      // Hero parallax effect - content fades and moves up as you scroll
+      gsap.to(heroContent, {
+        y: -100,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom 60%',
+          scrub: 0.8
+        }
       });
 
-      reveals.forEach(el => observer.observe(el));
-      parts.forEach(el => observer.observe(el));
-      voices.forEach(el => observer.observe(el));
+      // Scroll indicator fades out quickly
+      if (heroScroll) {
+        gsap.to(heroScroll, {
+          opacity: 0,
+          y: 20,
+          ease: "none",
+          scrollTrigger: {
+            trigger: '.hero',
+            start: 'top top',
+            end: '30% top',
+            scrub: 0.5
+          }
+        });
+      }
+
+      // ============================================================
+      // THESIS SECTION - Quote and content reveals
+      // ============================================================
+      const thesisSection = document.querySelector('.thesis');
+
+      // Animate the quote border line
+      gsap.to('.thesis__quote-line', {
+        scaleY: 1,
+        duration: 1.2,
+        ease: elegantEase,
+        scrollTrigger: {
+          trigger: '.thesis__quote',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      // Quote text reveal with stagger
+      gsap.to('.thesis__quote-text', {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: elegantEase,
+        scrollTrigger: {
+          trigger: '.thesis__quote',
+          start: 'top 75%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      gsap.to('.thesis__quote-cite', {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.3,
+        ease: smoothEase,
+        scrollTrigger: {
+          trigger: '.thesis__quote',
+          start: 'top 75%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      // Thesis content paragraphs with stagger
+      gsap.to('.thesis__content p', {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        stagger: 0.15,
+        ease: elegantEase,
+        scrollTrigger: {
+          trigger: '.thesis__content',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      // ============================================================
+      // SERIES SECTION - Header and cards
+      // ============================================================
+
+      // Series header elements
+      const seriesHeaderTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.series__header',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      seriesHeaderTl
+        .to('.series__overline', {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: smoothEase
+        })
+        .to('.series__title', {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: elegantEase
+        }, '-=0.4')
+        .to('.series__description', {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: smoothEase
+        }, '-=0.5');
+
+      // Part cards - staggered 3D entrance
+      const parts = document.querySelectorAll('.part');
+
+      parts.forEach((part, index) => {
+        // Alternate direction based on grid position
+        const isLeftSide = index === 0 || index === 3;
+        const isRightSide = index === 1 || index === 4;
+        const isFeatured = index === 2;
+
+        let xOffset = 0;
+        let rotateY = 0;
+
+        if (isLeftSide) {
+          xOffset = -30;
+          rotateY = 5;
+        } else if (isRightSide) {
+          xOffset = 30;
+          rotateY = -5;
+        }
+
+        gsap.fromTo(part,
+          {
+            opacity: 0,
+            y: 60,
+            x: xOffset,
+            rotateX: 8,
+            rotateY: rotateY,
+            scale: 0.95
+          },
+          {
+            opacity: 1,
+            y: 0,
+            x: 0,
+            rotateX: 0,
+            rotateY: 0,
+            scale: 1,
+            duration: isFeatured ? 1.2 : 1,
+            delay: index * 0.12,
+            ease: elegantEase,
+            scrollTrigger: {
+              trigger: '.parts',
+              start: 'top 80%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        );
+
+        // Subtle hover enhancement with GSAP
+        part.addEventListener('mouseenter', () => {
+          gsap.to(part, {
+            y: -8,
+            scale: 1.02,
+            duration: 0.4,
+            ease: 'power2.out'
+          });
+        });
+
+        part.addEventListener('mouseleave', () => {
+          gsap.to(part, {
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            ease: 'power2.out'
+          });
+        });
+      });
+
+      // ============================================================
+      // VOICES SECTION - Perspective card reveals
+      // ============================================================
+
+      // Voices header
+      const voicesHeaderTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.voices__header',
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      voicesHeaderTl
+        .to('.voices__overline', {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: smoothEase
+        })
+        .to('.voices__title', {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: elegantEase
+        }, '-=0.4');
+
+      // Voice cards - staggered perspective reveal
+      const voices = document.querySelectorAll('.voice');
+
+      voices.forEach((voice, index) => {
+        // Alternate tilt direction for visual interest
+        const isEven = index % 2 === 0;
+
+        gsap.fromTo(voice,
+          {
+            opacity: 0,
+            y: 50,
+            rotateY: isEven ? -5 : 5,
+            rotateX: 8,
+            scale: 0.96
+          },
+          {
+            opacity: 1,
+            y: 0,
+            rotateY: 0,
+            rotateX: 0,
+            scale: 1,
+            duration: 0.9,
+            delay: index * 0.1,
+            ease: elegantEase,
+            scrollTrigger: {
+              trigger: '.voices__grid',
+              start: 'top 85%',
+              toggleActions: 'play none none reverse'
+            }
+          }
+        );
+
+        // Subtle hover lift
+        voice.addEventListener('mouseenter', () => {
+          gsap.to(voice, {
+            y: -6,
+            scale: 1.02,
+            duration: 0.35,
+            ease: 'power2.out'
+          });
+        });
+
+        voice.addEventListener('mouseleave', () => {
+          gsap.to(voice, {
+            y: 0,
+            scale: 1,
+            duration: 0.4,
+            ease: 'power2.out'
+          });
+        });
+      });
+
+      // ============================================================
+      // FOOTER - Elegant staggered reveal
+      // ============================================================
+      const footerElements = [
+        '.footer__quote',
+        '.footer__text',
+        '.footer__meta',
+        '.footer__authors'
+      ];
+
+      footerElements.forEach((selector, index) => {
+        gsap.to(selector, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: index * 0.12,
+          ease: elegantEase,
+          scrollTrigger: {
+            trigger: '.footer',
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+      });
+
+      // ============================================================
+      // REFRESH SCROLL TRIGGERS ON RESIZE
+      // ============================================================
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 250);
+      });
+
     })();
 
     // ============================================================
