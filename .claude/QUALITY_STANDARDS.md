@@ -73,6 +73,11 @@ python3 -m http.server 8080  # ALWAYS use port 8080
 node --check main.js  # Always validate JS syntax
 ```
 
+### Browser Testing
+- Use **Claude Code's Chrome plugin** for browser testing and screenshots
+- Do NOT use Playwright or other browser automation tools
+- Test at `http://localhost:8080` with the Python server running
+
 ---
 
 ## Animation Standards

@@ -33,10 +33,10 @@
       "Bash(npx @gltf-transform/cli inspect:*)",
       "Bash(python3:*)",
       "Skill(example-skills:pdf)",
-      "Skill(example-skills:webapp-testing)",
       "Bash(pip3 install:*)",
       "Bash(osascript:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(rm:*)"
     ]
   }
 }
