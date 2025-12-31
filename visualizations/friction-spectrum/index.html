@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Friction Spectrum | Beautiful Seams</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>~</text></svg>">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,20 +19,16 @@
 
     <style>
         :root {
-            --color-bg: #06080c;
+            --color-bg: #08080c;
+            --color-bg-elevated: #0e0e14;
             --color-text: #f5f0e8;
             --color-text-muted: rgba(245, 240, 232, 0.6);
-            --color-text-dim: rgba(245, 240, 232, 0.3);
+            --color-text-dim: rgba(245, 240, 232, 0.35);
 
-            /* Cool to Warm gradient */
-            --color-seamless: #22d3ee;      /* Cyan */
-            --color-visible: #60a5fa;       /* Blue */
-            --color-gated: #fbbf24;         /* Amber */
-            --color-human-only: #f59e0b;    /* Warm gold */
-
-            /* Accent */
-            --color-flow: #67e8f9;          /* Light cyan for flow */
-            --color-barrier: #fcd34d;       /* Golden barrier */
+            --color-seamless: #22d3ee;
+            --color-visible: #60a5fa;
+            --color-gated: #fbbf24;
+            --color-human-only: #dc2626;
 
             --font-display: 'Cormorant Garamond', Georgia, serif;
             --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
@@ -57,15 +52,15 @@
             height: 100%;
         }
 
-        /* Header - minimal during journey */
+        /* Header - Top left (matches Four Rungs) */
         .header {
             position: fixed;
-            top: 2rem;
-            left: 2rem;
+            top: 1.5rem;
+            left: 1.5rem;
             z-index: 100;
             opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 1s ease, transform 1s ease;
+            transform: translateY(-10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
         .header.visible {
@@ -75,200 +70,271 @@
 
         .header__title {
             font-family: var(--font-display);
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 500;
             letter-spacing: 0.02em;
             color: var(--color-text);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
         }
 
         .header__subtitle {
             font-family: var(--font-body);
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: 300;
-            letter-spacing: 0.15em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--color-text-muted);
         }
 
-        /* Begin Journey button - the primary CTA */
-        .begin-journey {
+        /* View Controls - Top Center (matches Four Rungs exactly) */
+        .view-controls {
             position: fixed;
-            bottom: 15%;
+            top: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 200;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-
-        .begin-journey.visible {
-            opacity: 1;
-        }
-
-        .begin-journey.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .begin-btn {
+            z-index: 100;
             display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 1rem 2.5rem;
-            background: transparent;
-            border: 1px solid rgba(103, 232, 249, 0.4);
-            border-radius: 100px;
-            font-family: var(--font-display);
-            font-size: 1.1rem;
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            color: var(--color-flow);
-            cursor: pointer;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(8px);
-        }
-
-        .begin-btn:hover {
-            background: rgba(103, 232, 249, 0.1);
-            border-color: rgba(103, 232, 249, 0.6);
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(103, 232, 249, 0.2);
-        }
-
-        .begin-btn__icon {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .begin-btn:hover .begin-btn__icon {
-            transform: translateX(4px);
-        }
-
-        /* Journey narration - appears during the journey */
-        .narration {
-            position: fixed;
-            bottom: 12%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 150;
-            text-align: center;
-            max-width: 600px;
+            gap: 0.25rem;
+            padding: 0.3rem;
+            background: rgba(8, 8, 12, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
             opacity: 0;
-            transition: opacity 0.8s ease;
-            pointer-events: none;
-        }
-
-        .narration.visible {
-            opacity: 1;
-        }
-
-        .narration__text {
-            font-family: var(--font-display);
-            font-style: italic;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            color: var(--color-text);
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
-        }
-
-        .narration__zone {
-            display: block;
-            font-family: var(--font-body);
-            font-size: 0.6rem;
-            font-style: normal;
-            font-weight: 500;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-top: 0.8rem;
-            opacity: 0.6;
-        }
-
-        /* Zone labels - appear as journey progresses */
-        .zone-label {
-            position: fixed;
-            z-index: 80;
-            pointer-events: none;
-            opacity: 0;
-            transform: translate(-50%, -50%);
             transition: opacity 0.6s ease;
-            text-align: center;
         }
 
-        .zone-label.visible {
+        .view-controls.visible {
             opacity: 1;
         }
 
-        .zone-label__name {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            font-weight: 500;
-            letter-spacing: 0.03em;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.8);
-        }
-
-        .zone-label__stakes {
-            font-family: var(--font-body);
-            font-size: 0.55rem;
-            font-weight: 400;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--color-text-muted);
-            margin-top: 0.25rem;
-        }
-
-        .zone-label--seamless .zone-label__name { color: var(--color-seamless); }
-        .zone-label--visible .zone-label__name { color: var(--color-visible); }
-        .zone-label--gated .zone-label__name { color: var(--color-gated); }
-        .zone-label--human-only .zone-label__name { color: var(--color-human-only); }
-
-        /* Replay button - after journey completes */
-        .replay {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 200;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-            pointer-events: none;
-        }
-
-        .replay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .replay-btn {
+        .view-btn {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.5rem;
-            background: rgba(6, 8, 12, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 100px;
+            gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
             font-family: var(--font-body);
             font-size: 0.7rem;
             font-weight: 400;
             letter-spacing: 0.05em;
             color: var(--color-text-muted);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
-        .replay-btn:hover {
-            border-color: rgba(255, 255, 255, 0.2);
+        .view-btn:hover {
             color: var(--color-text);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Legend - bottom left, subtle */
+        .view-btn.active {
+            color: var(--color-text);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Zone-specific active states */
+        .view-btn.active[data-zone="seamless"] {
+            color: var(--color-seamless);
+            border-color: rgba(34, 211, 238, 0.3);
+            background: rgba(34, 211, 238, 0.08);
+        }
+
+        .view-btn.active[data-zone="visible"] {
+            color: var(--color-visible);
+            border-color: rgba(96, 165, 250, 0.3);
+            background: rgba(96, 165, 250, 0.08);
+        }
+
+        .view-btn.active[data-zone="gated"] {
+            color: var(--color-gated);
+            border-color: rgba(251, 191, 36, 0.3);
+            background: rgba(251, 191, 36, 0.08);
+        }
+
+        .view-btn.active[data-zone="human-only"] {
+            color: var(--color-human-only);
+            border-color: rgba(220, 38, 38, 0.3);
+            background: rgba(220, 38, 38, 0.08);
+        }
+
+        .view-btn__icon {
+            font-size: 0.8rem;
+            line-height: 1;
+        }
+
+        .view-btn__label {
+            text-transform: capitalize;
+        }
+
+        /* Zone Label - Fixed top right (not in 3D scene) */
+        .zone-label {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+            text-align: right;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .zone-label.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .zone-label__name {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .zone-label__stakes {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Zone Controls - For interactive zones */
+        .zone-controls {
+            position: fixed;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: rgba(8, 8, 12, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .zone-controls.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .zone-controls__label {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+        }
+
+        .zone-controls__slider-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zone-controls__ticks {
+            position: relative;
+            width: 140px;
+            height: 8px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 7px; /* Half of thumb width to align */
+        }
+
+        .zone-controls__tick {
+            width: 2px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 1px;
+        }
+
+        .zone-controls__tick--red { background: rgba(220, 38, 38, 0.6); }
+        .zone-controls__tick--amber { background: rgba(251, 191, 36, 0.6); }
+        .zone-controls__tick--green { background: rgba(34, 197, 94, 0.6); }
+
+        .zone-controls__tick-labels {
+            position: relative;
+            width: 140px;
+            height: 12px;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2px;
+            margin-top: 2px;
+        }
+
+        .zone-controls__tick-label {
+            font-family: var(--font-body);
+            font-size: 0.45rem;
+            font-weight: 400;
+            color: var(--color-text-dim);
+            text-align: center;
+            width: 28px;
+        }
+
+        .zone-controls__slider {
+            -webkit-appearance: none;
+            width: 140px;
+            height: 4px;
+            background: linear-gradient(
+                to right,
+                rgba(220, 38, 38, 0.4) 0%,
+                rgba(220, 38, 38, 0.4) 33%,
+                rgba(251, 191, 36, 0.4) 33%,
+                rgba(251, 191, 36, 0.4) 66%,
+                rgba(34, 197, 94, 0.4) 66%,
+                rgba(34, 197, 94, 0.4) 100%
+            );
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .zone-controls__slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--color-gated);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s ease;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        .zone-controls__slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .zone-controls__slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--color-gated);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Legend - Bottom left (matches Four Rungs) */
         .legend {
             position: fixed;
-            bottom: 2rem;
-            left: 2rem;
+            bottom: 1.5rem;
+            left: 1.5rem;
             z-index: 100;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(10px);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
@@ -284,26 +350,31 @@
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--color-text-dim);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .legend__items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .legend__item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.35rem;
+            gap: 0.4rem;
         }
 
-        .legend__line {
-            width: 20px;
-            height: 2px;
-            border-radius: 1px;
+        .legend__dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
         }
 
-        .legend__line--seamless { background: var(--color-seamless); }
-        .legend__line--visible { background: var(--color-visible); }
-        .legend__line--gated { background: var(--color-gated); }
-        .legend__line--human-only { background: var(--color-human-only); }
+        .legend__dot--seamless { background: var(--color-seamless); }
+        .legend__dot--visible { background: var(--color-visible); }
+        .legend__dot--gated { background: var(--color-gated); }
+        .legend__dot--human-only { background: var(--color-human-only); }
 
         .legend__label {
             font-family: var(--font-body);
@@ -312,17 +383,37 @@
             color: var(--color-text-muted);
         }
 
-        /* Audio button */
+        /* Controls Hint - Bottom center (matches Four Rungs) */
+        .controls-hint {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 90;
+            font-family: var(--font-body);
+            font-size: 0.55rem;
+            font-weight: 300;
+            letter-spacing: 0.03em;
+            color: var(--color-text-dim);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .controls-hint.visible {
+            opacity: 1;
+        }
+
+        /* Audio Button - Bottom right (matches Four Rungs) */
         .audio-btn {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+            bottom: 1.5rem;
+            right: 1.5rem;
             z-index: 100;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.5rem 0.8rem;
-            background: rgba(6, 8, 12, 0.8);
+            gap: 0.35rem;
+            padding: 0.45rem 0.7rem;
+            background: rgba(8, 8, 12, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 4px;
             font-family: var(--font-body);
@@ -344,49 +435,154 @@
         }
 
         .audio-btn.active {
-            border-color: rgba(103, 232, 249, 0.3);
-            color: var(--color-flow);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: var(--color-gated);
         }
 
-        /* Controls hint */
-        .controls-hint {
+        .audio-icon {
+            font-size: 0.75rem;
+        }
+
+        /* Detail Panel - Right side (matches Four Rungs) */
+        .detail-panel {
             position: fixed;
-            top: 2rem;
-            right: 2rem;
-            z-index: 90;
-            font-family: var(--font-body);
-            font-size: 0.55rem;
-            font-weight: 300;
-            color: var(--color-text-dim);
+            top: 50%;
+            right: 1.5rem;
+            transform: translateY(-50%) translateX(20px);
+            z-index: 200;
+            width: 260px;
+            padding: 1.25rem;
+            background: rgba(8, 8, 12, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
             opacity: 0;
-            transition: opacity 0.8s ease;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        .controls-hint.visible {
+        .detail-panel.visible {
             opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .detail-panel__close {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            width: 20px;
+            height: 20px;
+            background: none;
+            border: none;
+            color: var(--color-text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .detail-panel__close:hover {
+            color: var(--color-text);
+        }
+
+        .detail-panel__stakes {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .detail-panel__title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: 0.6rem;
+        }
+
+        .detail-panel__description {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 300;
+            line-height: 1.55;
+            color: var(--color-text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-panel__examples {
+            padding: 0.6rem 0.8rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--color-text-dim);
+            border-radius: 2px;
+        }
+
+        .detail-panel__examples-label {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.2rem;
+        }
+
+        .detail-panel__examples-text {
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 300;
+            line-height: 1.45;
+            color: var(--color-text-muted);
         }
 
         /* Mobile */
         @media (max-width: 768px) {
-            .header { top: 1.5rem; left: 1.5rem; }
-            .header__title { font-size: 1.3rem; }
-
-            .begin-btn {
-                padding: 0.8rem 2rem;
-                font-size: 1rem;
+            .header {
+                top: 1rem;
+                left: 1rem;
             }
 
-            .narration {
-                bottom: 15%;
-                padding: 0 1.5rem;
+            .header__title {
+                font-size: 1.2rem;
             }
 
-            .narration__text { font-size: 1rem; }
+            .view-controls {
+                top: 1rem;
+            }
 
-            .legend { bottom: 1.5rem; left: 1.5rem; }
-            .audio-btn { bottom: 1.5rem; right: 1.5rem; }
+            .view-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.6rem;
+            }
 
-            .zone-label__name { font-size: 1rem; }
+            .legend {
+                bottom: 4rem;
+                left: 1rem;
+            }
+
+            .detail-panel {
+                right: 1rem;
+                left: 1rem;
+                width: auto;
+                top: auto;
+                bottom: 1rem;
+                transform: translateY(20px);
+            }
+
+            .detail-panel.visible {
+                transform: translateY(0);
+            }
+
+            .audio-btn {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .controls-hint {
+                bottom: 1rem;
+            }
         }
     </style>
 </head>
@@ -399,80 +595,100 @@
         <p class="header__subtitle">Beautiful Seams</p>
     </header>
 
-    <!-- Begin Journey CTA -->
-    <div class="begin-journey" id="beginJourney">
-        <button class="begin-btn" onclick="beginJourney()">
-            <span>Begin the Journey</span>
-            <span class="begin-btn__icon">→</span>
+    <!-- View Controls - Top Center (matches Four Rungs) -->
+    <nav class="view-controls" id="viewControls">
+        <button class="view-btn active" data-zone="seamless" onclick="switchZone('seamless')">
+            <span class="view-btn__icon">○</span>
+            <span class="view-btn__label">Seamless</span>
         </button>
-    </div>
-
-    <!-- Journey Narration -->
-    <div class="narration" id="narration">
-        <p class="narration__text" id="narrationText"></p>
-        <span class="narration__zone" id="narrationZone"></span>
-    </div>
-
-    <!-- Zone Labels -->
-    <div class="zone-label zone-label--seamless" id="label-seamless">
-        <div class="zone-label__name">Seamless</div>
-        <div class="zone-label__stakes">Low Stakes</div>
-    </div>
-
-    <div class="zone-label zone-label--visible" id="label-visible">
-        <div class="zone-label__name">Visible</div>
-        <div class="zone-label__stakes">Learning Stakes</div>
-    </div>
-
-    <div class="zone-label zone-label--gated" id="label-gated">
-        <div class="zone-label__name">Gated</div>
-        <div class="zone-label__stakes">High Stakes</div>
-    </div>
-
-    <div class="zone-label zone-label--human-only" id="label-human-only">
-        <div class="zone-label__name">Human-Only</div>
-        <div class="zone-label__stakes">Constitutional</div>
-    </div>
-
-    <!-- Replay Button -->
-    <div class="replay" id="replay">
-        <button class="replay-btn" onclick="replayJourney()">
-            <span>↺</span>
-            <span>Watch Again</span>
+        <button class="view-btn" data-zone="visible" onclick="switchZone('visible')">
+            <span class="view-btn__icon">◐</span>
+            <span class="view-btn__label">Visible</span>
         </button>
+        <button class="view-btn" data-zone="gated" onclick="switchZone('gated')">
+            <span class="view-btn__icon">◫</span>
+            <span class="view-btn__label">Gated</span>
+        </button>
+        <button class="view-btn" data-zone="human-only" onclick="switchZone('human-only')">
+            <span class="view-btn__icon">●</span>
+            <span class="view-btn__label">Human-Only</span>
+        </button>
+    </nav>
+
+    <!-- Zone Label - Fixed top right -->
+    <div class="zone-label" id="zoneLabel">
+        <div class="zone-label__name" id="zoneLabelName">Seamless</div>
+        <div class="zone-label__stakes" id="zoneLabelStakes">Low Stakes</div>
+    </div>
+
+    <!-- Zone Controls - Gate Slider (shown only for Gated zone) -->
+    <div class="zone-controls" id="zoneControls">
+        <span class="zone-controls__label">🔒 Closed</span>
+        <div class="zone-controls__slider-container">
+            <div class="zone-controls__ticks">
+                <span class="zone-controls__tick zone-controls__tick--red"></span>
+                <span class="zone-controls__tick zone-controls__tick--amber"></span>
+                <span class="zone-controls__tick zone-controls__tick--green"></span>
+            </div>
+            <input type="range" class="zone-controls__slider" id="gateSlider" min="0" max="100" value="0"
+                   oninput="updateGate(this.value, false)"
+                   onchange="snapGate(this.value)">
+            <div class="zone-controls__tick-labels">
+                <span class="zone-controls__tick-label">Closed</span>
+                <span class="zone-controls__tick-label">Review</span>
+                <span class="zone-controls__tick-label">Open</span>
+            </div>
+        </div>
+        <span class="zone-controls__label">Open 🔓</span>
     </div>
 
     <!-- Legend -->
     <nav class="legend" id="legend">
         <div class="legend__title">Stakes Increase →</div>
-        <div class="legend__item">
-            <span class="legend__line legend__line--seamless"></span>
-            <span class="legend__label">Seamless</span>
-        </div>
-        <div class="legend__item">
-            <span class="legend__line legend__line--visible"></span>
-            <span class="legend__label">Visible</span>
-        </div>
-        <div class="legend__item">
-            <span class="legend__line legend__line--gated"></span>
-            <span class="legend__label">Gated</span>
-        </div>
-        <div class="legend__item">
-            <span class="legend__line legend__line--human-only"></span>
-            <span class="legend__label">Human-Only</span>
+        <div class="legend__items">
+            <div class="legend__item">
+                <span class="legend__dot legend__dot--seamless"></span>
+                <span class="legend__label">Seamless</span>
+            </div>
+            <div class="legend__item">
+                <span class="legend__dot legend__dot--visible"></span>
+                <span class="legend__label">Visible</span>
+            </div>
+            <div class="legend__item">
+                <span class="legend__dot legend__dot--gated"></span>
+                <span class="legend__label">Gated</span>
+            </div>
+            <div class="legend__item">
+                <span class="legend__dot legend__dot--human-only"></span>
+                <span class="legend__label">Human-Only</span>
+            </div>
         </div>
     </nav>
 
-    <!-- Audio -->
+    <!-- Controls Hint -->
+    <div class="controls-hint" id="controlsHint">
+        Drag to rotate · Scroll to zoom · Click to explore
+    </div>
+
+    <!-- Audio Button -->
     <button class="audio-btn" id="audioBtn" onclick="toggleAudio()">
         <span class="audio-icon">♪</span>
         <span class="audio-label">Sound</span>
     </button>
 
-    <!-- Controls Hint -->
-    <div class="controls-hint" id="controlsHint">
-        Drag to orbit · Scroll to zoom
-    </div>
+    <!-- Detail Panel -->
+    <aside class="detail-panel" id="detailPanel">
+        <button class="detail-panel__close" onclick="closeDetail()">&times;</button>
+        <div class="detail-panel__stakes" id="detailStakes">Low Stakes</div>
+        <h2 class="detail-panel__title" id="detailTitle">Seamless</h2>
+        <p class="detail-panel__description" id="detailDescription">
+            Zero friction. AI flows through invisibly — indistinguishable from human work.
+        </p>
+        <div class="detail-panel__examples">
+            <div class="detail-panel__examples-label">Examples</div>
+            <p class="detail-panel__examples-text" id="detailExamples">Auto-save, spell-check, spam filtering</p>
+        </div>
+    </aside>
 
     <script src="main.js"></script>
 </body>

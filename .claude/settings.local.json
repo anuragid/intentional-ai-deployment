@@ -35,7 +35,8 @@
       "Skill(example-skills:pdf)",
       "Skill(example-skills:webapp-testing)",
       "Bash(pip3 install:*)",
-      "Bash(osascript:*)"
+      "Bash(osascript:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

@@ -1,43 +1,67 @@
 # Claude Instructions
 
+## PARAMOUNT QUALITY STANDARD
+
+**This project aims to be awe-inspiring, groundbreaking, world-changing.** Every output must meet this bar. Never settle for "functional" — every visualization must evoke wonder, invite exploration, and demonstrate mastery.
+
+If what you're building isn't remarkable, stop and redesign.
+
 ## First Step for Every Session
 
-**Read `PROJECT_STATUS.md` before doing anything else.** It contains:
-- Complete project context and purpose
-- Technology stack with version constraints (Three.js r128 is critical)
-- Current status of all visualizations
-- Do's and Don'ts
-- File structure and key code locations
+1. **Read `PROJECT_STATUS.md`** — Complete context, tech stack, current status
+2. **Read `.claude/QUALITY_STANDARDS.md`** — Non-negotiables for consistency
+3. **Understand the CONCEPT before implementing** — Read article content, understand metaphors
 
-## Quick Context
+## Before Building Any Visualization
 
-This project creates interactive visualizations for a 5-part article series on Human-AI collaboration. The current focus is **The Complementarity View** — an isometric 3D scene showing AI's observable domain (street lamp light) vs human tacit knowledge (darkness with glowing orbs).
+### Conceptual Understanding (MANDATORY)
+1. What is the core idea being visualized?
+2. What metaphor communicates this idea?
+3. How does the visual make the abstract tangible?
+4. What should the user FEEL when interacting?
 
-## Critical Constraints
+**Never start coding until you can articulate these.**
 
-1. **Three.js version MUST stay at r128** — OrbitControls requires this
-2. **No build tools** — Use CDN script tags directly
-3. **Visualizations must work in 3 contexts:** standalone, embedded, presentation
-4. **Aesthetic: contemplative, not flashy** — "Quiet awe like stargazing"
+## Critical Technical Constraints
 
-## Key Files
+1. **Three.js r128** — LOCKED. OrbitControls requires this version.
+2. **Full 3D Interactivity** — Every visualization needs:
+   - OrbitControls (drag to rotate, scroll to zoom, right-drag to pan)
+   - Click interactions (focus, details)
+   - Hover feedback
+3. **No Tiny Canvases** — Full-screen immersive experiences, not grids of thumbnails
+4. **No Build Tools** — Direct CDN script loading
+5. **Three Contexts** — Must work: standalone, embedded, presentation
 
-- `visualizations/complementarity-view/main.js` — All visualization logic
-- `visualizations/complementarity-view/index.html` — HTML + embedded CSS
-- `shared/design-system.css` — Design tokens (for future visualizations)
+## Aesthetic Mandate
+
+- **"Quiet awe like stargazing"** — contemplative, not flashy
+- **Invite exploration** — users should WANT to interact
+- **Visual metaphors must be precise** — every element has meaning
+- **Consistency** — same fonts, colors, UI patterns across all visualizations
+
+## The Friction Spectrum Concepts (Part 4)
+
+> "Calibrated friction: seams matched to stakes"
+
+- **Seamless**: Zero friction. AI output indistinguishable from human. Information flows freely.
+- **Visible**: AI's contribution is VISIBLE. You can see/discern what AI did. "Beautiful seams."
+- **Gated**: Human-in-the-loop. Flow PAUSES for human approval before continuing.
+- **Human-Only**: Human is fully in control. Not just approving — deciding.
+
+This is about the FLOW of information and WHERE human oversight enters.
 
 ## Local Development
 
 ```bash
 python3 -m http.server 8080
-# Visit: http://localhost:8080/visualizations/complementarity-view/
+# Visit: http://localhost:8080/
 ```
 
-**Always use port 8080** — Do not use port 8000.
+**Always use port 8080.**
 
-## Before Editing
+## Before Every Commit
 
-1. Read the relevant file first
-2. Validate JS: `node --check main.js`
-3. Test in browser after changes
-4. Commit meaningful changes with descriptive messages
+1. Validate JS: `node --check main.js`
+2. Test in browser
+3. Ask: "Is this awe-inspiring?" If not, iterate.
