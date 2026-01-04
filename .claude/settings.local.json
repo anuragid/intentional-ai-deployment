@@ -40,7 +40,8 @@
       "Bash(node -e:*)",
       "Bash(git -C \"/Users/idstuart/Documents/Semester 4/Independent Study/intentional-ai-deployment\" log --oneline -- visualizations/friction-spectrum/main.js)",
       "Bash(git -C \"/Users/idstuart/Documents/Semester 4/Independent Study/intentional-ai-deployment\" show 8cdcc52:visualizations/friction-spectrum/main.js)",
-      "Bash(git -C \"/Users/idstuart/Documents/Semester 4/Independent Study/intentional-ai-deployment\" show 11a9829:visualizations/friction-spectrum/main.js)"
+      "Bash(git -C \"/Users/idstuart/Documents/Semester 4/Independent Study/intentional-ai-deployment\" show 11a9829:visualizations/friction-spectrum/main.js)",
+      "WebSearch"
     ]
   }
 }

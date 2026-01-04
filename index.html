@@ -932,6 +932,7 @@
       /* Initial state for GSAP */
       opacity: 0;
       transform-style: preserve-3d;
+      cursor: pointer;
     }
 
     .voice:hover {
@@ -1337,7 +1338,7 @@
         </header>
 
         <div class="voices__grid">
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/donnakflynn/">
             <p class="voice__text">
               "There's going to be a new humanism emerging at work that we have to define. We all need work. It's our identity."
             </p>
@@ -1347,7 +1348,7 @@
             </div>
           </div>
 
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/ewanduncan/">
             <p class="voice__text">
               "Very few people are asking what should we apply AI to. It's at a level above 'what problem are we trying to solve with AI.'"
             </p>
@@ -1357,7 +1358,7 @@
             </div>
           </div>
 
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/bobulate/">
             <p class="voice__text">
               "One of the responsible AI team's advice was to make sure to put that friction in, so people were aware of the interaction with AI at each stage."
             </p>
@@ -1367,7 +1368,7 @@
             </div>
           </div>
 
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/kathleen-brandenburg-b37216/">
             <p class="voice__text">
               "When we're proxying information over and over again, eventually our own brains, they atrophy."
             </p>
@@ -1377,7 +1378,7 @@
             </div>
           </div>
 
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/kellyfranznick/">
             <p class="voice__text">
               "People are deploying AI like it's an IT deployment when it's really a design process."
             </p>
@@ -1387,7 +1388,7 @@
             </div>
           </div>
 
-          <div class="voice">
+          <div class="voice" data-linkedin="https://www.linkedin.com/in/larrykeeley/">
             <p class="voice__text">
               "None of that would happen if we'd had AI back then. I could have stayed with the original small group of seven or eight people. We could have done everything we were trying to do."
             </p>
@@ -2139,6 +2140,14 @@
             duration: 0.4,
             ease: 'power2.out'
           });
+        });
+
+        // Open LinkedIn profile in new tab on click
+        voice.addEventListener('click', () => {
+          const linkedinUrl = voice.dataset.linkedin;
+          if (linkedinUrl) {
+            window.open(linkedinUrl, '_blank', 'noopener,noreferrer');
+          }
         });
       });
 

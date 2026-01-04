@@ -31,8 +31,9 @@ const ZONES = {
         id: 'seamless',
         title: 'Seamless',
         stakes: 'Low Stakes',
-        description: 'Zero friction. AI flows through invisibly — indistinguishable from human work. The user may not even know AI is involved.',
-        examples: 'Auto-save, spell-check, spam filtering, smart replies',
+        essence: 'AI flows invisibly, indistinguishable from human work.',
+        description: 'Zero friction. AI flows through invisibly, indistinguishable from human work. The user may not even know AI is involved.',
+        examples: 'Calendar scheduling, email sorting, auto-save',
         color: CONFIG.colors.seamless,
         colorHex: '#22d3ee',
     },
@@ -40,8 +41,9 @@ const ZONES = {
         id: 'visible',
         title: 'Visible',
         stakes: 'Learning Stakes',
-        description: 'Beautiful seams illuminate where AI contributed — teaching through transparency. Users see and learn from AI\'s reasoning.',
-        examples: 'Writing suggestions with highlights, code completion with explanations',
+        essence: 'Beautiful seams reveal where AI contributed.',
+        description: 'Beautiful seams illuminate where AI contributed, teaching through transparency. Users see and learn from AI\'s reasoning.',
+        examples: 'AI-drafted reports with marked sections, code with attribution',
         color: CONFIG.colors.visible,
         colorHex: '#60a5fa',
     },
@@ -49,8 +51,9 @@ const ZONES = {
         id: 'gated',
         title: 'Gated',
         stakes: 'High Stakes',
+        essence: 'Flow pauses. Human approval required.',
         description: 'The flow pauses. Human approval required before AI action proceeds. A checkpoint ensures human judgment at critical moments.',
-        examples: 'Send email confirmation, financial transactions, medical recommendations',
+        examples: 'Medical diagnosis requiring approval, fraud flags for review',
         color: CONFIG.colors.gated,
         colorHex: '#fbbf24',
     },
@@ -58,8 +61,9 @@ const ZONES = {
         id: 'human-only',
         title: 'Human-Only',
         stakes: 'Constitutional Stakes',
+        essence: 'Human decides. AI advises at most.',
         description: 'The barrier is absolute. Human decides, AI advises at most. Some choices belong to us alone.',
-        examples: 'Hiring decisions, judicial rulings, life-altering medical choices',
+        examples: 'Judicial rulings, personnel decisions, strategic direction',
         color: CONFIG.colors.humanOnly,
         colorHex: '#8b5cf6',
     },
@@ -233,16 +237,19 @@ function updateZoneLight(color) {
 }
 
 function updateZoneLabel(zone) {
-    const labelName = document.getElementById('zoneLabelName');
     const labelStakes = document.getElementById('zoneLabelStakes');
-    const label = document.getElementById('zoneLabel');
+    const labelEssence = document.getElementById('zoneLabelEssence');
+    const examplesText = document.getElementById('examplesText');
 
-    if (labelName) {
-        labelName.textContent = zone.title;
-        labelName.style.color = zone.colorHex;
-    }
     if (labelStakes) {
         labelStakes.textContent = zone.stakes;
+        labelStakes.style.color = zone.colorHex;
+    }
+    if (labelEssence) {
+        labelEssence.textContent = zone.essence;
+    }
+    if (examplesText) {
+        examplesText.textContent = zone.examples;
     }
 }
 
@@ -1240,22 +1247,11 @@ function closeDetail() {
 }
 
 // ============================================================
-// Canvas Click - Show detail panel
+// Canvas Click - Reserved for future interactions
 // ============================================================
 function onCanvasClick(event) {
-    // Check if clicking on the 3D scene (not UI)
-    const rect = renderer.domElement.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    // Simple click detection - if clicking roughly in center, show detail
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-
-    if (distance < rect.width * 0.3) {
-        showDetail(currentZone);
-    }
+    // Click interactions could be added here for specific 3D elements
+    // Currently, all information is displayed directly in the UI
 }
 
 // ============================================================

@@ -181,6 +181,7 @@
             opacity: 0;
             transform: translateY(-10px);
             transition: opacity 0.8s ease, transform 0.8s ease;
+            max-width: 320px;
         }
 
         .zone-label.visible {
@@ -188,21 +189,67 @@
             transform: translateY(0);
         }
 
-        .zone-label__name {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-        }
-
         .zone-label__stakes {
             font-family: var(--font-body);
             font-size: 0.6rem;
-            font-weight: 400;
-            letter-spacing: 0.1em;
+            font-weight: 500;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--color-text-muted);
-            margin-top: 0.2rem;
+            transition: color 0.4s ease;
+        }
+
+        .zone-label__essence {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.45;
+            color: var(--color-text-muted);
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+        }
+
+        .zone-label.visible .zone-label__essence {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .zone-label__examples {
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+            margin-top: 0.6rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+        }
+
+        .zone-label.visible .zone-label__examples {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .zone-label__examples-prefix {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            flex-shrink: 0;
+        }
+
+        .zone-label__examples-text {
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 300;
+            line-height: 1.4;
+            color: var(--color-text-dim);
         }
 
         /* Zone Controls - For interactive zones */
@@ -324,7 +371,7 @@
             letter-spacing: 0.08em;
         }
 
-        /* Controls Hint - Bottom center (matches Four Rungs) */
+        /* Controls Hint - Bottom center */
         .controls-hint {
             position: fixed;
             bottom: 1.5rem;
@@ -332,7 +379,7 @@
             transform: translateX(-50%);
             z-index: 90;
             font-family: var(--font-body);
-            font-size: 0.55rem;
+            font-size: 0.5rem;
             font-weight: 300;
             letter-spacing: 0.03em;
             color: var(--color-text-dim);
@@ -384,100 +431,6 @@
             font-size: 0.75rem;
         }
 
-        /* Detail Panel - Right side (matches Four Rungs) */
-        .detail-panel {
-            position: fixed;
-            top: 50%;
-            right: 1.5rem;
-            transform: translateY(-50%) translateX(20px);
-            z-index: 200;
-            width: 260px;
-            padding: 1.25rem;
-            background: rgba(8, 8, 12, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            backdrop-filter: blur(12px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-
-        .detail-panel.visible {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(-50%) translateX(0);
-        }
-
-        .detail-panel__close {
-            position: absolute;
-            top: 0.8rem;
-            right: 0.8rem;
-            width: 20px;
-            height: 20px;
-            background: none;
-            border: none;
-            color: var(--color-text-dim);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .detail-panel__close:hover {
-            color: var(--color-text);
-        }
-
-        .detail-panel__stakes {
-            font-family: var(--font-body);
-            font-size: 0.5rem;
-            font-weight: 500;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--color-text-dim);
-            margin-bottom: 0.4rem;
-        }
-
-        .detail-panel__title {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--color-text);
-            margin-bottom: 0.6rem;
-        }
-
-        .detail-panel__description {
-            font-family: var(--font-body);
-            font-size: 0.75rem;
-            font-weight: 300;
-            line-height: 1.55;
-            color: var(--color-text-muted);
-            margin-bottom: 0.8rem;
-        }
-
-        .detail-panel__examples {
-            padding: 0.6rem 0.8rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 2px solid var(--color-text-dim);
-            border-radius: 2px;
-        }
-
-        .detail-panel__examples-label {
-            font-family: var(--font-body);
-            font-size: 0.5rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--color-text-dim);
-            margin-bottom: 0.2rem;
-        }
-
-        .detail-panel__examples-text {
-            font-family: var(--font-body);
-            font-size: 0.65rem;
-            font-weight: 300;
-            line-height: 1.45;
-            color: var(--color-text-muted);
-        }
-
         /* Mobile */
         @media (max-width: 768px) {
             .header {
@@ -498,31 +451,33 @@
                 font-size: 0.6rem;
             }
 
-            .legend {
-                bottom: 4rem;
-                left: 1rem;
-            }
-
-            .detail-panel {
-                right: 1rem;
-                left: 1rem;
-                width: auto;
+            .zone-label {
                 top: auto;
-                bottom: 1rem;
-                transform: translateY(20px);
+                bottom: 5rem;
+                right: 1rem;
+                max-width: 220px;
             }
 
-            .detail-panel.visible {
-                transform: translateY(0);
+            .zone-label__essence {
+                font-size: 0.8rem;
+            }
+
+            .zone-label__examples-text {
+                font-size: 0.55rem;
+            }
+
+            .legend {
+                bottom: 5rem;
+                left: 1rem;
+            }
+
+            .controls-hint {
+                bottom: 1rem;
             }
 
             .audio-btn {
                 bottom: 1rem;
                 right: 1rem;
-            }
-
-            .controls-hint {
-                bottom: 1rem;
             }
         }
     </style>
@@ -556,10 +511,14 @@
         </button>
     </nav>
 
-    <!-- Zone Label - Fixed top right -->
+    <!-- Zone Context - Fixed top right -->
     <div class="zone-label" id="zoneLabel">
-        <div class="zone-label__name" id="zoneLabelName">Seamless</div>
         <div class="zone-label__stakes" id="zoneLabelStakes">Low Stakes</div>
+        <div class="zone-label__essence" id="zoneLabelEssence">AI flows invisibly, indistinguishable from human work.</div>
+        <div class="zone-label__examples" id="zoneLabelExamples">
+            <span class="zone-label__examples-prefix">e.g.</span>
+            <span class="zone-label__examples-text" id="examplesText">Calendar scheduling, email sorting, auto-save</span>
+        </div>
     </div>
 
     <!-- Zone Controls - Gate Slider (shown only for Gated zone) -->
@@ -584,29 +543,13 @@
     </nav>
 
     <!-- Controls Hint -->
-    <div class="controls-hint" id="controlsHint">
-        Drag to rotate · Scroll to zoom · Click to explore
-    </div>
+    <div class="controls-hint" id="controlsHint">Drag to rotate · Scroll to zoom</div>
 
     <!-- Audio Button -->
     <button class="audio-btn" id="audioBtn" onclick="toggleAudio()">
         <span class="audio-icon">♪</span>
         <span class="audio-label">Sound</span>
     </button>
-
-    <!-- Detail Panel -->
-    <aside class="detail-panel" id="detailPanel">
-        <button class="detail-panel__close" onclick="closeDetail()">&times;</button>
-        <div class="detail-panel__stakes" id="detailStakes">Low Stakes</div>
-        <h2 class="detail-panel__title" id="detailTitle">Seamless</h2>
-        <p class="detail-panel__description" id="detailDescription">
-            Zero friction. AI flows through invisibly — indistinguishable from human work.
-        </p>
-        <div class="detail-panel__examples">
-            <div class="detail-panel__examples-label">Examples</div>
-            <p class="detail-panel__examples-text" id="detailExamples">Auto-save, spell-check, spam filtering</p>
-        </div>
-    </aside>
 
     <script src="main.js"></script>
 </body>
