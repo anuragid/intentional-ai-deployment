@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cost of Speed | Organizational Pace Layers</title>
+    <meta name="description" content="When faster layers force slower layers to change at inappropriate speeds, strain accumulates.">
+
+    <!-- Fonts: Cormorant Garamond (display) + IBM Plex Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Three.js r128 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+
+            --color-bg: #08080c;
+            --color-text: #f5f5f4;
+            --color-text-muted: rgba(245, 245, 244, 0.6);
+            --color-text-dim: rgba(245, 245, 244, 0.35);
+
+            /* Muted, contemplative palette */
+            --color-ring: rgba(180, 180, 190, 0.4);
+            --color-ring-bright: rgba(220, 220, 230, 0.7);
+            --color-center: rgba(200, 180, 160, 0.6);
+            --color-accent: #f59e0b;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+            padding: 1.5rem 2rem;
+            pointer-events: none;
+        }
+
+        .title-group {
+            flex: 0 0 auto;
+        }
+
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .header .subtitle {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .quote {
+            flex: 1 1 auto;
+            text-align: right;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .quote.visible { opacity: 1; }
+
+        .quote p {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            line-height: 1.5;
+        }
+
+        .quote cite {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-style: normal;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* Layer Labels - minimal, appear on hover */
+        .layer-label {
+            position: fixed;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.1rem;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .layer-label.visible {
+            opacity: 0.7;
+        }
+
+        .layer-label.hovered {
+            opacity: 1;
+        }
+
+        .layer-label.dimmed {
+            opacity: 0.15;
+        }
+
+        .layer-label .name {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text);
+            white-space: nowrap;
+        }
+
+        .layer-label .speed {
+            font-family: var(--font-body);
+            font-size: 0.5rem;
+            font-weight: 300;
+            color: var(--color-text-dim);
+            white-space: nowrap;
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 2rem;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.25rem;
+            background: rgba(8, 8, 12, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .legend.visible { opacity: 1; }
+
+        .legend-title {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.25rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--color-ring);
+        }
+
+        .legend-dot--fast {
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+
+        .legend-dot--slow {
+            background: var(--color-center);
+        }
+
+        .legend-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0.4rem 0;
+        }
+
+        /* Cultural Debt Indicator */
+        .debt-indicator {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 2rem;
+            z-index: 100;
+            text-align: center;
+            padding: 1rem 1.25rem;
+            background: rgba(10, 10, 15, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .debt-indicator.visible { opacity: 1; }
+
+        .debt-label {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .debt-formula {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--color-text);
+            line-height: 1.4;
+        }
+
+        .debt-sigma {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--color-accent);
+        }
+
+        .debt-strains {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 300;
+            font-style: italic;
+            color: var(--color-text-dim);
+            margin-top: 0.4rem;
+        }
+
+        /* Controls Hint */
+        .controls-hint {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--color-text-dim);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .controls-hint.visible { opacity: 1; }
+
+        /* Detail Panel */
+        .detail-panel {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%) translateX(20px);
+            z-index: 150;
+            width: 300px;
+            padding: 1.5rem;
+            background: rgba(8, 8, 12, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .detail-panel.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .detail-panel__close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--color-text-muted);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-panel__close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+        }
+
+        .detail-panel__label {
+            font-family: var(--font-body);
+            font-size: 0.6rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--color-text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-panel__title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-panel__speed {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-panel__description {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--color-text-muted);
+        }
+
+        .detail-panel__quote {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--color-accent);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .detail-panel__quote p {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+            line-height: 1.5;
+        }
+
+        .detail-panel__quote cite {
+            display: block;
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-style: normal;
+            color: var(--color-text-dim);
+            margin-top: 0.4rem;
+        }
+
+        /* Focus state - dims everything else */
+        body.layer-focused .header,
+        body.layer-focused .quote,
+        body.layer-focused .legend,
+        body.layer-focused .debt-indicator {
+            opacity: 0.2 !important;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.35rem;
+            }
+
+            .quote {
+                display: none;
+            }
+
+            .detail-panel {
+                top: auto;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                transform: translateY(100%);
+            }
+
+            .detail-panel.visible {
+                transform: translateY(0);
+            }
+
+            .legend {
+                bottom: auto;
+                top: 4rem;
+                left: auto;
+                right: 1rem;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .controls-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <header class="header">
+        <div class="title-group">
+            <h1>The Cost of Speed</h1>
+            <p class="subtitle">Organizational Pace Layers</p>
+        </div>
+        <blockquote class="quote" id="quote">
+            <p>"The fast layers innovate; the slow layers stabilize."</p>
+            <cite>Stewart Brand, 1999</cite>
+        </blockquote>
+    </header>
+
+    <div class="legend" id="legend">
+        <div class="legend-title">Pace Layers</div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #5eaa8d;"></span>
+            <span>Capability (Days)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #b8839b;"></span>
+            <span>Productivity (Weeks)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #7a9cb8;"></span>
+            <span>Expertise (Months)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #c9a858;"></span>
+            <span>Governance (Years)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #9683b0;"></span>
+            <span>Profession (Decades)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot" style="background: #c48556;"></span>
+            <span>Purpose (Evolutionary)</span>
+        </div>
+        <div class="legend-divider"></div>
+        <div class="legend-item legend-item--strain">
+            <span class="legend-dot" style="background: #d45c5c; box-shadow: 0 0 6px #d45c5c;"></span>
+            <span>Boundary Strain</span>
+        </div>
+    </div>
+
+    <!-- Cultural Debt Indicator -->
+    <div class="debt-indicator" id="debtIndicator">
+        <div class="debt-label">Cultural Debt</div>
+        <div class="debt-formula">
+            <span class="debt-sigma">Σ</span> = Skill + Quality + Trust + Ethics + Identity
+        </div>
+        <div class="debt-strains">Strain at each boundary</div>
+    </div>
+
+    <div class="controls-hint" id="controlsHint">
+        <span>Drag to rotate</span>
+        <span>·</span>
+        <span>Scroll to zoom</span>
+        <span>·</span>
+        <span>Click layers to explore</span>
+    </div>
+
+    <div class="detail-panel" id="detailPanel">
+        <button class="detail-panel__close" id="closePanel">&times;</button>
+        <div class="detail-panel__label">Pace Layer</div>
+        <h2 class="detail-panel__title" id="panelTitle"></h2>
+        <p class="detail-panel__speed" id="panelSpeed"></p>
+        <p class="detail-panel__description" id="panelDescription"></p>
+        <div class="detail-panel__quote" id="panelQuote">
+            <p id="panelQuoteText"></p>
+            <cite id="panelQuoteCite"></cite>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
