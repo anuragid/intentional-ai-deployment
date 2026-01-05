@@ -238,10 +238,10 @@
             right: 2rem;
             z-index: 100;
             text-align: center;
-            padding: 1rem 1.25rem;
-            background: rgba(10, 10, 15, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            padding: 1.25rem 1.75rem;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
             opacity: 0;
             transition: opacity 0.8s ease;
         }
@@ -250,27 +250,32 @@
 
         .debt-label {
             font-family: var(--font-body);
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             font-weight: 500;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
             color: var(--color-text-dim);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .debt-formula {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
             font-family: var(--font-body);
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: 400;
             color: var(--color-text);
-            line-height: 1.4;
+            line-height: 1;
         }
 
         .debt-sigma {
             font-family: var(--font-display);
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1.75rem;
+            font-weight: 600;
             color: var(--color-accent);
+            line-height: 1;
         }
 
         .debt-strains {
@@ -279,7 +284,7 @@
             font-weight: 300;
             font-style: italic;
             color: var(--color-text-dim);
-            margin-top: 0.4rem;
+            margin-top: 0.6rem;
         }
 
         /* Controls Hint */
@@ -513,7 +518,7 @@
     <div class="debt-indicator" id="debtIndicator">
         <div class="debt-label">Cultural Debt</div>
         <div class="debt-formula">
-            <span class="debt-sigma">Σ</span> = Skill + Quality + Trust + Ethics + Identity
+            <span class="debt-sigma">Σ</span><span class="debt-terms">(Skill + Quality + Trust + Ethics + Identity)</span>
         </div>
         <div class="debt-strains">Strain at each boundary</div>
     </div>
