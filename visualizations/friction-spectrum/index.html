@@ -386,7 +386,28 @@
             #friction-arrow { display: none; }
             .zone-label .zone-name { font-size: 0.85rem; }
         }
+
+        /* ===== Embed mode (when loaded with ?embed=1) ===== */
+        .embed-mode #header,
+        .embed-mode #quote,
+        .embed-mode #legend,
+        .embed-mode #friction-arrow,
+        .embed-mode #controls-hint,
+        .embed-mode #audio-toggle {
+            display: none !important;
+        }
     </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.add('embed-mode');
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
