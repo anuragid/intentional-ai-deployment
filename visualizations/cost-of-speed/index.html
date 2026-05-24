@@ -465,7 +465,32 @@
                 display: none;
             }
         }
+
+        /* ===== Embed mode (when loaded with ?embed=1) ===== */
+        .embed-mode .header,
+        .embed-mode .quote,
+        .embed-mode #quote,
+        .embed-mode .legend,
+        .embed-mode #legend,
+        .embed-mode .controls-hint,
+        .embed-mode #controlsHint,
+        .embed-mode .debt-indicator,
+        .embed-mode #debtIndicator,
+        .embed-mode .debt-label {
+            display: none !important;
+        }
     </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.add('embed-mode');
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
