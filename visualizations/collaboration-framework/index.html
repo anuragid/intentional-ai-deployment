@@ -542,6 +542,17 @@
             }
         }
     </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.add('embed-mode');
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
     <main class="framework">
