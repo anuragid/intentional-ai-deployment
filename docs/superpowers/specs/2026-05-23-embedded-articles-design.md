@@ -230,18 +230,10 @@ window.addEventListener('pageshow', () => {
 - The standalone viz pages already start animation on `DOMContentLoaded`; that's fine inside the iframe since the iframe itself isn't loaded until needed.
 - No additional `IntersectionObserver` required given native lazy-load.
 
-### 6.6 The complementarity-view GLB caveat
-The complementarity-view loads a 72 MB `Walking_person.glb` by default. Even with lazy-loading on the iframe, allowing this download for embedded mode would be unacceptable.
+### 6.6 The complementarity-view GLB (not an issue at runtime)
+The complementarity-view folder contains a 72 MB `Walking_person.glb` and several lighter GLB variants, but **none are fetched at runtime** — `main.js:2972` calls `createFallbackHumanFigure()` unconditionally and the GLB code path is currently inert (commented out / stubbed). No embed-mode patch needed for the GLB. The file's presence in the repo is a separate, out-of-scope concern (see §12).
 
-**Patch:** wrap the GLB fetch in a guard:
-```js
-if (!document.body.classList.contains('embed-mode')) {
-  // existing GLB load path
-} else {
-  createFallbackHumanFigure();
-}
-```
-The fallback procedural figure already exists in the codebase and is what's used when the GLB fails to load.
+QA will verify (§11.3) that loading the embed iframe does not trigger a 72 MB transfer.
 
 ### 6.7 What `?embed=1` does NOT do
 - Does not modify the camera position, lighting, or scene composition.
@@ -334,8 +326,7 @@ Three waves of work. Each wave's subagents run in parallel where possible.
 1. Build `shared/article.css` (the reading shell — implements all styling in §5).
 2. Build the article template (the HTML structure each article instance fills in).
 3. Patch each visualization's `index.html` to honor `?embed=1` per §6.2.
-4. Patch complementarity-view to skip the 72 MB GLB in embed mode per §6.6.
-5. Repoint landing `index.html` Part card hrefs per §8.
+4. Repoint landing `index.html` Part card hrefs per §8.
 
 Sequential because each step depends on conventions established by the previous. Single subagent (or main thread) so the patches stay stylistically uniform.
 
