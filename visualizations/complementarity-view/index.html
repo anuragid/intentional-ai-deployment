@@ -870,7 +870,33 @@
                 display: none;
             }
         }
+
+        /* ===== Embed mode (when loaded with ?embed=1) ===== */
+        .embed-mode .header,
+        .embed-mode .quote,
+        .embed-mode #quote,
+        .embed-mode .legend,
+        .embed-mode #legend,
+        .embed-mode .controls-hint,
+        .embed-mode #controlsHint,
+        .embed-mode #audioToggle,
+        .embed-mode .audio-btn,
+        .embed-mode .mobile-onboarding,
+        .embed-mode .onboarding-content {
+            display: none !important;
+        }
     </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.add('embed-mode');
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
     <header class="header">
