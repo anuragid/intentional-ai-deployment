@@ -589,7 +589,28 @@
                 font-size: 4rem;
             }
         }
+
+        /* ===== Embed mode (when loaded with ?embed=1) ===== */
+        .embed-mode .header,
+        .embed-mode #header,
+        .embed-mode .legend,
+        .embed-mode #legend,
+        .embed-mode .controls-hint,
+        .embed-mode #controlsHint {
+            display: none !important;
+        }
     </style>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      if (params.get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+        document.addEventListener('DOMContentLoaded', function () {
+          document.body.classList.add('embed-mode');
+        });
+      }
+    })();
+  </script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
