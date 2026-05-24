@@ -241,15 +241,18 @@ a { color: inherit; text-decoration: none; }
 }
 .article__prose ul li, .article__prose ol li { margin: 0.5rem 0; }
 
-/* ===== Embed ===== */
+/* ===== Embed =====
+   The embed lives inside .article__prose (680px column) but must break out
+   to up to 960px. Use the full-bleed pattern: width based on the viewport,
+   then re-centered via left:50% + transform. Parent has no overflow clip,
+   so the element extends beyond the column cleanly. */
 .article-embed {
-  width: 100%;
-  max-width: var(--embed-width);
-  margin: 4rem auto;
   position: relative;
+  width: calc(100vw - 3rem);
+  max-width: var(--embed-width);
+  margin: 4rem 0;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0 1.5rem;
 }
 .embed-frame {
   position: relative;
@@ -447,7 +450,7 @@ a { color: inherit; text-decoration: none; }
   .article__prose { padding: 0 1.25rem; font-size: 1rem; line-height: 1.7; }
   .article__prose h2 { font-size: 1.6rem; margin-top: 3rem; }
   .article__prose h3 { font-size: 1.25rem; }
-  .article-embed { margin: 2.5rem auto; padding: 0; }
+  .article-embed { width: 100vw; margin: 2.5rem 0; }
   .embed-frame { border-radius: 0; border-left: 0; border-right: 0; }
   .embed-fullscreen-btn { top: 8px; right: 8px; width: 32px; height: 32px; font-size: 14px; }
   .article-nav {
