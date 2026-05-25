@@ -13,9 +13,10 @@
   <link rel="stylesheet" href="../../shared/article.css">
 </head>
 <body class="article-page" data-slug="before-you-automate">
+  <div class="reading-progress" aria-hidden="true"></div>
 
   <header class="article-header">
-    <a href="../../" class="article-header__wordmark">We Are Choosing By Not Choosing</a>
+    <a href="../../" class="article-header__wordmark"><span class="article-header__back" aria-hidden="true">&larr;</span>We Are Choosing By Not Choosing</a>
     <span class="article-header__meta">PART 2 / 5</span>
   </header>
 
@@ -228,6 +229,24 @@
         io.observe(embedFigure);
       }
     }
+
+    // Reading progress bar
+    (function () {
+      const bar = document.querySelector('.reading-progress');
+      if (!bar) return;
+      let ticking = false;
+      function update() {
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = docH > 0 ? (window.scrollY / docH) * 100 : 0;
+        bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(update); ticking = true; }
+      }, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+      update();
+    })();
   </script>
 </body>
 </html>
