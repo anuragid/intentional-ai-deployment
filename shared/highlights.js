@@ -1,13 +1,12 @@
 // Highlights UI: selection menu, paragraph anchoring, render, hover tooltip,
-// reactions.
-//
-// Phase 1: Highlight button + count tooltip.
-// Phase 2: heart/clap/like reactions in menu + interactive tooltip.
+// reactions, sharing, article-level reactions.
 
 import {
   listenHighlights,
   createHighlight,
   toggleHighlightReaction,
+  listenArticleReactions,
+  toggleArticleReaction,
   getCurrentUid,
 } from './highlights-data.js';
 
@@ -42,6 +41,7 @@ function init() {
 
   let highlights = [];
   let highlightById = new Map();
+  let deepLinkConsumed = false;
 
   listenHighlights(slug, (list) => {
     highlights = list;
@@ -49,16 +49,28 @@ function init() {
     renderHighlights(proseEl, highlights);
     attachHighlightHandlers(proseEl, highlightById, tooltip);
     refreshActiveTooltip(tooltip, highlightById);
+    if (!deepLinkConsumed) {
+      const handled = consumeDeepLink(proseEl);
+      if (handled) deepLinkConsumed = true;
+    }
   });
 
-  wireSelectionMenu(proseEl, menu, async (anchor, reactionType) => {
-    await createHighlight(slug, anchor, reactionType, null);
+  wireSelectionMenu(proseEl, menu, async (anchor, action) => {
+    const reactionType = (action === 'highlight' || action === 'copy') ? null : action;
+    const id = await createHighlight(slug, anchor, reactionType, null);
+    if (action === 'copy') {
+      await copyDeepLink(slug, id);
+    }
     hideMenu(menu);
     window.getSelection()?.removeAllRanges();
   });
 
   wireTooltipReactions(tooltip);
+  wireTooltipCopy(tooltip);
   wireDismissTooltip(tooltip);
+
+  // Article-level reactions row
+  mountArticleReactions();
 }
 
 // ===== Paragraph IDs =====
@@ -77,7 +89,7 @@ function createMenu() {
   menu.className = 'hl-menu';
   menu.setAttribute('role', 'toolbar');
   const reactionBtns = REACTIONS.map((r) =>
-    `<button type="button" class="hl-menu__btn hl-menu__btn--icon" data-action="react" data-reaction="${r.type}" aria-label="Highlight and ${r.label.toLowerCase()}">
+    `<button type="button" class="hl-menu__btn hl-menu__btn--icon" data-action="${r.type}" aria-label="Highlight and ${r.label.toLowerCase()}">
        <span aria-hidden="true">${r.glyph}</span>
      </button>`
   ).join('');
@@ -87,6 +99,10 @@ function createMenu() {
     </button>
     <span class="hl-menu__sep" aria-hidden="true"></span>
     ${reactionBtns}
+    <span class="hl-menu__sep" aria-hidden="true"></span>
+    <button type="button" class="hl-menu__btn hl-menu__btn--icon" data-action="copy" aria-label="Copy link to this passage">
+      <span aria-hidden="true">⤴</span>
+    </button>
   `;
   return menu;
 }
@@ -138,11 +154,7 @@ function wireSelectionMenu(prose, menu, onCreate) {
   menu.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn || !currentAnchor) return;
-    if (btn.dataset.action === 'highlight') {
-      onCreate(currentAnchor, null);
-    } else if (btn.dataset.action === 'react') {
-      onCreate(currentAnchor, btn.dataset.reaction);
-    }
+    onCreate(currentAnchor, btn.dataset.action);
   });
 }
 
@@ -318,6 +330,10 @@ function renderTooltipBody(tooltip, hl) {
     </div>
     <div class="hl-tooltip__row hl-tooltip__row--actions">
       ${reactionBtns}
+      <span class="hl-tooltip__sep" aria-hidden="true"></span>
+      <button type="button" class="hl-tooltip__react" data-action="copy" aria-label="Copy link to this passage">
+        <span class="hl-tooltip__glyph" aria-hidden="true">⤴</span>
+      </button>
     </div>
   `;
 }
@@ -409,6 +425,17 @@ function wireTooltipReactions(tooltip) {
   });
 }
 
+function wireTooltipCopy(tooltip) {
+  tooltip.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action="copy"]');
+    if (!btn) return;
+    const hlId = tooltip.dataset.hlId;
+    if (!hlId) return;
+    e.stopPropagation();
+    await copyDeepLink(slug, hlId);
+  });
+}
+
 function wireDismissTooltip(tooltip) {
   document.addEventListener('mousedown', (e) => {
     if (!tooltipPinned) return;
@@ -419,5 +446,136 @@ function wireDismissTooltip(tooltip) {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && tooltipPinned) hideTooltip(tooltip);
+  });
+}
+
+// ===== Sharing / deep-link =====
+
+function buildHighlightUrl(slug, hlId) {
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '';
+  url.searchParams.set('h', hlId);
+  return url.toString();
+}
+
+async function copyText(text, successMessage) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(successMessage);
+    return;
+  } catch {
+    // Fallback for non-secure contexts or non-gesture invocations
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast(successMessage); }
+  catch { showToast('Copy failed — try selecting URL manually'); }
+  document.body.removeChild(ta);
+}
+
+async function copyDeepLink(slug, hlId) {
+  await copyText(buildHighlightUrl(slug, hlId), 'Link copied');
+}
+
+function consumeDeepLink(prose) {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('h');
+  if (!id) return false;
+  const mark = prose.querySelector(`mark.hl[data-hl-id="${CSS.escape(id)}"]`);
+  if (!mark) return false;
+  window.__hlDeepLink = { id, ranAt: Date.now() };
+  const target = mark.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.35;
+  window.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
+  mark.classList.add('hl--flash');
+  setTimeout(() => mark.classList.remove('hl--flash'), 1800);
+  setTimeout(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('h');
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+  }, 2000);
+  return true;
+}
+
+// ===== Toast =====
+
+let toastEl = null;
+let toastTimer = null;
+
+function ensureToast() {
+  if (toastEl) return toastEl;
+  toastEl = document.createElement('div');
+  toastEl.className = 'hl-toast';
+  toastEl.setAttribute('role', 'status');
+  toastEl.setAttribute('aria-live', 'polite');
+  document.body.appendChild(toastEl);
+  return toastEl;
+}
+
+function showToast(message) {
+  const t = ensureToast();
+  t.textContent = message;
+  t.classList.add('hl-toast--visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('hl-toast--visible'), 2500);
+}
+
+// ===== Article-level reactions =====
+
+function mountArticleReactions() {
+  // Insert before the prev/next nav, after the footnotes section if present
+  const nav = document.querySelector('.article-nav');
+  if (!nav) return;
+
+  const row = document.createElement('div');
+  row.className = 'article-reactions';
+  row.innerHTML = `
+    <div class="article-reactions__inner">
+      <div class="article-reactions__buttons">
+        ${REACTIONS.map((r) => `
+          <button type="button" class="article-reactions__btn" data-reaction="${r.type}" aria-pressed="false" aria-label="${r.label} this article">
+            <span class="article-reactions__glyph" aria-hidden="true">${r.glyph}</span>
+            <span class="article-reactions__count" data-count-for="${r.type}">0</span>
+          </button>
+        `).join('')}
+      </div>
+      <button type="button" class="article-reactions__share" data-action="copy-article" aria-label="Copy link to this article">
+        <span aria-hidden="true">⤴</span> Copy link
+      </button>
+    </div>
+  `;
+  nav.parentNode.insertBefore(row, nav);
+
+  // Subscribe to article reactions
+  listenArticleReactions(slug, ({ counts, mine }) => {
+    REACTIONS.forEach((r) => {
+      const btn = row.querySelector(`[data-reaction="${r.type}"]`);
+      if (!btn) return;
+      const count = counts[r.type] || 0;
+      const isMine = mine.includes(r.type);
+      btn.classList.toggle('is-active', isMine);
+      btn.setAttribute('aria-pressed', String(isMine));
+      btn.querySelector(`[data-count-for="${r.type}"]`).textContent = String(count);
+    });
+  });
+
+  row.addEventListener('click', async (e) => {
+    const reactBtn = e.target.closest('[data-reaction]');
+    if (reactBtn) {
+      await toggleArticleReaction(slug, reactBtn.dataset.reaction);
+      return;
+    }
+    const shareBtn = e.target.closest('[data-action="copy-article"]');
+    if (shareBtn) {
+      const url = new URL(window.location.href);
+      url.search = '';
+      url.hash = '';
+      await copyText(url.toString(), 'Article link copied');
+    }
   });
 }
