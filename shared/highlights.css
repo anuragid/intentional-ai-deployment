@@ -86,6 +86,12 @@
   white-space: nowrap;
 }
 
+.hl-menu__btn--icon {
+  padding: 8px 10px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .hl-menu__btn:hover {
   background: rgba(251, 191, 36, 0.12);
   color: #f5f0e8;
@@ -96,17 +102,25 @@
   outline-offset: 1px;
 }
 
-/* ===== Hover tooltip (over existing highlights) ===== */
+.hl-menu__sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 2px;
+}
+
+/* ===== Highlight tooltip (hover + click-pinned) ===== */
 .hl-tooltip {
   position: absolute;
   z-index: 199;
-  padding: 8px 12px;
+  min-width: 168px;
+  padding: 10px 12px;
   background: rgba(18, 18, 24, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
   font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: rgba(245, 240, 232, 0.9);
   letter-spacing: 0.01em;
   opacity: 0;
@@ -115,17 +129,75 @@
   transition: opacity 0.15s ease, transform 0.15s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  white-space: nowrap;
 }
 
 .hl-tooltip.hl-tooltip--visible {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto;
 }
+
+.hl-tooltip__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.hl-tooltip__row + .hl-tooltip__row {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hl-tooltip__row--actions { gap: 2px; }
 
 .hl-tooltip__count {
   font-weight: 500;
   color: #fbbf24;
+  letter-spacing: 0.02em;
+}
+
+.hl-tooltip__react {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: rgba(245, 240, 232, 0.75);
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.hl-tooltip__react:hover {
+  background: rgba(251, 191, 36, 0.10);
+  color: #f5f0e8;
+}
+
+.hl-tooltip__react.is-active {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.35);
+  color: #fbbf24;
+}
+
+.hl-tooltip__react:focus-visible {
+  outline: 2px solid rgba(251, 191, 36, 0.7);
+  outline-offset: 1px;
+}
+
+.hl-tooltip__glyph {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.hl-tooltip__rcount {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: inherit;
 }
 
 /* ===== Toast ===== */

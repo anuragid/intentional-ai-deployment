@@ -1,12 +1,24 @@
-// Highlights UI: selection menu, paragraph anchoring, render, hover tooltip.
+// Highlights UI: selection menu, paragraph anchoring, render, hover tooltip,
+// reactions.
 //
-// Phase 1: just the Highlight button on the selection menu and a count tooltip
-// on hover. Reactions and sharing arrive in phases 2 and 3.
+// Phase 1: Highlight button + count tooltip.
+// Phase 2: heart/clap/like reactions in menu + interactive tooltip.
 
 import {
   listenHighlights,
   createHighlight,
+  toggleHighlightReaction,
+  getCurrentUid,
 } from './highlights-data.js';
+
+const REACTIONS = [
+  { type: 'heart', glyph: '♥', label: 'Heart' },
+  { type: 'clap',  glyph: '👏', label: 'Clap' },
+  { type: 'like',  glyph: '👍', label: 'Like' },
+];
+
+let activeTooltipHl = null;   // id of currently-shown highlight, if any
+let tooltipPinned = false;    // sticky after click
 
 // ===== Setup =====
 
@@ -28,19 +40,25 @@ function init() {
   document.body.appendChild(menu);
   document.body.appendChild(tooltip);
 
-  // Track live highlights for this article
   let highlights = [];
+  let highlightById = new Map();
+
   listenHighlights(slug, (list) => {
     highlights = list;
+    highlightById = new Map(list.map((h) => [h.id, h]));
     renderHighlights(proseEl, highlights);
-    attachHoverHandlers(proseEl, highlights, tooltip);
+    attachHighlightHandlers(proseEl, highlightById, tooltip);
+    refreshActiveTooltip(tooltip, highlightById);
   });
 
-  wireSelectionMenu(proseEl, menu, async (anchor) => {
-    await createHighlight(slug, anchor, null, null);
+  wireSelectionMenu(proseEl, menu, async (anchor, reactionType) => {
+    await createHighlight(slug, anchor, reactionType, null);
     hideMenu(menu);
     window.getSelection()?.removeAllRanges();
   });
+
+  wireTooltipReactions(tooltip);
+  wireDismissTooltip(tooltip);
 }
 
 // ===== Paragraph IDs =====
@@ -58,17 +76,23 @@ function createMenu() {
   const menu = document.createElement('div');
   menu.className = 'hl-menu';
   menu.setAttribute('role', 'toolbar');
+  const reactionBtns = REACTIONS.map((r) =>
+    `<button type="button" class="hl-menu__btn hl-menu__btn--icon" data-action="react" data-reaction="${r.type}" aria-label="Highlight and ${r.label.toLowerCase()}">
+       <span aria-hidden="true">${r.glyph}</span>
+     </button>`
+  ).join('');
   menu.innerHTML = `
     <button type="button" class="hl-menu__btn" data-action="highlight" aria-label="Highlight selection">
       <span aria-hidden="true">✎</span> Highlight
     </button>
+    <span class="hl-menu__sep" aria-hidden="true"></span>
+    ${reactionBtns}
   `;
   return menu;
 }
 
 function showMenu(menu, rect) {
   menu.classList.add('hl-menu--visible');
-  // Center menu horizontally above the selection
   const menuRect = menu.getBoundingClientRect();
   const left = rect.left + (rect.width / 2) - (menuRect.width / 2) + window.scrollX;
   const top = rect.top - menuRect.height - 10 + window.scrollY;
@@ -80,7 +104,7 @@ function hideMenu(menu) {
   menu.classList.remove('hl-menu--visible');
 }
 
-function wireSelectionMenu(prose, menu, onHighlight) {
+function wireSelectionMenu(prose, menu, onCreate) {
   let currentAnchor = null;
 
   document.addEventListener('selectionchange', () => {
@@ -106,7 +130,6 @@ function wireSelectionMenu(prose, menu, onHighlight) {
     showMenu(menu, rect);
   });
 
-  // Hide on click outside menu/selection
   document.addEventListener('mousedown', (e) => {
     if (menu.contains(e.target)) return;
     if (window.getSelection()?.isCollapsed) hideMenu(menu);
@@ -114,16 +137,16 @@ function wireSelectionMenu(prose, menu, onHighlight) {
 
   menu.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    if (btn.dataset.action === 'highlight' && currentAnchor) {
-      onHighlight(currentAnchor);
+    if (!btn || !currentAnchor) return;
+    if (btn.dataset.action === 'highlight') {
+      onCreate(currentAnchor, null);
+    } else if (btn.dataset.action === 'react') {
+      onCreate(currentAnchor, btn.dataset.reaction);
     }
   });
 }
 
 // ===== Anchoring =====
-// Compute the (paragraphId, startOffset, endOffset, quote) for a selection.
-// Restricted to selections that begin and end inside the same block element.
 
 function computeAnchor(prose, range) {
   const startBlock = findBlock(prose, range.startContainer);
@@ -161,36 +184,18 @@ function textOffsetInBlock(block, targetNode, targetOffset) {
     if (node === targetNode) return pos + targetOffset;
     pos += node.nodeValue.length;
   }
-  if (targetNode.nodeType === Node.ELEMENT_NODE) {
-    // Selection ended at an element boundary — walk to compute up to that point
-    const w2 = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
-    let p = 0;
-    while ((node = w2.nextNode())) {
-      if (targetNode.contains(node)) {
-        const range = document.createRange();
-        range.selectNodeContents(targetNode);
-        range.setEnd(node, node.nodeValue.length);
-        p += node.nodeValue.length;
-      } else {
-        p += node.nodeValue.length;
-      }
-    }
-    return p;
-  }
   return pos;
 }
 
 // ===== Render highlights =====
 
 function renderHighlights(prose, highlights) {
-  // Group by paragraphId
   const byPid = new Map();
   for (const hl of highlights) {
     if (!byPid.has(hl.paragraphId)) byPid.set(hl.paragraphId, []);
     byPid.get(hl.paragraphId).push(hl);
   }
 
-  // For each block: restore pristine HTML, then apply highlights in order
   const blocks = prose.querySelectorAll('[data-pid]');
   blocks.forEach((block) => {
     if (block.dataset.pristine === undefined) {
@@ -199,11 +204,9 @@ function renderHighlights(prose, highlights) {
       block.innerHTML = block.dataset.pristine;
     }
     const list = byPid.get(block.dataset.pid);
-    if (!list) return;
+    if (!list || list.length === 0) return;
 
-    // Re-anchor each highlight (offsets may have shifted if text changed; we try quote first)
     const resolved = list.map((hl) => resolveAnchor(block, hl)).filter(Boolean);
-    // Sort by start offset
     resolved.sort((a, b) => a.startOffset - b.startOffset);
 
     for (const hl of resolved) {
@@ -212,7 +215,6 @@ function renderHighlights(prose, highlights) {
   });
 }
 
-// Try original offsets first; fall back to text search on quote.
 function resolveAnchor(block, hl) {
   const text = block.textContent;
   if (
@@ -223,7 +225,6 @@ function resolveAnchor(block, hl) {
   ) {
     return hl;
   }
-  // Fallback: find the quote in the text
   if (hl.quote) {
     const idx = text.indexOf(hl.quote);
     if (idx !== -1) {
@@ -234,7 +235,6 @@ function resolveAnchor(block, hl) {
 }
 
 function wrapRange(block, startOffset, endOffset, hl) {
-  // Walk text nodes; skip nodes already inside .hl marks
   const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       if (node.parentElement && node.parentElement.closest('mark.hl')) {
@@ -257,13 +257,9 @@ function wrapRange(block, startOffset, endOffset, hl) {
       segments.push({ node, localStart, localEnd });
     }
     pos = nodeEnd;
-    // Note: we don't break here because text after a skipped (already-marked)
-    // node may push positions beyond endOffset incorrectly. Walking the full
-    // block keeps offsets consistent with the pristine text count above.
     if (pos >= block.textContent.length) break;
   }
 
-  // Apply in reverse so node-splitting doesn't shift earlier offsets
   for (let i = segments.length - 1; i >= 0; i--) {
     const { node, localStart, localEnd } = segments[i];
     if (localStart >= localEnd) continue;
@@ -280,20 +276,18 @@ function wrapRange(block, startOffset, endOffset, hl) {
 
     node.nodeValue = before;
     const parent = node.parentNode;
-    let cursor = node.nextSibling;
-    parent.insertBefore(mark, cursor);
+    parent.insertBefore(mark, node.nextSibling);
     if (after) parent.insertBefore(document.createTextNode(after), mark.nextSibling);
   }
 }
 
 function intensityFor(hl) {
   const total = (hl.counts && hl.counts.total) || 1;
-  // Clamp 0.18 -> 0.40 as count grows
   const alpha = Math.min(0.40, 0.18 + 0.025 * (total - 1));
   return alpha.toFixed(3);
 }
 
-// ===== Hover tooltip =====
+// ===== Tooltip (interactive) =====
 
 function createTooltip() {
   const t = document.createElement('div');
@@ -302,38 +296,128 @@ function createTooltip() {
   return t;
 }
 
-function showTooltip(tooltip, mark, text) {
-  tooltip.textContent = '';
-  const span = document.createElement('span');
-  span.className = 'hl-tooltip__count';
-  span.textContent = text;
-  tooltip.appendChild(span);
-  tooltip.classList.add('hl-tooltip--visible');
+function renderTooltipBody(tooltip, hl) {
+  const counts = hl.counts || { heart: 0, clap: 0, like: 0, total: 0 };
+  const uid = getCurrentUid();
+  const mine = (hl.reactions && hl.reactions[uid]) || [];
+  const total = counts.total || 0;
+  const totalText = total === 1 ? '1 highlight' : `${total} highlights`;
+
+  const reactionBtns = REACTIONS.map((r) => {
+    const active = mine.includes(r.type);
+    const count = counts[r.type] || 0;
+    return `<button type="button" class="hl-tooltip__react ${active ? 'is-active' : ''}" data-reaction="${r.type}" aria-pressed="${active}" aria-label="${r.label} (${count})">
+      <span class="hl-tooltip__glyph" aria-hidden="true">${r.glyph}</span>
+      ${count > 0 ? `<span class="hl-tooltip__rcount">${count}</span>` : ''}
+    </button>`;
+  }).join('');
+
+  tooltip.innerHTML = `
+    <div class="hl-tooltip__row">
+      <span class="hl-tooltip__count">${totalText}</span>
+    </div>
+    <div class="hl-tooltip__row hl-tooltip__row--actions">
+      ${reactionBtns}
+    </div>
+  `;
+}
+
+function positionTooltip(tooltip, mark) {
   const rect = mark.getBoundingClientRect();
   const tt = tooltip.getBoundingClientRect();
-  const top = rect.top - tt.height - 8 + window.scrollY;
+  const top = rect.top - tt.height - 10 + window.scrollY;
   const left = rect.left + rect.width / 2 - tt.width / 2 + window.scrollX;
-  tooltip.style.left = `${Math.max(8, left)}px`;
+  tooltip.style.left = `${Math.max(8, Math.min(left, window.innerWidth - tt.width - 8))}px`;
   tooltip.style.top = `${Math.max(8, top)}px`;
 }
 
-function hideTooltip(tooltip) {
-  tooltip.classList.remove('hl-tooltip--visible');
+function showTooltipFor(tooltip, mark, hl, opts = {}) {
+  activeTooltipHl = hl.id;
+  tooltipPinned = !!opts.pinned;
+  renderTooltipBody(tooltip, hl);
+  tooltip.classList.add('hl-tooltip--visible');
+  if (tooltipPinned) tooltip.classList.add('hl-tooltip--pinned');
+  else tooltip.classList.remove('hl-tooltip--pinned');
+  positionTooltip(tooltip, mark);
+  tooltip.dataset.hlId = hl.id;
 }
 
-function attachHoverHandlers(prose, highlights, tooltip) {
-  const byId = new Map(highlights.map((h) => [h.id, h]));
+function hideTooltip(tooltip) {
+  tooltip.classList.remove('hl-tooltip--visible', 'hl-tooltip--pinned');
+  activeTooltipHl = null;
+  tooltipPinned = false;
+  delete tooltip.dataset.hlId;
+}
+
+function refreshActiveTooltip(tooltip, byId) {
+  if (!activeTooltipHl) return;
+  const hl = byId.get(activeTooltipHl);
+  if (!hl) {
+    hideTooltip(tooltip);
+    return;
+  }
+  renderTooltipBody(tooltip, hl);
+  const mark = document.querySelector(`mark.hl[data-hl-id="${CSS.escape(activeTooltipHl)}"]`);
+  if (mark) positionTooltip(tooltip, mark);
+}
+
+function attachHighlightHandlers(prose, byId, tooltip) {
   const marks = prose.querySelectorAll('mark.hl');
   marks.forEach((mark) => {
-    if (mark.dataset.hoverBound === '1') return;
-    mark.dataset.hoverBound = '1';
+    if (mark.dataset.bound === '1') return;
+    mark.dataset.bound = '1';
+
     mark.addEventListener('mouseenter', () => {
+      if (tooltipPinned) return;
       const hl = byId.get(mark.dataset.hlId);
       if (!hl) return;
-      const total = (hl.counts && hl.counts.total) || 1;
-      const text = total === 1 ? '1 highlight' : `${total} highlights`;
-      showTooltip(tooltip, mark, text);
+      showTooltipFor(tooltip, mark, hl, { pinned: false });
     });
-    mark.addEventListener('mouseleave', () => hideTooltip(tooltip));
+
+    mark.addEventListener('mouseleave', () => {
+      if (tooltipPinned) return;
+      // Slight delay so user can move cursor into the tooltip
+      setTimeout(() => {
+        if (tooltipPinned) return;
+        if (!tooltip.matches(':hover')) hideTooltip(tooltip);
+      }, 80);
+    });
+
+    mark.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const hl = byId.get(mark.dataset.hlId);
+      if (!hl) return;
+      showTooltipFor(tooltip, mark, hl, { pinned: true });
+    });
+  });
+}
+
+function wireTooltipReactions(tooltip) {
+  tooltip.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-reaction]');
+    if (!btn) return;
+    const hlId = tooltip.dataset.hlId;
+    if (!hlId) return;
+    e.stopPropagation();
+    await toggleHighlightReaction(slug, hlId, btn.dataset.reaction);
+    // The listenHighlights subscription will re-render and refreshActiveTooltip
+  });
+
+  tooltip.addEventListener('mouseleave', () => {
+    if (tooltipPinned) return;
+    hideTooltip(tooltip);
+  });
+}
+
+function wireDismissTooltip(tooltip) {
+  document.addEventListener('mousedown', (e) => {
+    if (!tooltipPinned) return;
+    if (tooltip.contains(e.target)) return;
+    if (e.target.closest('mark.hl')) return;
+    hideTooltip(tooltip);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && tooltipPinned) hideTooltip(tooltip);
   });
 }
