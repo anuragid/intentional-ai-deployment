@@ -10,15 +10,30 @@ function isRealConfig(cfg) {
   return !!(cfg && cfg.apiKey && cfg.apiKey !== 'PASTE_FROM_CONSOLE' && cfg.projectId);
 }
 
-// Config lives in ./firebase-config.js (gitignored). On a host where that file
-// wasn't deployed, the import rejects and we fall back to localStorage rather
-// than crashing the module.
-let firebaseConfig = null;
-try {
-  ({ firebaseConfig } = await import('./firebase-config.js'));
-} catch {
-  firebaseConfig = null;
+// Resolve the Firebase config without ever committing keys to the repo:
+//   1. Firebase Hosting serves it at the reserved /__/firebase/init.json path
+//      (production). Keys live in the hosting environment, not in git.
+//   2. Local dev / non-Firebase hosts fall back to the gitignored
+//      ./firebase-config.js module.
+//   3. If neither resolves, the data layer uses its localStorage fallback.
+async function loadConfig() {
+  try {
+    const res = await fetch('/__/firebase/init.json', { cache: 'no-store' });
+    if (res.ok) {
+      const cfg = await res.json();
+      if (cfg && cfg.apiKey) return cfg;
+    }
+  } catch { /* not served by Firebase Hosting */ }
+
+  try {
+    const mod = await import('./firebase-config.js');
+    if (mod.firebaseConfig) return mod.firebaseConfig;
+  } catch { /* no local config module present */ }
+
+  return null;
 }
+
+const firebaseConfig = await loadConfig();
 
 let db = null;
 let auth = null;

@@ -1,4 +1,29 @@
 {
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      "firestore.rules",
+      "firestore.indexes.json",
+      "**/.*",
+      "**/node_modules/**",
+      "docs/**",
+      "CLAUDE.md",
+      "PROJECT_STATUS.md",
+      "package.json",
+      "package-lock.json",
+      "shared/firebase-config.js",
+      "shared/firebase-config.example.js"
+    ],
+    "cleanUrls": true,
+    "headers": [
+      {
+        "source": "/__/firebase/init.json",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      }
+    ]
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
