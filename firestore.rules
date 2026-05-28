@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Security model for public highlights + reactions.
+//
+// - Anyone can READ highlights and article reactions (public by design).
+// - Only anonymous-authenticated clients can WRITE.
+// - A highlight's content fields are immutable after creation; updates are
+//   restricted to reaction toggles, and a caller may only touch their own
+//   entry in the reactions map.
+// - Article reactions live in a per-uid doc the caller fully owns.
+// - Nothing can be deleted.
+//
+// Counts are denormalized convenience fields; a determined client could skew
+// them. Acceptable for this site. Tighten with App Check if abuse appears.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /articles/{slug}/highlights/{highlightId} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.creatorUid == request.auth.uid
+        && request.resource.data.paragraphId is string
+        && request.resource.data.quote is string
+        && request.resource.data.quote.size() > 0
+        && request.resource.data.quote.size() < 5000;
+
+      // Reaction toggles only: just `reactions` and `counts` may change, and
+      // within `reactions` only the caller's own key may be affected.
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions', 'counts'])
+        && request.resource.data.reactions.diff(resource.data.reactions).affectedKeys().hasOnly([request.auth.uid]);
+
+      allow delete: if false;
+    }
+
+    match /articles/{slug}/articleReactions/{uid} {
+      allow read: if true;
+      allow create, update: if request.auth != null && uid == request.auth.uid;
+      allow delete: if false;
+    }
+  }
+}
