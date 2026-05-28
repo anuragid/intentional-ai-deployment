@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://intentional-ai-deployment.web.app", "https://intentional-ai-deployment.firebaseapp.com", "http://localhost:8080"],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Range", "Accept-Ranges"],
+    "maxAgeSeconds": 3600
+  }
+]

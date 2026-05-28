@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /audio/{allPaths=**} {
+      allow read: if true;        // public audio assets
+      allow write: if false;      // only the build tool (admin SDK) writes
+    }
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
