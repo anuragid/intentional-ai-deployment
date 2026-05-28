@@ -4,12 +4,20 @@
 // We dynamic-import the SDK only when configured, so the fallback path doesn't
 // pay the bandwidth cost of pulling Firebase from the CDN.
 
-import { firebaseConfig } from './firebase-config.js';
-
 const SDK_VERSION = '10.14.1';
 
 function isRealConfig(cfg) {
   return !!(cfg && cfg.apiKey && cfg.apiKey !== 'PASTE_FROM_CONSOLE' && cfg.projectId);
+}
+
+// Config lives in ./firebase-config.js (gitignored). On a host where that file
+// wasn't deployed, the import rejects and we fall back to localStorage rather
+// than crashing the module.
+let firebaseConfig = null;
+try {
+  ({ firebaseConfig } = await import('./firebase-config.js'));
+} catch {
+  firebaseConfig = null;
 }
 
 let db = null;
