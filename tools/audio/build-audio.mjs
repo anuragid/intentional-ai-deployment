@@ -9,13 +9,21 @@ import { extractBlocks } from './lib/extract.js';
 import { chunkBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
 import { estimateCost } from './lib/cost.js';
 import { mapNarration } from './lib/map.js';
+import { pcmDurationSeconds } from './lib/pcm.js';
+import { encodeMp3FromPcm } from './lib/encode.js';
 import {
-  synthesizeWithTimestamps, createPodcast, pollProjectUntilDone, downloadPodcastAudio,
+  synthesizeWithTimestamps, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
 } from './lib/elevenlabs.js';
 import { uploadArtifacts, buildManifest } from './lib/upload.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_DIR = resolve(__dirname, '../../articles');
+
+// Steady, contemplative read (see plan amendment A4).
+const NARRATION_VOICE_SETTINGS = {
+  stability: 0.6, similarity_boost: 0.75, style: 0, speed: 0.95, use_speaker_boost: true,
+};
+const NARRATION_MAX_CHARS = 9000; // under multilingual_v2's 10k limit, margin for normalization
 
 function env(name, required = true) {
   const v = process.env[name];
@@ -34,22 +42,28 @@ function readArticleHtml(slug) {
 }
 
 async function buildNarration(slug, blocks, cfg) {
-  const chunkGroups = chunkBlocks(blocks);
-  const audioParts = [];
+  const chunkGroups = chunkBlocks(blocks, NARRATION_MAX_CHARS);
+  const pcmParts = [];
   const alignments = [];
   const chunks = [];
+  const prevRequestIds = [];          // request-stitching chain for prosody continuity
   for (const group of chunkGroups) {
     const text = group.map(b => b.text).join(JOIN_SEPARATOR);
-    const { audio, alignment } = await synthesizeWithTimestamps(text, {
+    const { audio, alignment, requestId } = await synthesizeWithTimestamps(text, {
       apiKey: cfg.apiKey, voiceId: cfg.narrationVoiceId, modelId: cfg.modelId,
+      outputFormat: 'pcm_44100', voiceSettings: NARRATION_VOICE_SETTINGS,
+      previousRequestIds: prevRequestIds.slice(-3),
     });
-    const dur = alignment.character_end_times_seconds.at(-1) ?? 0;
-    audioParts.push(audio);
+    pcmParts.push(audio);
     alignments.push(alignment);
-    chunks.push({ blocks: group, text, audioDuration: dur });
+    // True per-chunk duration from PCM sample count (not last char-end-time → no drift).
+    chunks.push({ blocks: group, text, audioDuration: pcmDurationSeconds(audio.length) });
+    if (requestId) prevRequestIds.push(requestId);
   }
   const timings = mapNarration(chunks, alignments);
-  return { mp3: Buffer.concat(audioParts), json: timings };
+  // Concatenate PCM sample-accurately, encode to MP3 once (gapless).
+  const mp3 = await encodeMp3FromPcm(Buffer.concat(pcmParts), { sampleRate: 44100, channels: 1, bitrate: '192k' });
+  return { mp3, json: timings };
 }
 
 async function buildPodcast(slug, blocks, cfg) {
@@ -59,10 +73,15 @@ async function buildPodcast(slug, blocks, cfg) {
     source: { type: 'text', text },
     hostVoiceId: cfg.podcastHostVoiceId, guestVoiceId: cfg.podcastGuestVoiceId,
     instructionsPrompt: 'Contemplative, thoughtful two-host discussion. Calm pacing, no hype.',
+    durationScale: 'default', qualityPreset: 'high',
   });
   await pollProjectUntilDone({ apiKey: cfg.apiKey, projectId });
   const mp3 = await downloadPodcastAudio({ apiKey: cfg.apiKey, projectId });
-  return { mp3, json: { duration: 0, transcript: [] } }; // transcript best-effort; fill if project exposes it
+  const transcript = await fetchPodcastTranscript({
+    apiKey: cfg.apiKey, projectId,
+    hostVoiceId: cfg.podcastHostVoiceId, guestVoiceId: cfg.podcastGuestVoiceId,
+  });
+  return { mp3, json: { duration: 0, transcript } };
 }
 
 async function main() {

@@ -1504,3 +1504,23 @@ git commit -m "docs(audio): document audio mode build pipeline in PROJECT_STATUS
 **Type consistency:** `narration.json` shape `{ duration, blocks:[{ index, words:[{text,start,end}] }] }` is produced by `mapNarration` (Task 5) and consumed by `buildWordIndex` (Task 11). `manifest.modes[mode].{audio,timings,duration}` produced by `buildManifest` (Task 7), consumed by player `setMode` (Task 11). `findActiveWordIndex(words,t)` defined and tested (Task 11). Consistent. ✓
 
 **Known risk:** `rangeForWord` maps collapsed-whitespace token offsets onto raw DOM text-node offsets; these can drift when prose has irregular inline whitespace. Task 13 Step 5 explicitly verifies highlight alignment in the browser; if drift appears, the fix is to compute offsets against a per-block running text built with the same collapse rule (documented in the Shared Word Contract).
+
+---
+
+## Amendments — 2026-05-28 (post-implementation, after live-doc research)
+
+After Tasks 1–12 were built and the ElevenLabs docs were verified against the live API (TTS with-timestamps, Studio/GenFM podcast OpenAPI spec, models, voice settings), the following amendments harden the build pipeline before the first paid run. They are implemented as **Task 12.5** (local, no spend) and supersede the listed lines where they conflict. Request *construction* was already correct; these change the *orchestration*.
+
+**A1 — Podcast completion detection (bug fix).** `pollProjectUntilDone` must poll `GET /v1/studio/projects/{id}` and treat **`creation_meta.status === 'finished'`** as done (and `'failed'` as a terminal error), not bare `state === 'default'` (which is also the idle state → false-positive on a freshly-created, not-yet-converted project). Source: get-project schema. The snapshot id field is confirmed **`project_snapshot_id`**; `downloadPodcastAudio` sorts snapshots by `created_at_unix` and streams the latest with `{ convert_to_mpeg: true }`, reading the body as binary (`arrayBuffer()`).
+
+**A2 — Narration prosody stitching.** Generate chunks **sequentially**; capture each chunk's `request-id` **response header** and pass it (last ≤3) as the next chunk's **`previous_request_ids`**. Keeps voice/prosody continuous across chunk boundaries (ElevenLabs "request stitching" guidance). Must use the same model + voice_settings for all chunks; request-ids are valid 2h. `eleven_v3` does **not** support stitching → confirms `eleven_multilingual_v2` for narration.
+
+**A3 — Gapless audio + drift-free timing (PCM intermediate).** ElevenLabs alignment times are **per-chunk (start at 0)** and the last `character_end_times_seconds` is **not** the true encoded duration; raw-MP3 byte concatenation also adds encoder-delay clicks. Fix: request each chunk as **`pcm_44100`** (S16LE mono), `Buffer.concat` the PCM (sample-accurate, gapless), compute each chunk's exact duration = `bytes / 2 / 44100` for the `mapNarration` offsets, then **encode the single concatenated PCM → `mp3_44100_192` once via `ffmpeg`** (present locally, v6.1). New helper `lib/pcm.js` (`pcmDurationSeconds`, unit-tested); `lib/encode.js` (`encodeMp3FromPcm`, ffmpeg spawn — I/O, validated by live run).
+
+**A4 — Quality knobs.** Podcast: `quality_preset: 'high'`, `duration_scale: 'default'`. Narration `voice_settings`: `{ stability: 0.6, similarity_boost: 0.75, style: 0, speed: 0.95, use_speaker_boost: true }` (steady contemplative read).
+
+**A5 — Larger chunks.** Raise `chunkBlocks` target to ~9,000 chars (under the 10k multilingual_v2 limit, margin for normalization) → ≈2 chunks/article instead of 3–4, fewer joins. (All 5 articles exceed 10k, so ≥2 chunks is unavoidable.)
+
+**A6 — Podcast transcript (best-effort).** After conversion, `GET /v1/studio/projects/{id}` for the chapter id, then `GET .../chapters/{chapter_id}` → flatten `content.blocks[].nodes[]` (`voice_id`→Host/Guest via the create-time voice ids, `text`) into `podcast.json.transcript`. Wrapped in try/catch — never fails the build.
+
+**Voices (to confirm in dashboard):** narration `George` `JBFqnCBsd6RMkjVDRZzb`; podcast host `Sarah` `EXAVITQu4vr4xnSDxMaL`, guest `Brian` `nPczCjzI2devNBz1zQrb`. Default voices sunset 2026-12-31; commercial use needs a paid plan.
