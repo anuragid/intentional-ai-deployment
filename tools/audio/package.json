@@ -1,0 +1,13 @@
+{
+  "name": "audio-build",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "node build-audio.mjs"
+  },
+  "dependencies": {
+    "node-html-parser": "^6.1.13",
+    "firebase-admin": "^12.7.0"
+  }
+}

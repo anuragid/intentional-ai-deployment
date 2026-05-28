@@ -1,6 +1,15 @@
 node_modules
 
+# Local secrets / API keys (real values live here; copy from .env.example)
+.env
+.env.local
+.env.*.local
+
 # Firebase config (real keys live here; copy from firebase-config.example.js)
 shared/firebase-config.js
 firebase-debug.log
 .firebase/
+
+# Audio build tool secrets
+tools/audio/.env
+tools/audio/service-account.json
