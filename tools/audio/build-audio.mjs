@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
 import process from 'node:process';
@@ -6,7 +6,7 @@ import admin from 'firebase-admin';
 
 import { parseArgs } from './lib/cli.js';
 import { extractBlocks } from './lib/extract.js';
-import { chunkBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
+import { chunkBlocks, capBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
 import { estimateCost } from './lib/cost.js';
 import { mapNarration } from './lib/map.js';
 import { pcmDurationSeconds } from './lib/pcm.js';
@@ -99,12 +99,20 @@ async function main() {
       podcastHostVoiceId: env('ELEVENLABS_PODCAST_HOST_VOICE_ID', args.mode !== 'narration'),
       podcastGuestVoiceId: env('ELEVENLABS_PODCAST_GUEST_VOICE_ID', args.mode !== 'narration'),
     };
-    admin.initializeApp({ storageBucket: env('FIREBASE_STORAGE_BUCKET') });
-    bucket = admin.storage().bucket();
+    // --local-out writes artifacts to disk instead of Firebase (no service account needed).
+    if (!args.localOut) {
+      admin.initializeApp({ storageBucket: env('FIREBASE_STORAGE_BUCKET') });
+      bucket = admin.storage().bucket();
+    }
   }
 
   for (const slug of articleSlugs(args.article)) {
-    const blocks = extractBlocks(readArticleHtml(slug));
+    let blocks = extractBlocks(readArticleHtml(slug));
+    if (args.maxChars) {
+      const capped = capBlocks(blocks, args.maxChars);
+      console.log(`[${slug}] --max-chars ${args.maxChars}: using ${capped.length}/${blocks.length} blocks`);
+      blocks = capped;
+    }
     console.log(`\n[${slug}] ${blocks.length} blocks. ${estimateCost(blocks).summary}`);
     if (args.dryRun) continue;
 
@@ -130,8 +138,16 @@ async function main() {
     }
     const manifest = buildManifest(slug, modes);
     files.push({ name: 'manifest.json', buffer: Buffer.from(JSON.stringify(manifest)), contentType: 'application/json' });
-    await uploadArtifacts(bucket, slug, files);
-    console.log(`[${slug}] uploaded ${files.length} files to audio/${slug}/`);
+
+    if (args.localOut) {
+      const dir = resolve(args.localOut, slug);
+      mkdirSync(dir, { recursive: true });
+      for (const f of files) writeFileSync(resolve(dir, f.name), f.buffer);
+      console.log(`[${slug}] wrote ${files.length} files to ${dir}`);
+    } else {
+      await uploadArtifacts(bucket, slug, files);
+      console.log(`[${slug}] uploaded ${files.length} files to audio/${slug}/`);
+    }
   }
 }
 
