@@ -59,8 +59,12 @@ async function buildNarration(slug, blocks, cfg) {
   const bitrate = `${fmt.match(/mp3_\d+_(\d+)/)?.[1] ?? '192'}k`;
 
   // (1) extract already done by caller -> `blocks` are the CLEAN blocks.
-  // (2) tag: clean -> tagged (additive only; strip-check fallback inside).
-  const tagged = await tagBlocks(blocks, { apiKey: cfg.anthropicApiKey, model: cfg.anthropicModel });
+  // (2) tag (OPTIONAL): only when an Anthropic key is provided. v3 narrates well
+  // directly, so tagging is opt-in expressiveness, not required. Without it,
+  // tagged === clean and the prose goes straight to v3.
+  const tagged = cfg.anthropicApiKey
+    ? await tagBlocks(blocks, { apiKey: cfg.anthropicApiKey, model: cfg.anthropicModel })
+    : blocks.map(b => ({ index: b.index, clean: b.text, tagged: b.text }));
 
   // (3) synthesize v3: chunk the TAGGED text on block boundaries; no stitching.
   const taggedBlocks = tagged.map(t => ({ index: t.index, text: t.tagged }));
@@ -135,7 +139,7 @@ async function main() {
       modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
       narrationOutputFormat: NARRATION_OUTPUT_FORMAT,
       narrationModelId: NARRATION_MODEL_ID,
-      anthropicApiKey: env('ANTHROPIC_API_KEY', args.mode !== 'podcast'),
+      anthropicApiKey: process.env.ANTHROPIC_API_KEY || null, // optional: enables tag "Enhance"
       anthropicModel: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
       narrationVoiceId: env('ELEVENLABS_NARRATION_VOICE_ID', args.mode !== 'podcast'),
       podcastHostVoiceId: env('ELEVENLABS_PODCAST_HOST_VOICE_ID', args.mode !== 'narration'),
