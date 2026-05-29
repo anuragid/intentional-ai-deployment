@@ -19,12 +19,12 @@
     {
       "index": 3,
       "clean": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see.",
-      "enhanced": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see."
+      "enhanced": "Here is a better question: Stop asking what AI cannot do… Start asking what AI cannot see."
     },
     {
       "index": 4,
       "clean": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential.",
-      "enhanced": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential."
+      "enhanced": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural… It does not improve with better models. And it determines where human judgment stays essential."
     },
     {
       "index": 5,
@@ -44,7 +44,7 @@
     {
       "index": 8,
       "clean": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists.",
-      "enhanced": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists."
+      "enhanced": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there… It is the only light that exists."
     },
     {
       "index": 9,
@@ -54,12 +54,12 @@
     {
       "index": 10,
       "clean": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched.",
-      "enhanced": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched."
+      "enhanced": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated… The darkness goes unsearched."
     },
     {
       "index": 11,
       "clean": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark.",
-      "enhanced": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark."
+      "enhanced": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light… The keys may be out in the dark."
     },
     {
       "index": 12,
@@ -84,17 +84,17 @@
     {
       "index": 16,
       "clean": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave.",
-      "enhanced": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave."
+      "enhanced": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee… or something grave."
     },
     {
       "index": 17,
       "clean": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark.",
-      "enhanced": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark."
+      "enhanced": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light… and can also see into the dark."
     },
     {
       "index": 18,
       "clean": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective.",
-      "enhanced": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective."
+      "enhanced": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead… It was the corrective."
     },
     {
       "index": 19,
@@ -104,7 +104,7 @@
     {
       "index": 20,
       "clean": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it.",
-      "enhanced": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it."
+      "enhanced": "The streetlight cannot illuminate the broken leg… Only the human, present in the situation, can see it."
     },
     {
       "index": 21,
@@ -149,7 +149,7 @@
     {
       "index": 29,
       "clean": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing.",
-      "enhanced": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing."
+      "enhanced": "The streetlight illuminated costs… Health remained in the dark. The system optimized brilliantly for the WRONG thing."
     },
     {
       "index": 30,
@@ -189,12 +189,12 @@
     {
       "index": 37,
       "clean": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness.",
-      "enhanced": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness."
+      "enhanced": "Every layer of abstraction loses information. The lived experience becomes the interview transcript… The transcript becomes the coded theme… The theme becomes the training data… The AI operates on that final abstraction, the most removed from the original richness."
     },
     {
       "index": 38,
       "clean": "Some keys are not just outside the light. They are made of material the light cannot illuminate.",
-      "enhanced": "Some keys are not just outside the light. They are made of material the light cannot illuminate."
+      "enhanced": "Some keys are not just outside the light… They are made of material the light cannot illuminate."
     },
     {
       "index": 39,
@@ -204,7 +204,7 @@
     {
       "index": 40,
       "clean": "Understanding what AI cannot see is not a limitation to work around. It is a design specification.",
-      "enhanced": "Understanding what AI cannot see is not a limitation to work around. It is a design specification."
+      "enhanced": "Understanding what AI cannot see is not a limitation to work around… It is a design specification."
     },
     {
       "index": 41,
@@ -239,7 +239,7 @@
     {
       "index": 47,
       "clean": "Their judgment was the feature, not the overhead.",
-      "enhanced": "Their judgment was the feature, not the overhead."
+      "enhanced": "Their judgment was the feature… not the overhead."
     },
     {
       "index": 48,
@@ -259,7 +259,7 @@
     {
       "index": 51,
       "clean": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see.",
-      "enhanced": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see."
+      "enhanced": "That question is answerable now… And the answer determines where human judgment remains essential. Not as a placeholder until AI improves… As the only access point to information the system was never designed to see."
     },
     {
       "index": 52,
@@ -269,12 +269,12 @@
     {
       "index": 53,
       "clean": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there.",
-      "enhanced": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there."
+      "enhanced": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy… But his keys are not there."
     },
     {
       "index": 54,
       "clean": "They never were.",
-      "enhanced": "They never were."
+      "enhanced": "…They never were."
     }
   ]
 }
