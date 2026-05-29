@@ -41,6 +41,29 @@ export async function synthesizeWithTimestamps(text, {
   };
 }
 
+// v3 audiobook TTS. Plain POST (no with-timestamps), no request stitching
+// (eleven_v3 does not support previous_request_ids). Returns audio bytes only;
+// karaoke timings come from the Forced Alignment API, not inline timestamps.
+// `text` is the TAGGED chunk; voice_settings is the contemplative profile
+// (drop any field v3 rejects — the response error is surfaced verbatim).
+export async function synthesizeV3(text, {
+  apiKey, voiceId, modelId = 'eleven_v3', outputFormat = 'mp3_44100_192', voiceSettings,
+}, fetchImpl) {
+  const url = `${BASE}/v1/text-to-speech/${voiceId}?output_format=${outputFormat}`;
+  const body = {
+    text,
+    model_id: modelId,
+    ...(voiceSettings ? { voice_settings: voiceSettings } : {}),
+  };
+  const res = await call(url, {
+    method: 'POST',
+    headers: { 'xi-api-key': apiKey, 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  }, fetchImpl);
+  const ab = await res.arrayBuffer();
+  return { audio: Buffer.from(ab) };
+}
+
 // Podcast: kicks off async Studio project. Returns { projectId }.
 export async function createPodcast({
   apiKey, modelId, source, hostVoiceId, guestVoiceId,
