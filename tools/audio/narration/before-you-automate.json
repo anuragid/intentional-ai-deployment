@@ -1,0 +1,305 @@
+{
+  "slug": "before-you-automate",
+  "blocks": [
+    {
+      "index": 0,
+      "clean": "Part 2 of the series: We Are Choosing By Not Choosing",
+      "enhanced": "Part 2 of the series: We Are Choosing By Not Choosing"
+    },
+    {
+      "index": 1,
+      "clean": "The first article in this series established a principle: friction reduction always wins. People reach for whatever removes the obstacle in front of them. They optimize for right now.",
+      "enhanced": "The first article in this series established a principle: friction reduction always wins. People reach for whatever removes the obstacle in front of them. They optimize for right now."
+    },
+    {
+      "index": 2,
+      "clean": "This creates a problem. Organizations stand at the bottom of a ladder and ask “What can AI do?” The useful question sits at the top: “What problem deserves solving?” Most organizations stay on the bottom rung.",
+      "enhanced": "This creates a problem. Organizations stand at the bottom of a ladder and ask “What can AI do?” The useful question sits at the top: “What problem deserves solving?” Most organizations stay on the bottom rung."
+    },
+    {
+      "index": 3,
+      "clean": "The Eighty Percent Problem",
+      "enhanced": "The Eighty Percent Problem"
+    },
+    {
+      "index": 4,
+      "clean": "By some estimates, more than 80 percent of AI projects fail. The failure rate is twice that of IT projects without AI. The technology works. The question is what we ask it to do.",
+      "enhanced": "By some estimates, more than 80 percent of AI projects fail. The failure rate is twice that of IT projects without AI. The technology works. The question is what we ask it to do."
+    },
+    {
+      "index": 5,
+      "clean": "A 2024 RAND Corporation study interviewed 65 data scientists and engineers to understand why. They identified multiple root causes. The leading cause was misunderstanding the problem to be solved. Eighty-four percent of interviewees cited this as primary.",
+      "enhanced": "A 2024 RAND Corporation study interviewed 65 data scientists and engineers to understand why. They identified multiple root causes. The leading cause was misunderstanding the problem to be solved. Eighty-four percent of interviewees cited this as primary."
+    },
+    {
+      "index": 6,
+      "clean": "The study’s conclusion is direct: “Misunderstandings and miscommunications about the intent and purpose of the project are the most common reasons for AI project failure” (Ryseff et al., 2024).",
+      "enhanced": "The study’s conclusion is direct: “Misunderstandings and miscommunications about the intent and purpose of the project are the most common reasons for AI project failure” (Ryseff et al., 2024)."
+    },
+    {
+      "index": 7,
+      "clean": "The researchers documented a specific pattern. “All too often, leadership instructs the data science team to solve the wrong problem with AI. This results in the data science team working hard for months to deliver a trained AI model that makes little impact on the business” (Ryseff et al., 2024).",
+      "enhanced": "The researchers documented a specific pattern. “All too often, leadership instructs the data science team to solve the wrong problem with AI. This results in the data science team working hard for months to deliver a trained AI model that makes little impact on the business” (Ryseff et al., 2024)."
+    },
+    {
+      "index": 8,
+      "clean": "Organizations build systems that work. Then they discover they built the wrong system. They optimized at the wrong rung.",
+      "enhanced": "Organizations build systems that work. Then they discover they built the wrong system. They optimized at the wrong rung."
+    },
+    {
+      "index": 9,
+      "clean": "Kelly Franznick, Chief Innovation Officer and Co-Founder at Blink UX, describes one version of this pattern: “The IT team may say, hey, we have this huge database or corpus of knowledge over here and we built an LLM. Sometimes that doesn’t know what problem it’s going to solve and they may search for problems to solve with it” (Franznick, personal interview, October 2025).",
+      "enhanced": "Kelly Franznick, Chief Innovation Officer and Co-Founder at Blink UX, describes one version of this pattern: “The IT team may say, hey, we have this huge database or corpus of knowledge over here and we built an LLM. Sometimes that doesn’t know what problem it’s going to solve and they may search for problems to solve with it” (Franznick, personal interview, October 2025)."
+    },
+    {
+      "index": 10,
+      "clean": "The LLM works. It just has no reason to exist.",
+      "enhanced": "The LLM works. It just has no reason to exist."
+    },
+    {
+      "index": 11,
+      "clean": "The Railroad Lesson",
+      "enhanced": "The Railroad Lesson"
+    },
+    {
+      "index": 12,
+      "clean": "This pattern has a name. Theodore Levitt identified it in 1960. He called it marketing myopia.",
+      "enhanced": "This pattern has a name. Theodore Levitt identified it in 1960. He called it marketing myopia."
+    },
+    {
+      "index": 13,
+      "clean": "Railroads dominated American transportation for a century. Then they declined. Levitt asked why. His answer changed how strategists think about business definition.",
+      "enhanced": "Railroads dominated American transportation for a century. Then they declined. Levitt asked why. His answer changed how strategists think about business definition."
+    },
+    {
+      "index": 14,
+      "clean": "The railroads failed because they thought they were in the railroad business. They were actually in the transportation business. They defined themselves by what they produced, rather than by what customers needed (Levitt, 1960).",
+      "enhanced": "The railroads failed because they thought they were in the railroad business. They were actually in the transportation business. They defined themselves by what they produced, rather than by what customers needed (Levitt, 1960)."
+    },
+    {
+      "index": 15,
+      "clean": "This distinction matters. A railroad company invests in better trains. A transportation company invests in whatever moves people and goods most effectively. When new options emerged, railroad companies optimized at the wrong level. They climbed a ladder that led nowhere.",
+      "enhanced": "This distinction matters. A railroad company invests in better trains. A transportation company invests in whatever moves people and goods most effectively. When new options emerged, railroad companies optimized at the wrong level. They climbed a ladder that led nowhere."
+    },
+    {
+      "index": 16,
+      "clean": "The parallel to AI deployment is direct. Organizations ask “What can we automate?” They should ask “What outcome are we pursuing?” The first question defines you by the tool. The second defines you by the purpose.",
+      "enhanced": "The parallel to AI deployment is direct. Organizations ask “What can we automate?” They should ask “What outcome are we pursuing?” The first question defines you by the tool. The second defines you by the purpose."
+    },
+    {
+      "index": 17,
+      "clean": "Ewan Duncan, Senior Partner at McKinsey & Company, observes this at scale: “Very few people are asking what should we apply AI to. It’s at a level above the, you know, what problem are we trying to solve with AI?” (Duncan, personal interview, October 2025).",
+      "enhanced": "Ewan Duncan, Senior Partner at McKinsey & Company, observes this at scale: “Very few people are asking what should we apply AI to. It’s at a level above the, you know, what problem are we trying to solve with AI?” (Duncan, personal interview, October 2025)."
+    },
+    {
+      "index": 18,
+      "clean": "The organizations that fail are skilled at AI applied to the wrong problem. They stand on the wrong rung.",
+      "enhanced": "The organizations that fail are skilled at AI applied to the wrong problem. They stand on the wrong rung."
+    },
+    {
+      "index": 19,
+      "clean": "The Four Rungs",
+      "enhanced": "The Four Rungs"
+    },
+    {
+      "index": 20,
+      "clean": "Problem definition operates at different levels. Each level is more strategic, more durable. Picture these levels as rungs on a ladder.",
+      "enhanced": "Problem definition operates at different levels. Each level is more strategic, more durable. Picture these levels as rungs on a ladder."
+    },
+    {
+      "index": 21,
+      "clean": "At the top sits Outcome. What does success look like from the end-user perspective? The answer describes what will be different in the world when you succeed.",
+      "enhanced": "At the top sits Outcome. What does success look like from the end-user perspective? The answer describes what will be different in the world when you succeed."
+    },
+    {
+      "index": 22,
+      "clean": "One rung down: Approach. How will you create differentiated value? Two organizations might pursue the same outcome through radically different approaches. The approach determines what kind of solution makes sense.",
+      "enhanced": "One rung down: Approach. How will you create differentiated value? Two organizations might pursue the same outcome through radically different approaches. The approach determines what kind of solution makes sense."
+    },
+    {
+      "index": 23,
+      "clean": "These top two rungs are strategic human territory. AI cannot tell you what problem deserves solving. AI cannot tell you what success looks like to your customer. AI cannot tell you why this outcome matters more than another.",
+      "enhanced": "These top two rungs are strategic human territory. AI cannot tell you what problem deserves solving. AI cannot tell you what success looks like to your customer. AI cannot tell you why this outcome matters more than another."
+    },
+    {
+      "index": 24,
+      "clean": "Lower on the ladder: Method. What specific capabilities and solutions will you deploy? This is where AI enters the conversation. Given your approach, what tools and technologies will execute it?",
+      "enhanced": "Lower on the ladder: Method. What specific capabilities and solutions will you deploy? This is where AI enters the conversation. Given your approach, what tools and technologies will execute it?"
+    },
+    {
+      "index": 25,
+      "clean": "At the bottom: Execution. How will you implement day-to-day operations? Workflows. Automation. Tactical details.",
+      "enhanced": "At the bottom: Execution. How will you implement day-to-day operations? Workflows. Automation. Tactical details."
+    },
+    {
+      "index": 26,
+      "clean": "These bottom two rungs are where AI excels. The technology is remarkable at method and execution. Give it a clear objective, and it will find efficient paths to reach it.",
+      "enhanced": "These bottom two rungs are where AI excels. The technology is remarkable at method and execution. Give it a clear objective, and it will find efficient paths to reach it."
+    },
+    {
+      "index": 27,
+      "clean": "The failure pattern is rung-skipping. Organizations start at Method or Execution. They ask “What can AI do?” or “What can we automate?” They never climb to the rungs above.",
+      "enhanced": "The failure pattern is rung-skipping. Organizations start at Method or Execution. They ask “What can AI do?” or “What can we automate?” They never climb to the rungs above."
+    },
+    {
+      "index": 28,
+      "clean": "The RAND study documented exactly this pattern. One interviewee described a pricing algorithm built to recommend what price to set for a product. The business actually needed the price that maximized profit margin. The data science team lacked this context and optimized for the wrong objective (Ryseff et al., 2024).",
+      "enhanced": "The RAND study documented exactly this pattern. One interviewee described a pricing algorithm built to recommend what price to set for a product. The business actually needed the price that maximized profit margin. The data science team lacked this context and optimized for the wrong objective (Ryseff et al., 2024)."
+    },
+    {
+      "index": 29,
+      "clean": "The team stood on the Method rung. They built what was asked. They solved the wrong problem.",
+      "enhanced": "The team stood on the Method rung. They built what was asked. They solved the wrong problem."
+    },
+    {
+      "index": 30,
+      "clean": "Why Rungs Get Skipped",
+      "enhanced": "Why Rungs Get Skipped"
+    },
+    {
+      "index": 31,
+      "clean": "Climbing takes effort. Jumping to solutions feels efficient.",
+      "enhanced": "Climbing takes effort. Jumping to solutions feels efficient."
+    },
+    {
+      "index": 32,
+      "clean": "Larry Keeley, Innovation Scientist and Professor at IIT Institute of Design, puts it bluntly: “You think people are going to be thoughtful about that, and I think people are going to be lazy about that. They will use it every single time it’s the fastest way to get the answer they’re looking for right now” (Keeley, personal interview, October 2025).",
+      "enhanced": "Larry Keeley, Innovation Scientist and Professor at IIT Institute of Design, puts it bluntly: “You think people are going to be thoughtful about that, and I think people are going to be lazy about that. They will use it every single time it’s the fastest way to get the answer they’re looking for right now” (Keeley, personal interview, October 2025)."
+    },
+    {
+      "index": 33,
+      "clean": "Franznick identifies three deployment patterns across his clients. The first is cost-driven: “Where can we have the most cost savings with the least risk?” The second is capability-driven: build the technology first, find the problem later. The third, and rarest, starts with experience: “What are the customer experience improvements that we need to make and which ones seem right for AI?” (Franznick, personal interview, October 2025).",
+      "enhanced": "Franznick identifies three deployment patterns across his clients. The first is cost-driven: “Where can we have the most cost savings with the least risk?” The second is capability-driven: build the technology first, find the problem later. The third, and rarest, starts with experience: “What are the customer experience improvements that we need to make and which ones seem right for AI?” (Franznick, personal interview, October 2025)."
+    },
+    {
+      "index": 34,
+      "clean": "The first two patterns dominate. They share a common feature. Both start at the Method rung. Both skip Outcome and Approach entirely.",
+      "enhanced": "The first two patterns dominate. They share a common feature. Both start at the Method rung. Both skip Outcome and Approach entirely."
+    },
+    {
+      "index": 35,
+      "clean": "The result is predictable. Projects succeed on their own terms and fail on the terms that matter. The AI works. It just works on the wrong problem.",
+      "enhanced": "The result is predictable. Projects succeed on their own terms and fail on the terms that matter. The AI works. It just works on the wrong problem."
+    },
+    {
+      "index": 36,
+      "clean": "The policy researchers Horst Rittel and Melvin Webber formalized why this matters in 1973. For complex problems, there is no definitive formulation. The way you frame the problem determines what solutions become visible. You cannot fully understand the problem until you develop a solution. Yet you cannot develop the right solution until you understand the problem (Rittel & Webber, 1973).",
+      "enhanced": "The policy researchers Horst Rittel and Melvin Webber formalized why this matters in 1973. For complex problems, there is no definitive formulation. The way you frame the problem determines what solutions become visible. You cannot fully understand the problem until you develop a solution. Yet you cannot develop the right solution until you understand the problem (Rittel & Webber, 1973)."
+    },
+    {
+      "index": 37,
+      "clean": "This paradox explains why the top rungs require human judgment. Outcome and Approach are questions about what matters and why.",
+      "enhanced": "This paradox explains why the top rungs require human judgment. Outcome and Approach are questions about what matters and why."
+    },
+    {
+      "index": 38,
+      "clean": "The Front End",
+      "enhanced": "The Front End"
+    },
+    {
+      "index": 39,
+      "clean": "Duncan describes where humans remain essential: “Front end in terms of defining what problem are you trying to solve? Where is the value? What’s the experience you’re trying to create?” (Duncan, personal interview, October 2025).",
+      "enhanced": "Duncan describes where humans remain essential: “Front end in terms of defining what problem are you trying to solve? Where is the value? What’s the experience you’re trying to create?” (Duncan, personal interview, October 2025)."
+    },
+    {
+      "index": 40,
+      "clean": "The front end is the top of the ladder. Outcome and Approach. This is where judgment lives. This is where you decide what matters before you decide how to pursue it.",
+      "enhanced": "The front end is the top of the ladder. Outcome and Approach. This is where judgment lives. This is where you decide what matters before you decide how to pursue it."
+    },
+    {
+      "index": 41,
+      "clean": "Duncan sees what happens when organizations skip the front end: “Currently it’s very much technology driven. Here’s what the tech can do. Let’s see where we can apply it.” The alternative requires different questions: “What are the problems we should be solving? What ones are going to be most appropriate for AI?” (Duncan, personal interview, October 2025).",
+      "enhanced": "Duncan sees what happens when organizations skip the front end: “Currently it’s very much technology driven. Here’s what the tech can do. Let’s see where we can apply it.” The alternative requires different questions: “What are the problems we should be solving? What ones are going to be most appropriate for AI?” (Duncan, personal interview, October 2025)."
+    },
+    {
+      "index": 42,
+      "clean": "The technology-driven approach starts at Method. It asks what AI can do, then searches for applications. The outcome-driven approach starts at the top. It asks what success looks like, then works down the ladder to find the right tools.",
+      "enhanced": "The technology-driven approach starts at Method. It asks what AI can do, then searches for applications. The outcome-driven approach starts at the top. It asks what success looks like, then works down the ladder to find the right tools."
+    },
+    {
+      "index": 43,
+      "clean": "The RAND researchers put it simply: “Too often, trained AI models are deployed that have been optimized for the wrong metrics or do not fit into the overall business workflow and context” (Ryseff et al., 2024).",
+      "enhanced": "The RAND researchers put it simply: “Too often, trained AI models are deployed that have been optimized for the wrong metrics or do not fit into the overall business workflow and context” (Ryseff et al., 2024)."
+    },
+    {
+      "index": 44,
+      "clean": "Wrong metrics. Wrong context. Wrong rung.",
+      "enhanced": "Wrong metrics. Wrong context. Wrong rung."
+    },
+    {
+      "index": 45,
+      "clean": "The Diagnostic",
+      "enhanced": "The Diagnostic"
+    },
+    {
+      "index": 46,
+      "clean": "Before deploying AI, answer four questions in sequence. If you cannot answer the first, do not proceed to the second.",
+      "enhanced": "Before deploying AI, answer four questions in sequence. If you cannot answer the first, do not proceed to the second."
+    },
+    {
+      "index": 47,
+      "clean": "Start here: What problem are we solving? State it in terms a customer or stakeholder would recognize. Describe the problem, not the technology you will deploy, not the process you will automate.",
+      "enhanced": "Start here: What problem are we solving? State it in terms a customer or stakeholder would recognize. Describe the problem, not the technology you will deploy, not the process you will automate."
+    },
+    {
+      "index": 48,
+      "clean": "Then: Why this problem? Every organization faces infinite problems. Resources are finite. Why does this problem deserve attention? What makes it strategic?",
+      "enhanced": "Then: Why this problem? Every organization faces infinite problems. Resources are finite. Why does this problem deserve attention? What makes it strategic?"
+    },
+    {
+      "index": 49,
+      "clean": "Then: For whom? Name them. Describe what changes for them when the problem is solved. If you cannot describe the beneficiary, you have not defined the outcome.",
+      "enhanced": "Then: For whom? Name them. Describe what changes for them when the problem is solved. If you cannot describe the beneficiary, you have not defined the outcome."
+    },
+    {
+      "index": 50,
+      "clean": "Only then: How might we solve it? This is where AI enters. This is the Method rung. You cannot arrive here honestly without climbing the rungs above.",
+      "enhanced": "Only then: How might we solve it? This is where AI enters. This is the Method rung. You cannot arrive here honestly without climbing the rungs above."
+    },
+    {
+      "index": 51,
+      "clean": "The test is simple. If you cannot clearly articulate why this problem matters, you are standing on the wrong rung.",
+      "enhanced": "The test is simple. If you cannot clearly articulate why this problem matters, you are standing on the wrong rung."
+    },
+    {
+      "index": 52,
+      "clean": "The Question Before the Question",
+      "enhanced": "The Question Before the Question"
+    },
+    {
+      "index": 53,
+      "clean": "The railroads failed because they optimized at the wrong level. They got efficient at moving trains. Customers stopped wanting trains.",
+      "enhanced": "The railroads failed because they optimized at the wrong level. They got efficient at moving trains. Customers stopped wanting trains."
+    },
+    {
+      "index": 54,
+      "clean": "The AI system that automates support inquiries might succeed on its own terms. If the Outcome-level problem is customer confusion, the automation treats symptoms. The disease remains.",
+      "enhanced": "The AI system that automates support inquiries might succeed on its own terms. If the Outcome-level problem is customer confusion, the automation treats symptoms. The disease remains."
+    },
+    {
+      "index": 55,
+      "clean": "The RAND data tells us something uncomfortable. Eight out of ten AI projects fail. Organizations skip the rungs that matter. They jump to Method and Execution while leaving Outcome and Approach undefined.",
+      "enhanced": "The RAND data tells us something uncomfortable. Eight out of ten AI projects fail. Organizations skip the rungs that matter. They jump to Method and Execution while leaving Outcome and Approach undefined."
+    },
+    {
+      "index": 56,
+      "clean": "The ladder has four rungs. The top two are human territory. They require judgment about what matters and why. The bottom two are AI territory. They require execution of what has been defined.",
+      "enhanced": "The ladder has four rungs. The top two are human territory. They require judgment about what matters and why. The bottom two are AI territory. They require execution of what has been defined."
+    },
+    {
+      "index": 57,
+      "clean": "One question defines the difference between the 80 percent that fail and the rest: What problem deserves a solution?",
+      "enhanced": "One question defines the difference between the 80 percent that fail and the rest: What problem deserves a solution?"
+    },
+    {
+      "index": 58,
+      "clean": "That question lives on the top rung. Everything else follows from the answer.",
+      "enhanced": "That question lives on the top rung. Everything else follows from the answer."
+    },
+    {
+      "index": 59,
+      "clean": "Next in this series: Part 3 explores what AI structurally cannot see. The information that never reaches it. And why that gap determines where human judgment remains essential.",
+      "enhanced": "Next in this series: Part 3 explores what AI structurally cannot see. The information that never reaches it. And why that gap determines where human judgment remains essential."
+    }
+  ]
+}

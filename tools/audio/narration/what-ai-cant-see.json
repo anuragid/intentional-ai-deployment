@@ -1,0 +1,280 @@
+{
+  "slug": "what-ai-cant-see",
+  "blocks": [
+    {
+      "index": 0,
+      "clean": "Part 3 of the series: We Are Choosing By Not Choosing",
+      "enhanced": "Part 3 of the series: We Are Choosing By Not Choosing"
+    },
+    {
+      "index": 1,
+      "clean": "The earlier articles in this series established two principles. First, friction reduction always wins. People reach for whatever removes the obstacle in front of them, right now, regardless of downstream effects. Second, \"uniquely human\" is unstable ground. Every capability boundary we draw eventually gets crossed.",
+      "enhanced": "The earlier articles in this series established two principles. First, friction reduction always wins. People reach for whatever removes the obstacle in front of them, right now, regardless of downstream effects. Second, \"uniquely human\" is unstable ground. Every capability boundary we draw eventually gets crossed."
+    },
+    {
+      "index": 2,
+      "clean": "If capability claims keep failing, what ground is stable?",
+      "enhanced": "If capability claims keep failing, what ground is stable?"
+    },
+    {
+      "index": 3,
+      "clean": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see.",
+      "enhanced": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see."
+    },
+    {
+      "index": 4,
+      "clean": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential.",
+      "enhanced": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential."
+    },
+    {
+      "index": 5,
+      "clean": "The Streetlight Effect",
+      "enhanced": "The Streetlight Effect"
+    },
+    {
+      "index": 6,
+      "clean": "There is an old joke about a man searching for his keys under a streetlight. A passerby asks where he dropped them. \"Over there,\" the man says, pointing into the darkness. \"But the light is better here.\"",
+      "enhanced": "There is an old joke about a man searching for his keys under a streetlight. A passerby asks where he dropped them. \"Over there,\" the man says, pointing into the darkness. \"But the light is better here.\""
+    },
+    {
+      "index": 7,
+      "clean": "The joke is ancient. Versions appear in Sufi folklore about Mulla Nasreddin. But it became a formal methodological concept through philosopher Abraham Kaplan in 1964. In The Conduct of Inquiry, Kaplan described how researchers \"formulate problems in a way which requires for their solution just those techniques in which he himself is especially skilled.\" He called this a systematic bias toward the accessible rather than the relevant.",
+      "enhanced": "The joke is ancient. Versions appear in Sufi folklore about Mulla Nasreddin. But it became a formal methodological concept through philosopher Abraham Kaplan in 1964. In The Conduct of Inquiry, Kaplan described how researchers \"formulate problems in a way which requires for their solution just those techniques in which he himself is especially skilled.\" He called this a systematic bias toward the accessible rather than the relevant."
+    },
+    {
+      "index": 8,
+      "clean": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists.",
+      "enhanced": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists."
+    },
+    {
+      "index": 9,
+      "clean": "A 2024 study made this concrete. Economists studying data-driven exploration found a paradox: access to data on past successes can narrow exploration and suppress breakthroughs. In laboratory experiments, revealing the value of medium-value projects reduced breakthrough likelihood by 56 percent. In genetic research, diseases with early promising evidence were 16 percentage points less likely to yield breakthroughs than diseases where early efforts had failed.",
+      "enhanced": "A 2024 study made this concrete. Economists studying data-driven exploration found a paradox: access to data on past successes can narrow exploration and suppress breakthroughs. In laboratory experiments, revealing the value of medium-value projects reduced breakthrough likelihood by 56 percent. In genetic research, diseases with early promising evidence were 16 percentage points less likely to yield breakthroughs than diseases where early efforts had failed."
+    },
+    {
+      "index": 10,
+      "clean": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched.",
+      "enhanced": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched."
+    },
+    {
+      "index": 11,
+      "clean": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark.",
+      "enhanced": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark."
+    },
+    {
+      "index": 12,
+      "clean": "What Lies in the Dark",
+      "enhanced": "What Lies in the Dark"
+    },
+    {
+      "index": 13,
+      "clean": "Ken Holstein is Assistant Professor of Human-Computer Interaction at Carnegie Mellon University, where he directs the CoALA Lab. His research focuses on understanding where human and artificial intelligence diverge, and on designing systems that elevate human expertise rather than diminish it.",
+      "enhanced": "Ken Holstein is Assistant Professor of Human-Computer Interaction at Carnegie Mellon University, where he directs the CoALA Lab. His research focuses on understanding where human and artificial intelligence diverge, and on designing systems that elevate human expertise rather than diminish it."
+    },
+    {
+      "index": 14,
+      "clean": "Holstein and his collaborators have developed a formal framework for thinking about the gap between what AI systems can access and what human decision-makers perceive. They call the concept \"model unobservables\": information structurally unavailable to the AI but available to the human. This is not about current limitations that better models will fix. This is about what never enters the system in the first place.",
+      "enhanced": "Holstein and his collaborators have developed a formal framework for thinking about the gap between what AI systems can access and what human decision-makers perceive. They call the concept \"model unobservables\": information structurally unavailable to the AI but available to the human. This is not about current limitations that better models will fix. This is about what never enters the system in the first place."
+    },
+    {
+      "index": 15,
+      "clean": "The child welfare research illustrates how this works in practice. In Allegheny County, Pennsylvania, case workers use an algorithmic tool to help assess risk. The model draws on administrative records. It knows age, number of children, prior system engagement, criminal history. \"It's just very coarse-grained information,\" Holstein explains.",
+      "enhanced": "The child welfare research illustrates how this works in practice. In Allegheny County, Pennsylvania, case workers use an algorithmic tool to help assess risk. The model draws on administrative records. It knows age, number of children, prior system engagement, criminal history. \"It's just very coarse-grained information,\" Holstein explains."
+    },
+    {
+      "index": 16,
+      "clean": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave.",
+      "enhanced": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave."
+    },
+    {
+      "index": 17,
+      "clean": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark.",
+      "enhanced": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark."
+    },
+    {
+      "index": 18,
+      "clean": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective.",
+      "enhanced": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective."
+    },
+    {
+      "index": 19,
+      "clean": "The classic formulation of this problem comes from Paul Meehl's 1954 work on clinical versus statistical prediction. A formula might accurately predict whether someone will attend the movies on a given Friday. But if you know the person broke their leg that morning, you beat the formula instantly. The broken leg is the unobservable: situational information that never made it into the dataset.",
+      "enhanced": "The classic formulation of this problem comes from Paul Meehl's 1954 work on clinical versus statistical prediction. A formula might accurately predict whether someone will attend the movies on a given Friday. But if you know the person broke their leg that morning, you beat the formula instantly. The broken leg is the unobservable: situational information that never made it into the dataset."
+    },
+    {
+      "index": 20,
+      "clean": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it.",
+      "enhanced": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it."
+    },
+    {
+      "index": 21,
+      "clean": "Mapping the Light and the Dark",
+      "enhanced": "Mapping the Light and the Dark"
+    },
+    {
+      "index": 22,
+      "clean": "The asymmetry between human and machine access runs in multiple directions. Mapping it reveals something more complex than a simple split between observable and unobservable.",
+      "enhanced": "The asymmetry between human and machine access runs in multiple directions. Mapping it reveals something more complex than a simple split between observable and unobservable."
+    },
+    {
+      "index": 23,
+      "clean": "Consider four zones, defined by two questions. Does AI have access to this information? Is the human consciously aware of it?",
+      "enhanced": "Consider four zones, defined by two questions. Does AI have access to this information? Is the human consciously aware of it?"
+    },
+    {
+      "index": 24,
+      "clean": "Where light overlaps with awareness: AI and human both see. This includes the model's training data, documented case history, structured inputs. Here AI has the advantage of scale and speed. It can process patterns across thousands of cases. Delegation is appropriate, with verification.",
+      "enhanced": "Where light overlaps with awareness: AI and human both see. This includes the model's training data, documented case history, structured inputs. Here AI has the advantage of scale and speed. It can process patterns across thousands of cases. Delegation is appropriate, with verification."
+    },
+    {
+      "index": 25,
+      "clean": "Where light exceeds awareness: AI sees patterns the human cannot consciously track. Statistical regularities across vast datasets, processing at speeds beyond cognition. The risk here is over-trust. If you cannot see what the model sees, you cannot verify whether it found something real or something spurious.",
+      "enhanced": "Where light exceeds awareness: AI sees patterns the human cannot consciously track. Statistical regularities across vast datasets, processing at speeds beyond cognition. The risk here is over-trust. If you cannot see what the model sees, you cannot verify whether it found something real or something spurious."
+    },
+    {
+      "index": 26,
+      "clean": "Where awareness exceeds light: The human knows what the model cannot access. This is the critical gap. Contextual knowledge, tacit understanding, situational judgment. This zone is where human involvement is not optional. It is the only access point to information the system cannot perceive.",
+      "enhanced": "Where awareness exceeds light: The human knows what the model cannot access. This is the critical gap. Contextual knowledge, tacit understanding, situational judgment. This zone is where human involvement is not optional. It is the only access point to information the system cannot perceive."
+    },
+    {
+      "index": 27,
+      "clean": "Where neither sees: The unknown. Emergent risks that neither human nor machine can anticipate. Second-order effects visible only after deployment. This is where catastrophic failures originate.",
+      "enhanced": "Where neither sees: The unknown. Emergent risks that neither human nor machine can anticipate. Second-order effects visible only after deployment. This is where catastrophic failures originate."
+    },
+    {
+      "index": 28,
+      "clean": "The healthcare algorithm that Obermeyer and colleagues analyzed in Science operated in this fourth zone without anyone realizing it. The system optimized for healthcare costs rather than healthcare needs, using cost as a proxy for health. Because Black patients systematically have lower costs at equivalent health levels (due to unequal access to care), the algorithm falsely concluded Black patients were healthier. Correcting the bias would have increased Black patient enrollment from 17.7 percent to 46.5 percent. The bias was invisible until researchers specifically looked for it.",
+      "enhanced": "The healthcare algorithm that Obermeyer and colleagues analyzed in Science operated in this fourth zone without anyone realizing it. The system optimized for healthcare costs rather than healthcare needs, using cost as a proxy for health. Because Black patients systematically have lower costs at equivalent health levels (due to unequal access to care), the algorithm falsely concluded Black patients were healthier. Correcting the bias would have increased Black patient enrollment from 17.7 percent to 46.5 percent. The bias was invisible until researchers specifically looked for it."
+    },
+    {
+      "index": 29,
+      "clean": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing.",
+      "enhanced": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing."
+    },
+    {
+      "index": 30,
+      "clean": "Why Some Things Stay Dark",
+      "enhanced": "Why Some Things Stay Dark"
+    },
+    {
+      "index": 31,
+      "clean": "Some information resists entering the light not because of technical limitations but because of its nature.",
+      "enhanced": "Some information resists entering the light not because of technical limitations but because of its nature."
+    },
+    {
+      "index": 32,
+      "clean": "Kathleen Brandenburg is Co-Founder and Co-CEO of IA Collaborative, a design consultancy, and a Lecturer at Harvard Graduate School of Design. Her firm takes immersive research seriously. \"If I'm going to be designing for diabetes care, can I inject myself with a placebo insulin every day?\" she asks. \"We in fact have had designers on our team do exactly that, where they're wearing a patch for like over a month to really understand it.\"",
+      "enhanced": "Kathleen Brandenburg is Co-Founder and Co-CEO of IA Collaborative, a design consultancy, and a Lecturer at Harvard Graduate School of Design. Her firm takes immersive research seriously. \"If I'm going to be designing for diabetes care, can I inject myself with a placebo insulin every day?\" she asks. \"We in fact have had designers on our team do exactly that, where they're wearing a patch for like over a month to really understand it.\""
+    },
+    {
+      "index": 33,
+      "clean": "This is not thorough research. This is access to a different category of information. \"When you really get as close to the user experience as possible, you start to really understand it differently. You start to really feel it. You see things, you observe things. We find that what people do is often more significant than what they say.\"",
+      "enhanced": "This is not thorough research. This is access to a different category of information. \"When you really get as close to the user experience as possible, you start to really understand it differently. You start to really feel it. You see things, you observe things. We find that what people do is often more significant than what they say.\""
+    },
+    {
+      "index": 34,
+      "clean": "The philosopher Michael Polanyi articulated this in 1966. \"We can know more than we can tell,\" he wrote in The Tacit Dimension. His example was face recognition. We identify faces among thousands but cannot state the rules by which we do so. Making tacit knowledge explicit often destroys it. The cyclist who thinks consciously about balance falls off.",
+      "enhanced": "The philosopher Michael Polanyi articulated this in 1966. \"We can know more than we can tell,\" he wrote in The Tacit Dimension. His example was face recognition. We identify faces among thousands but cannot state the rules by which we do so. Making tacit knowledge explicit often destroys it. The cyclist who thinks consciously about balance falls off."
+    },
+    {
+      "index": 35,
+      "clean": "The sociologist Harry Collins extended this into a taxonomy. He distinguishes three kinds of tacit knowledge: relational (tacit due to social circumstances, explicable in principle), somatic (embodied in body and brain, potentially replicable), and collective (embedded in society, requiring socialization to acquire). Collective tacit knowledge, Collins argues, is the irreducible core. Riding a bicycle in traffic requires reading social cues, understanding unspoken conventions, knowing which rules to bend. \"We know of no way to describe it or make machines that possess it.\"",
+      "enhanced": "The sociologist Harry Collins extended this into a taxonomy. He distinguishes three kinds of tacit knowledge: relational (tacit due to social circumstances, explicable in principle), somatic (embodied in body and brain, potentially replicable), and collective (embedded in society, requiring socialization to acquire). Collective tacit knowledge, Collins argues, is the irreducible core. Riding a bicycle in traffic requires reading social cues, understanding unspoken conventions, knowing which rules to bend. \"We know of no way to describe it or make machines that possess it.\""
+    },
+    {
+      "index": 36,
+      "clean": "This kind of knowledge lives permanently in the dark. No amount of data collection will bring it under the streetlight. It exists in the doing, in the being-there, in the embodied presence. Brandenburg's designers injecting placebo insulin are not gathering data points. They are gaining access to something that resists capture.",
+      "enhanced": "This kind of knowledge lives permanently in the dark. No amount of data collection will bring it under the streetlight. It exists in the doing, in the being-there, in the embodied presence. Brandenburg's designers injecting placebo insulin are not gathering data points. They are gaining access to something that resists capture."
+    },
+    {
+      "index": 37,
+      "clean": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness.",
+      "enhanced": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness."
+    },
+    {
+      "index": 38,
+      "clean": "Some keys are not just outside the light. They are made of material the light cannot illuminate.",
+      "enhanced": "Some keys are not just outside the light. They are made of material the light cannot illuminate."
+    },
+    {
+      "index": 39,
+      "clean": "Three Questions for Any Deployment",
+      "enhanced": "Three Questions for Any Deployment"
+    },
+    {
+      "index": 40,
+      "clean": "Understanding what AI cannot see is not a limitation to work around. It is a design specification.",
+      "enhanced": "Understanding what AI cannot see is not a limitation to work around. It is a design specification."
+    },
+    {
+      "index": 41,
+      "clean": "Every system has boundaries. Understanding where AI's boundaries lie is not criticism. It is engineering. You would not call someone anti-car for noting that cars cannot fly. The observable/unobservable distinction is structural reality. Good design accounts for it.",
+      "enhanced": "Every system has boundaries. Understanding where AI's boundaries lie is not criticism. It is engineering. You would not call someone anti-car for noting that cars cannot fly. The observable/unobservable distinction is structural reality. Good design accounts for it."
+    },
+    {
+      "index": 42,
+      "clean": "For any AI deployment, ask three questions:",
+      "enhanced": "For any AI deployment, ask three questions:"
+    },
+    {
+      "index": 43,
+      "clean": "First: What information is under the streetlight? What data did the model train on? What inputs does it receive? This is the zone of legitimate AI advantage.",
+      "enhanced": "First: What information is under the streetlight? What data did the model train on? What inputs does it receive? This is the zone of legitimate AI advantage."
+    },
+    {
+      "index": 44,
+      "clean": "Second: What decision-relevant information lies in the dark? What contextual, tacit, or situational knowledge shapes good judgment in this domain but never enters the data pipeline? Where this zone is significant, human involvement is essential.",
+      "enhanced": "Second: What decision-relevant information lies in the dark? What contextual, tacit, or situational knowledge shapes good judgment in this domain but never enters the data pipeline? Where this zone is significant, human involvement is essential."
+    },
+    {
+      "index": 45,
+      "clean": "Third: What might neither human nor machine currently see? What emergent risks or second-order effects could surprise everyone? Where this zone is large, humility and monitoring matter more than confidence.",
+      "enhanced": "Third: What might neither human nor machine currently see? What emergent risks or second-order effects could surprise everyone? Where this zone is large, humility and monitoring matter more than confidence."
+    },
+    {
+      "index": 46,
+      "clean": "The child welfare workers who reduced racial disparity were not slowing down an automated process. They were providing access to the dark zone. They could see what the allegation actually involved. They could read the situation. They brought information the algorithm could not perceive, and that information improved outcomes.",
+      "enhanced": "The child welfare workers who reduced racial disparity were not slowing down an automated process. They were providing access to the dark zone. They could see what the allegation actually involved. They could read the situation. They brought information the algorithm could not perceive, and that information improved outcomes."
+    },
+    {
+      "index": 47,
+      "clean": "Their judgment was the feature, not the overhead.",
+      "enhanced": "Their judgment was the feature, not the overhead."
+    },
+    {
+      "index": 48,
+      "clean": "Stable Ground",
+      "enhanced": "Stable Ground"
+    },
+    {
+      "index": 49,
+      "clean": "Capability boundaries shift every few months. Every claim about what AI \"cannot do\" becomes a countdown to embarrassment. But information access boundaries are structural. They are determined by what enters the data pipeline, not by model architecture or training scale.",
+      "enhanced": "Capability boundaries shift every few months. Every claim about what AI \"cannot do\" becomes a countdown to embarrassment. But information access boundaries are structural. They are determined by what enters the data pipeline, not by model architecture or training scale."
+    },
+    {
+      "index": 50,
+      "clean": "This gives leaders something to work with. Instead of asking \"Will AI eventually master this?\" (a question that history answers with \"probably\"), ask: \"What information relevant to this decision never makes it into the system?\"",
+      "enhanced": "This gives leaders something to work with. Instead of asking \"Will AI eventually master this?\" (a question that history answers with \"probably\"), ask: \"What information relevant to this decision never makes it into the system?\""
+    },
+    {
+      "index": 51,
+      "clean": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see.",
+      "enhanced": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see."
+    },
+    {
+      "index": 52,
+      "clean": "The organizations that thrive will not be those that automate fastest or adopt most aggressively. They will be those that understand where the light falls, what lies in the darkness, and why both zones matter for decisions that affect lives.",
+      "enhanced": "The organizations that thrive will not be those that automate fastest or adopt most aggressively. They will be those that understand where the light falls, what lies in the darkness, and why both zones matter for decisions that affect lives."
+    },
+    {
+      "index": 53,
+      "clean": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there.",
+      "enhanced": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there."
+    },
+    {
+      "index": 54,
+      "clean": "They never were.",
+      "enhanced": "They never were."
+    }
+  ]
+}
