@@ -381,6 +381,20 @@ python3 -m http.server 8080
 
 ---
 
+## Narration (audiobook v3)
+
+Per-article narration is built by the offline CLI in `tools/audio/` (ElevenLabs `eleven_v3` TTS → Forced Alignment → karaoke `narration.json`). It is never run in the browser.
+
+**Expressiveness comes from committed transcripts — no recurring LLM cost.** Each article has a hand-authored "enhanced transcript" at `tools/audio/narration/<slug>.json` (`{ slug, blocks: [{ index, clean, enhanced }] }`). The `enhanced` text adds sparse, contemplative delivery cues — ellipses (`…`) for breath, light caps emphasis, and the occasional v3 audio tag (`[exhales]`, `[thoughtful]`) — that v3 renders. `build-audio.mjs` loads these via `lib/enhance.js` (`loadEnhanced`); there is no build-time API call for tagging (the old Anthropic `tag.js` step was retired).
+
+**Karaoke stays in sync** because the director may only add tags/punctuation/caps, never change a spoken word. `lib/enhance.js` enforces a **word-sequence invariant** (`sameWords`): `narration/narration-artifacts.test.js` checks every committed transcript against live article extraction, so a desynced build cannot be committed. Alignment still runs against the **clean** text, so the highlight tracks the live DOM exactly.
+
+**Voice settings:** v3 uses `stability: 0.5` ("Natural" — responsive to cues without high-stability flatness); `speed`/`style` are dropped (v3 paces via tags/punctuation).
+
+**Operator note:** `ELEVENLABS_NARRATION_VOICE_ID` is the single biggest v3 lever — it must point at an expressive IVC or designed voice, not a PVC or a flat voice. To re-author cues: edit the `enhanced` fields and keep `node --test` green. To scaffold a new article's transcript: `node tools/audio/scaffold-narration.mjs <slug>`.
+
+---
+
 ## Do's and Don'ts
 
 ### DO
