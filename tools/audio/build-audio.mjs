@@ -10,7 +10,7 @@ import { chunkBlocks, capBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
 import { estimateCost } from './lib/cost.js';
 import { mapNarration } from './lib/map.js';
 import { pcmDurationSeconds } from './lib/pcm.js';
-import { encodeMp3FromPcm } from './lib/encode.js';
+import { encodeMp3FromPcm, concatMp3, probeDurationSeconds } from './lib/encode.js';
 import {
   synthesizeWithTimestamps, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
 } from './lib/elevenlabs.js';
@@ -24,6 +24,9 @@ const NARRATION_VOICE_SETTINGS = {
   stability: 0.6, similarity_boost: 0.75, style: 0, speed: 0.95, use_speaker_boost: true,
 };
 const NARRATION_MAX_CHARS = 9000; // under multilingual_v2's 10k limit, margin for normalization
+// Free tier serves MP3 only; pcm_* is Pro-tier and gives the most pristine
+// stitching. Override with ELEVENLABS_NARRATION_OUTPUT_FORMAT on Pro.
+const NARRATION_OUTPUT_FORMAT = process.env.ELEVENLABS_NARRATION_OUTPUT_FORMAT || 'mp3_44100_128';
 
 function env(name, required = true) {
   const v = process.env[name];
@@ -42,8 +45,11 @@ function readArticleHtml(slug) {
 }
 
 async function buildNarration(slug, blocks, cfg) {
+  const fmt = cfg.narrationOutputFormat;
+  const isPcm = fmt.startsWith('pcm');
+  const bitrate = `${fmt.match(/mp3_\d+_(\d+)/)?.[1] ?? '128'}k`;
   const chunkGroups = chunkBlocks(blocks, NARRATION_MAX_CHARS);
-  const pcmParts = [];
+  const audioParts = [];
   const alignments = [];
   const chunks = [];
   const prevRequestIds = [];          // request-stitching chain for prosody continuity
@@ -51,18 +57,22 @@ async function buildNarration(slug, blocks, cfg) {
     const text = group.map(b => b.text).join(JOIN_SEPARATOR);
     const { audio, alignment, requestId } = await synthesizeWithTimestamps(text, {
       apiKey: cfg.apiKey, voiceId: cfg.narrationVoiceId, modelId: cfg.modelId,
-      outputFormat: 'pcm_44100', voiceSettings: NARRATION_VOICE_SETTINGS,
+      outputFormat: fmt, voiceSettings: NARRATION_VOICE_SETTINGS,
       previousRequestIds: prevRequestIds.slice(-3),
     });
-    pcmParts.push(audio);
+    audioParts.push(audio);
     alignments.push(alignment);
-    // True per-chunk duration from PCM sample count (not last char-end-time → no drift).
-    chunks.push({ blocks: group, text, audioDuration: pcmDurationSeconds(audio.length) });
+    // True per-chunk duration: PCM sample count (Pro) or ffprobe (MP3) — never
+    // the last char-end-time, which omits trailing silence and would drift.
+    const dur = isPcm ? pcmDurationSeconds(audio.length) : await probeDurationSeconds(audio);
+    chunks.push({ blocks: group, text, audioDuration: dur });
     if (requestId) prevRequestIds.push(requestId);
   }
   const timings = mapNarration(chunks, alignments);
-  // Concatenate PCM sample-accurately, encode to MP3 once (gapless).
-  const mp3 = await encodeMp3FromPcm(Buffer.concat(pcmParts), { sampleRate: 44100, channels: 1, bitrate: '192k' });
+  // PCM path: concat samples + encode once. MP3 path: gapless ffmpeg concat.
+  const mp3 = isPcm
+    ? await encodeMp3FromPcm(Buffer.concat(audioParts), { sampleRate: 44100, channels: 1, bitrate: '192k' })
+    : await concatMp3(audioParts, { bitrate });
   return { mp3, json: timings };
 }
 
@@ -95,6 +105,7 @@ async function main() {
     cfg = {
       apiKey: env('ELEVENLABS_API_KEY'),
       modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
+      narrationOutputFormat: NARRATION_OUTPUT_FORMAT,
       narrationVoiceId: env('ELEVENLABS_NARRATION_VOICE_ID', args.mode !== 'podcast'),
       podcastHostVoiceId: env('ELEVENLABS_PODCAST_HOST_VOICE_ID', args.mode !== 'narration'),
       podcastGuestVoiceId: env('ELEVENLABS_PODCAST_GUEST_VOICE_ID', args.mode !== 'narration'),
