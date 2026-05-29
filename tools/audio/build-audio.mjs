@@ -12,9 +12,12 @@ import { mapNarration } from './lib/map.js';
 import { pcmDurationSeconds } from './lib/pcm.js';
 import { encodeMp3FromPcm, concatMp3, probeDurationSeconds } from './lib/encode.js';
 import {
-  synthesizeWithTimestamps, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
+  synthesizeWithTimestamps, synthesizeV3, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
 } from './lib/elevenlabs.js';
 import { uploadArtifacts, buildManifest } from './lib/upload.js';
+import { tagBlocks } from './lib/tag.js';
+import { forcedAlign } from './lib/align.js';
+import { mapAlignedWords } from './lib/align-map.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_DIR = resolve(__dirname, '../../articles');
@@ -26,7 +29,13 @@ const NARRATION_VOICE_SETTINGS = {
 const NARRATION_MAX_CHARS = 9000; // under multilingual_v2's 10k limit, margin for normalization
 // Free tier serves MP3 only; pcm_* is Pro-tier and gives the most pristine
 // stitching. Override with ELEVENLABS_NARRATION_OUTPUT_FORMAT on Pro.
-const NARRATION_OUTPUT_FORMAT = process.env.ELEVENLABS_NARRATION_OUTPUT_FORMAT || 'mp3_44100_128';
+const NARRATION_OUTPUT_FORMAT = process.env.ELEVENLABS_NARRATION_OUTPUT_FORMAT || 'mp3_44100_192';
+
+// v3's per-request limit is ~5000 chars; cap on the TAGGED length (tags inflate it).
+const V3_MAX_CHARS = 4500;
+const NARRATION_MODEL_ID = process.env.ELEVENLABS_NARRATION_MODEL_ID || 'eleven_v3';
+const ALIGNMENT_LOSS_MAX = 0.5;     // per-article quality gate (tune on first real run)
+const round4 = (n) => +Number(n).toFixed(4);
 
 function env(name, required = true) {
   const v = process.env[name];
@@ -47,32 +56,51 @@ function readArticleHtml(slug) {
 async function buildNarration(slug, blocks, cfg) {
   const fmt = cfg.narrationOutputFormat;
   const isPcm = fmt.startsWith('pcm');
-  const bitrate = `${fmt.match(/mp3_\d+_(\d+)/)?.[1] ?? '128'}k`;
-  const chunkGroups = chunkBlocks(blocks, NARRATION_MAX_CHARS);
+  const bitrate = `${fmt.match(/mp3_\d+_(\d+)/)?.[1] ?? '192'}k`;
+
+  // (1) extract already done by caller -> `blocks` are the CLEAN blocks.
+  // (2) tag: clean -> tagged (additive only; strip-check fallback inside).
+  const tagged = await tagBlocks(blocks, { apiKey: cfg.anthropicApiKey, model: cfg.anthropicModel });
+
+  // (3) synthesize v3: chunk the TAGGED text on block boundaries; no stitching.
+  const taggedBlocks = tagged.map(t => ({ index: t.index, text: t.tagged }));
+  const chunkGroups = chunkBlocks(taggedBlocks, V3_MAX_CHARS);
   const audioParts = [];
-  const alignments = [];
-  const chunks = [];
-  const prevRequestIds = [];          // request-stitching chain for prosody continuity
   for (const group of chunkGroups) {
     const text = group.map(b => b.text).join(JOIN_SEPARATOR);
-    const { audio, alignment, requestId } = await synthesizeWithTimestamps(text, {
-      apiKey: cfg.apiKey, voiceId: cfg.narrationVoiceId, modelId: cfg.modelId,
+    const { audio } = await synthesizeV3(text, {
+      apiKey: cfg.apiKey, voiceId: cfg.narrationVoiceId, modelId: cfg.narrationModelId,
       outputFormat: fmt, voiceSettings: NARRATION_VOICE_SETTINGS,
-      previousRequestIds: prevRequestIds.slice(-3),
     });
     audioParts.push(audio);
-    alignments.push(alignment);
-    // True per-chunk duration: PCM sample count (Pro) or ffprobe (MP3) — never
-    // the last char-end-time, which omits trailing silence and would drift.
-    const dur = isPcm ? pcmDurationSeconds(audio.length) : await probeDurationSeconds(audio);
-    chunks.push({ blocks: group, text, audioDuration: dur });
-    if (requestId) prevRequestIds.push(requestId);
   }
-  const timings = mapNarration(chunks, alignments);
-  // PCM path: concat samples + encode once. MP3 path: gapless ffmpeg concat.
+
+  // (4) concat: gapless single file + true encoded duration.
   const mp3 = isPcm
     ? await encodeMp3FromPcm(Buffer.concat(audioParts), { sampleRate: 44100, channels: 1, bitrate: '192k' })
     : await concatMp3(audioParts, { bitrate });
+  const encodedDuration = isPcm
+    ? pcmDurationSeconds(Buffer.concat(audioParts).length)
+    : await probeDurationSeconds(mp3);
+
+  // (5) align: full mp3 vs full CLEAN transcript (tag-free).
+  const cleanBlocks = tagged.map(t => ({ index: t.index, text: t.clean }));
+  const transcript = cleanBlocks.map(b => b.text).join(JOIN_SEPARATOR);
+  const alignment = await forcedAlign({ apiKey: cfg.apiKey, audio: mp3, transcript, contentType: 'audio/mpeg' });
+
+  // quality gate: reject drifting karaoke rather than ship it.
+  if (typeof alignment.loss === 'number' && alignment.loss > ALIGNMENT_LOSS_MAX) {
+    throw new Error(`[${slug}] forced-alignment loss ${alignment.loss} > ${ALIGNMENT_LOSS_MAX}`);
+  }
+
+  // (6) map: aligned words -> narration.json (player-compatible shape).
+  const timings = mapAlignedWords(cleanBlocks, alignment.words);
+  const drift = Math.abs(timings.duration - encodedDuration);
+  if (drift > 2.0) {
+    console.warn(`[${slug}] alignment max-end ${timings.duration}s vs encoded ${encodedDuration.toFixed(2)}s (drift ${drift.toFixed(2)}s)`);
+  }
+  timings.duration = round4(encodedDuration); // trust the encoded file for total length
+
   return { mp3, json: timings };
 }
 
@@ -106,6 +134,9 @@ async function main() {
       apiKey: env('ELEVENLABS_API_KEY'),
       modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
       narrationOutputFormat: NARRATION_OUTPUT_FORMAT,
+      narrationModelId: NARRATION_MODEL_ID,
+      anthropicApiKey: env('ANTHROPIC_API_KEY', args.mode !== 'podcast'),
+      anthropicModel: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
       narrationVoiceId: env('ELEVENLABS_NARRATION_VOICE_ID', args.mode !== 'podcast'),
       podcastHostVoiceId: env('ELEVENLABS_PODCAST_HOST_VOICE_ID', args.mode !== 'narration'),
       podcastGuestVoiceId: env('ELEVENLABS_PODCAST_GUEST_VOICE_ID', args.mode !== 'narration'),
@@ -125,7 +156,11 @@ async function main() {
       blocks = capped;
     }
     console.log(`\n[${slug}] ${blocks.length} blocks. ${estimateCost(blocks).summary}`);
-    if (args.dryRun) continue;
+    if (args.dryRun) {
+      const taggedCharsNote = 'tagged-char count ~= clean + a few tags/block';
+      console.log(`[${slug}] v3 narration: ~${estimateCost(blocks).narrationChars} clean chars (${taggedCharsNote}); + 1 forced-alignment call (paid, per-file); + 1 Claude tagging pass per block.`);
+      continue;
+    }
 
     const modes = {};
     const files = [];
