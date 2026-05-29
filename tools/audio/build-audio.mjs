@@ -15,16 +15,18 @@ import {
   synthesizeWithTimestamps, synthesizeV3, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
 } from './lib/elevenlabs.js';
 import { uploadArtifacts, buildManifest } from './lib/upload.js';
-import { tagBlocks } from './lib/tag.js';
+import { loadEnhanced } from './lib/enhance.js';
 import { forcedAlign } from './lib/align.js';
 import { mapAlignedWords } from './lib/align-map.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_DIR = resolve(__dirname, '../../articles');
 
-// Steady, contemplative read (see plan amendment A4).
+// v3 contemplative read. Stability 0.5 = "Natural": responsive to delivery
+// cues without v3's high-stability flatness. v3 paces via tags/punctuation,
+// not a `speed` setting; `style`/`speed` are dropped (verified on first run).
 const NARRATION_VOICE_SETTINGS = {
-  stability: 0.6, similarity_boost: 0.75, style: 0, speed: 0.95, use_speaker_boost: true,
+  stability: 0.5, similarity_boost: 0.75, use_speaker_boost: true,
 };
 const NARRATION_MAX_CHARS = 9000; // under multilingual_v2's 10k limit, margin for normalization
 // Free tier serves MP3 only; pcm_* is Pro-tier and gives the most pristine
@@ -59,15 +61,12 @@ async function buildNarration(slug, blocks, cfg) {
   const bitrate = `${fmt.match(/mp3_\d+_(\d+)/)?.[1] ?? '192'}k`;
 
   // (1) extract already done by caller -> `blocks` are the CLEAN blocks.
-  // (2) tag (OPTIONAL): only when an Anthropic key is provided. v3 narrates well
-  // directly, so tagging is opt-in expressiveness, not required. Without it,
-  // tagged === clean and the prose goes straight to v3.
-  const tagged = cfg.anthropicApiKey
-    ? await tagBlocks(blocks, { apiKey: cfg.anthropicApiKey, model: cfg.anthropicModel })
-    : blocks.map(b => ({ index: b.index, clean: b.text, tagged: b.text }));
+  // (2) enhance: load the committed expressive transcript for this article.
+  // Per-block fallback to clean text on a missing/stale artifact (never desyncs).
+  const enhanced = loadEnhanced(slug, blocks);
 
-  // (3) synthesize v3: chunk the TAGGED text on block boundaries; no stitching.
-  const taggedBlocks = tagged.map(t => ({ index: t.index, text: t.tagged }));
+  // (3) synthesize v3: chunk the ENHANCED text on block boundaries; no stitching.
+  const taggedBlocks = enhanced.map(t => ({ index: t.index, text: t.tagged }));
   const chunkGroups = chunkBlocks(taggedBlocks, V3_MAX_CHARS);
   const audioParts = [];
   for (const group of chunkGroups) {
@@ -88,7 +87,7 @@ async function buildNarration(slug, blocks, cfg) {
     : await probeDurationSeconds(mp3);
 
   // (5) align: full mp3 vs full CLEAN transcript (tag-free).
-  const cleanBlocks = tagged.map(t => ({ index: t.index, text: t.clean }));
+  const cleanBlocks = enhanced.map(t => ({ index: t.index, text: t.clean }));
   const transcript = cleanBlocks.map(b => b.text).join(JOIN_SEPARATOR);
   const alignment = await forcedAlign({ apiKey: cfg.apiKey, audio: mp3, transcript, contentType: 'audio/mpeg' });
 
@@ -139,8 +138,6 @@ async function main() {
       modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
       narrationOutputFormat: NARRATION_OUTPUT_FORMAT,
       narrationModelId: NARRATION_MODEL_ID,
-      anthropicApiKey: process.env.ANTHROPIC_API_KEY || null, // optional: enables tag "Enhance"
-      anthropicModel: process.env.ANTHROPIC_MODEL || 'claude-opus-4-8',
       narrationVoiceId: env('ELEVENLABS_NARRATION_VOICE_ID', args.mode !== 'podcast'),
       podcastHostVoiceId: env('ELEVENLABS_PODCAST_HOST_VOICE_ID', args.mode !== 'narration'),
       podcastGuestVoiceId: env('ELEVENLABS_PODCAST_GUEST_VOICE_ID', args.mode !== 'narration'),
@@ -161,8 +158,7 @@ async function main() {
     }
     console.log(`\n[${slug}] ${blocks.length} blocks. ${estimateCost(blocks).summary}`);
     if (args.dryRun) {
-      const taggedCharsNote = 'tagged-char count ~= clean + a few tags/block';
-      console.log(`[${slug}] v3 narration: ~${estimateCost(blocks).narrationChars} clean chars (${taggedCharsNote}); + 1 forced-alignment call (paid, per-file); + 1 Claude tagging pass per block.`);
+      console.log(`[${slug}] v3 narration: ~${estimateCost(blocks).narrationChars} clean chars (enhanced adds a few tags/block); + 1 forced-alignment call (paid, per-file). No LLM tagging cost (committed transcripts).`);
       continue;
     }
 
