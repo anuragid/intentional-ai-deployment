@@ -29,6 +29,13 @@ test('sameWords: false on a reordered word', () => {
   assert.equal(sameWords('tools are good', 'are tools good'), false);
 });
 
+test('normalizeWords mirrors the karaoke mapper: hyphenated compound is one token', () => {
+  // align-map.js strips punctuation WITHOUT splitting, so "state-of-the-art"
+  // is a single token there. The guard must agree or it could wrong-pass.
+  assert.deepEqual(normalizeWords('state-of-the-art tool'), ['stateoftheart', 'tool']);
+  assert.equal(sameWords('state-of-the-art tool', 'state of the art tool'), false);
+});
+
 import { loadEnhanced } from './enhance.js';
 
 const liveBlocks = [

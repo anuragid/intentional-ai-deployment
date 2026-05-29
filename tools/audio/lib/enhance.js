@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { collapseWhitespace } from '../../../shared/audio-tokenize.js';
+import { tokenizeWords } from '../../../shared/audio-tokenize.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_DIR = resolve(__dirname, '../narration');
@@ -12,15 +12,17 @@ export function stripTags(text) {
   return text.replace(/\[[^\]]*\]/g, '');
 }
 
-// The spoken-word sequence of a string: strip tags, lowercase, turn every
-// non-letter/non-digit (punctuation, ellipses, dashes) into a separator,
-// collapse whitespace, split. Two strings with an equal result carry the same
+// The spoken-word sequence of a string. Mirrors EXACTLY the tokenizer the
+// karaoke mapper uses (align-map.js): strip tags, split on whitespace
+// (tokenizeWords), then drop every non-alphanumeric WITHIN each token without
+// inserting a separator and lowercase. This keeps the guard identical to the
+// runtime path, so e.g. "state-of-the-art" stays one token (not four) just as
+// the aligner sees it. Two strings with an equal result carry the same spoken
 // words in the same order regardless of tags, caps, ellipses, or punctuation.
 export function normalizeWords(text) {
-  const noTags = stripTags(text).toLowerCase();
-  const wordsOnly = noTags.replace(/[^\p{L}\p{N}\s]+/gu, ' ');
-  const collapsed = collapseWhitespace(wordsOnly);
-  return collapsed ? collapsed.split(' ') : [];
+  return tokenizeWords(stripTags(text))
+    .map((t) => t.text.toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''))
+    .filter(Boolean);
 }
 
 export function sameWords(a, b) {
