@@ -36,10 +36,24 @@ async function loadManifest(slug) {
 }
 
 // Resolve a Storage object path to a download URL via the Firebase config.
+// Local-dev override (inert in production): `?awLocal` on the URL, or a global
+// `window.__AW_AUDIO_BASE__`, serves `<base>/<path>` from the dev server instead
+// of Firebase Storage — used to verify the player against local build output.
 async function storageUrl(path) {
-  // Public bucket: use the standard download URL form.
+  const localBase = localAudioBase();
+  if (localBase != null) return `${localBase}/${path}`;
   const bucket = (await getBucket());
   return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`;
+}
+
+function localAudioBase() {
+  if (typeof window !== 'undefined' && typeof window.__AW_AUDIO_BASE__ === 'string') {
+    return window.__AW_AUDIO_BASE__;
+  }
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('awLocal')) {
+    return ''; // server root: `/audio/<slug>/...`
+  }
+  return null;
 }
 
 async function getBucket() {
@@ -66,6 +80,7 @@ function buildPlayer(manifest) {
   let timings = null;                                 // narration word data
   let wordIndex = [];                                 // flattened [{el-less} words + range builder]
   let following = true;
+  let lastIdx = -1;                                   // last highlighted word index (declared before any use)
 
   root.innerHTML = `
     <button class="aw-play" aria-label="Play">▶</button>
@@ -75,6 +90,7 @@ function buildPlayer(manifest) {
       <option value="1">1×</option><option value="1.25">1.25×</option>
       <option value="1.5">1.5×</option><option value="2">2×</option>
     </select>
+    <button class="aw-follow" aria-label="Resume auto-scroll" hidden>Follow</button>
     ${modes.length > 1 ? `<div class="aw-modes" role="tablist">
       ${modes.map(m => `<button class="aw-mode" data-mode="${m}" role="tab">${m}</button>`).join('')}
     </div>` : ''}
@@ -110,7 +126,16 @@ function buildPlayer(manifest) {
   root.querySelector('.aw-speed').addEventListener('change', e => { audio.playbackRate = +e.target.value; });
   seek.addEventListener('input', () => { if (audio.duration) audio.currentTime = (seek.value / 1000) * audio.duration; });
   root.querySelectorAll('.aw-mode').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  window.addEventListener('scroll', () => { following = false; }, { passive: true });
+
+  // Disable auto-scroll only on genuine USER scroll intent — NOT the player's own
+  // programmatic smooth-scroll (which also fires 'scroll' and would self-disable).
+  const followBtn = root.querySelector('.aw-follow');
+  const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar']);
+  const stopFollowing = () => { if (following) { following = false; if (followBtn) followBtn.hidden = false; } };
+  window.addEventListener('wheel', stopFollowing, { passive: true });
+  window.addEventListener('touchmove', stopFollowing, { passive: true });
+  window.addEventListener('keydown', (e) => { if (SCROLL_KEYS.has(e.key)) stopFollowing(); }, { passive: true });
+  followBtn?.addEventListener('click', () => { following = true; followBtn.hidden = true; lastIdx = -1; });
 
   function tick() {
     if (audio.paused) return;
@@ -163,7 +188,6 @@ function buildPlayer(manifest) {
     return set ? range : null;
   }
 
-  let lastIdx = -1;
   function highlightAt(t) {
     const idx = findActiveWordIndex(wordIndex, t);
     if (idx === lastIdx || idx < 0) return;
