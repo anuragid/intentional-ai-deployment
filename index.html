@@ -380,13 +380,20 @@
       margin-bottom: var(--space-4xl);
     }
 
+    /* A quiet shaft of light rather than a highlighter bar — a faint warm
+       bloom at the top dissolving through soft starlight into nothing. */
     .thesis__quote-line {
       position: absolute;
       left: 0;
       top: 0;
       bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--color-accent-warm), var(--color-accent-warm), transparent);
+      width: 1px;
+      background: linear-gradient(to bottom,
+        rgba(251, 191, 36, 0.45) 0%,
+        rgba(244, 243, 241, 0.22) 35%,
+        rgba(244, 243, 241, 0.06) 70%,
+        transparent 100%);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.12);
       transform-origin: top;
       transform: scaleY(0);
     }
@@ -1900,19 +1907,39 @@
         }
       });
 
-      // Scroll indicator fades out quickly
+      // Scroll indicator fades out with the rest of the hero as you scroll.
+      // The CSS entrance animation uses fill-mode: forwards, which would
+      // override GSAP's inline opacity and pin the indicator visible. So we
+      // wait for that entrance to finish, release it (clear the animation,
+      // lock opacity inline), and only then let GSAP own the scroll fade.
       if (heroScroll) {
-        gsap.to(heroScroll, {
-          opacity: 0,
-          y: 20,
-          ease: "none",
-          scrollTrigger: {
-            trigger: '.hero',
-            start: 'top top',
-            end: '30% top',
-            scrub: 0.5
-          }
-        });
+        const initScrollFade = () => {
+          gsap.to(heroScroll, {
+            opacity: 0,
+            y: 20,
+            ease: "none",
+            scrollTrigger: {
+              trigger: '.hero',
+              start: 'top top',
+              end: '30% top',
+              scrub: 0.5
+            }
+          });
+        };
+
+        let faded = false;
+        const releaseToGsap = () => {
+          if (faded) return;
+          faded = true;
+          heroScroll.style.animation = 'none';
+          heroScroll.style.opacity = '1';
+          initScrollFade();
+        };
+
+        heroScroll.addEventListener('animationend', releaseToGsap, { once: true });
+        // Fallback in case the entrance animation never fires (e.g. reduced
+        // motion): hand control to GSAP shortly after it would have ended.
+        setTimeout(releaseToGsap, 3000);
       }
 
       // ============================================================
