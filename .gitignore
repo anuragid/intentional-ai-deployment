@@ -4,3 +4,12 @@ node_modules
 shared/firebase-config.js
 firebase-debug.log
 .firebase/
+
+# Secrets / credentials (defense in depth)
+**/.env
+**/.env.local
+**/service-account*.json
+**/*-service-account.json
+
+# OS cruft
+**/.DS_Store

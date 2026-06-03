@@ -14,7 +14,9 @@
       "package.json",
       "package-lock.json",
       "shared/firebase-config.js",
-      "shared/firebase-config.example.js"
+      "shared/firebase-config.example.js",
+      "audio/**",
+      "skills-lock.json"
     ],
     "cleanUrls": true,
     "headers": [
