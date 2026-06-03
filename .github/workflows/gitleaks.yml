@@ -1,0 +1,34 @@
+name: "Secret scan (gitleaks)"
+
+# Scans the full git history for committed secrets on every push and pull request.
+#
+# gitleaks-action@v2 is free for public repositories and personal accounts and does
+# NOT require a GITLEAKS_LICENSE. A license key is only needed when scanning repos
+# owned by a GitHub Organization, so no license secret is configured here.
+
+on:
+  push:
+  pull_request:
+
+# Least-privilege token: read-only access is all gitleaks needs.
+# pull-requests: read lets the action read PR metadata for annotations.
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        # actions/checkout pinned to the v4 release commit SHA for supply-chain hygiene.
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0 # full history so gitleaks scans every commit
+
+      - name: Run gitleaks
+        # gitleaks/gitleaks-action pinned to the v2 release commit SHA.
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # used for PR annotations
