@@ -31,6 +31,22 @@ export async function encodeMp3FromPcm(pcm, { sampleRate = 44100, channels = 1, 
   ], pcm);
 }
 
+// `seconds` of digital silence as an MP3 buffer (for the concat path: inserted
+// around section headings so they read with audiobook-style breathing room).
+export async function silenceMp3(seconds, { sampleRate = 44100, channels = 1, bitrate = '192k' } = {}) {
+  const cl = channels === 1 ? 'mono' : 'stereo';
+  return run('ffmpeg', [
+    '-hide_banner', '-loglevel', 'error',
+    '-f', 'lavfi', '-i', `anullsrc=r=${sampleRate}:cl=${cl}`,
+    '-t', String(seconds), '-codec:a', 'libmp3lame', '-b:a', bitrate, '-f', 'mp3', 'pipe:1',
+  ], null);
+}
+
+// `seconds` of silence as a zero-filled S16LE PCM buffer (for the Pro PCM path).
+export function silencePcm(seconds, { sampleRate = 44100, channels = 1 } = {}) {
+  return Buffer.alloc(Math.round(seconds * sampleRate * channels * 2));
+}
+
 // True duration (seconds) of an encoded audio buffer, via ffprobe.
 export async function probeDurationSeconds(buffer) {
   const dir = mkdtempSync(join(tmpdir(), 'aw-probe-'));

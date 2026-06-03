@@ -13,6 +13,10 @@ firebase-debug.log
 # Audio build tool secrets
 tools/audio/.env
 tools/audio/service-account.json
+# Firebase Admin SDK service-account keys (any name, anywhere) — NEVER commit
+*firebase-adminsdk*.json
+**/*-firebase-adminsdk-*.json
+service-account*.json
 
 # Locally-generated audio for dev verification (prod assets live in Firebase Storage)
 /audio/

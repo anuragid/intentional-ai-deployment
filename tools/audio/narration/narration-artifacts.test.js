@@ -19,7 +19,12 @@ test('there is a narration artifact for every article', () => {
   assert.deepEqual(artifactSlugs, articleSlugs);
 });
 
-test('every enhanced block stays word-synced to its live article block', () => {
+// Karaoke is dormant, so `enhanced` (the spoken text) is free to reshape for
+// delivery. What must NOT drift is the stored `clean` snapshot: it is the
+// staleness anchor loadEnhanced compares against the live article. If `clean`
+// matches live for every block, no committed transcript is stale (which would
+// otherwise silently fall back to flat clean text at build time).
+test('every artifact block carries enhanced text and a clean snapshot synced to the live article', () => {
   for (const file of artifacts) {
     const slug = file.replace(/\.json$/, '');
     const data = JSON.parse(readFileSync(resolve(NARRATION_DIR, file), 'utf8'));
@@ -27,9 +32,11 @@ test('every enhanced block stays word-synced to its live article block', () => {
     const byIndex = new Map(data.blocks.map((b) => [b.index, b]));
     for (const b of live) {
       const entry = byIndex.get(b.index);
-      assert.ok(entry, `${slug}: missing enhanced block ${b.index}`);
-      assert.ok(sameWords(entry.enhanced, b.text),
-        `${slug} block ${b.index}: enhanced words drift from the article`);
+      assert.ok(entry, `${slug}: missing artifact block ${b.index}`);
+      assert.ok(typeof entry.enhanced === 'string' && entry.enhanced.trim().length > 0,
+        `${slug} block ${b.index}: enhanced text missing/empty`);
+      assert.ok(sameWords(entry.clean, b.text),
+        `${slug} block ${b.index}: clean snapshot drifted from the article — re-author this block`);
     }
   }
 });

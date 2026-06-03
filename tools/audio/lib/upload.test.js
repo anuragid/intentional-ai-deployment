@@ -27,5 +27,8 @@ test('uploadArtifacts writes files under audio/<slug>/ with cache headers', asyn
     { name: 'narration.json', buffer: Buffer.from('{}'), contentType: 'application/json' },
   ]);
   assert.deepEqual(store.map(s => s.path), ['audio/sample/narration.mp3', 'audio/sample/narration.json']);
-  assert.match(store[0].opts.metadata.cacheControl, /max-age/);
+  // mp3 is cached hard (immutable); the mutable JSON entry points revalidate.
+  assert.match(store[0].opts.metadata.cacheControl, /immutable/);
+  assert.match(store[1].opts.metadata.cacheControl, /must-revalidate/);
+  assert.doesNotMatch(store[1].opts.metadata.cacheControl, /immutable/);
 });

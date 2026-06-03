@@ -42,10 +42,13 @@ export async function synthesizeWithTimestamps(text, {
 }
 
 // v3 audiobook TTS. Plain POST (no with-timestamps), no request stitching
-// (eleven_v3 does not support previous_request_ids). Returns audio bytes only;
-// karaoke timings come from the Forced Alignment API, not inline timestamps.
+// (eleven_v3 does not support previous_request_ids). Returns audio bytes only.
 // `text` is the TAGGED chunk; voice_settings is the contemplative profile
 // (drop any field v3 rejects — the response error is surfaced verbatim).
+// NOTE: eleven_v3 also rejects previous_text/next_text ("unsupported_model"),
+// so prosodic context must come from text adjacent IN the same request — which
+// is why section headings are read attached to their following prose, not as
+// isolated fragments.
 export async function synthesizeV3(text, {
   apiKey, voiceId, modelId = 'eleven_v3', outputFormat = 'mp3_44100_192', voiceSettings,
 }, fetchImpl) {

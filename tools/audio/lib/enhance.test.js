@@ -63,7 +63,22 @@ test('loadEnhanced falls back to clean on a missing file (one file-level warning
   assert.equal(warnings.length, 1);
 });
 
-test('loadEnhanced falls back per-block when an entry is stale (word-altered)', () => {
+test('loadEnhanced uses reworded enhanced text when the clean snapshot still matches live', () => {
+  // Karaoke dormant: the director may reshape spoken words freely. As long as
+  // the stored `clean` snapshot matches the live article, the (reworded)
+  // enhanced text is used verbatim — no fallback, no warning.
+  const warnings = [];
+  const readImpl = () => JSON.stringify({ slug: 's', blocks: [
+    { index: 0, clean: 'Remove the obstacle.', enhanced: 'Remove the obstacle…' },
+    { index: 1, clean: 'Tools are tools.', enhanced: 'Tools are tools… they are JUST tools, really.' },
+  ]});
+  const out = loadEnhanced('s', liveBlocks, { readImpl, onWarn: (m) => warnings.push(m) });
+  assert.equal(out[1].tagged, 'Tools are tools… they are JUST tools, really.');
+  assert.equal(out[1].clean, 'Tools are tools.'); // clean stays the LIVE text
+  assert.equal(warnings.length, 0);
+});
+
+test('loadEnhanced falls back per-block when the clean snapshot drifted from live (stale)', () => {
   const warnings = [];
   const readImpl = () => JSON.stringify({ slug: 's', blocks: [
     { index: 0, clean: 'Remove the obstacle.', enhanced: 'Remove the obstacle…' },

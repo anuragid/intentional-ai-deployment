@@ -4,7 +4,7 @@
     {
       "index": 0,
       "clean": "Part 2 of the series: We Are Choosing By Not Choosing",
-      "enhanced": "Part 2 of the series: We Are Choosing By Not Choosing"
+      "enhanced": "Part two of the series. We Are Choosing By Not Choosing."
     },
     {
       "index": 1,
@@ -14,22 +14,22 @@
     {
       "index": 2,
       "clean": "This creates a problem. Organizations stand at the bottom of a ladder and ask “What can AI do?” The useful question sits at the top: “What problem deserves solving?” Most organizations stay on the bottom rung.",
-      "enhanced": "This creates a problem. Organizations stand at the bottom of a ladder and ask “What can AI do?” The useful question sits at the top: “What problem deserves solving?”… Most organizations stay on the bottom rung."
+      "enhanced": "This creates a problem. Organizations stand at the bottom of a ladder and ask “What can AI do?” The useful question sits at the top: “What problem deserves solving?” Most organizations stay on the bottom rung."
     },
     {
       "index": 3,
       "clean": "The Eighty Percent Problem",
-      "enhanced": "The Eighty Percent Problem"
+      "enhanced": "The Eighty Percent Problem."
     },
     {
       "index": 4,
       "clean": "By some estimates, more than 80 percent of AI projects fail. The failure rate is twice that of IT projects without AI. The technology works. The question is what we ask it to do.",
-      "enhanced": "By some estimates, more than 80 percent of AI projects fail. The failure rate is twice that of IT projects without AI. The technology WORKS… The question is what we ask it to do."
+      "enhanced": "By some estimates, more than eighty percent of AI projects fail. The failure rate is twice that of IT projects without AI. The technology works. The question is what we ask it to do."
     },
     {
       "index": 5,
       "clean": "A 2024 RAND Corporation study interviewed 65 data scientists and engineers to understand why. They identified multiple root causes. The leading cause was misunderstanding the problem to be solved. Eighty-four percent of interviewees cited this as primary.",
-      "enhanced": "A 2024 RAND Corporation study interviewed 65 data scientists and engineers to understand why. They identified multiple root causes. The leading cause was misunderstanding the problem to be solved. Eighty-four percent of interviewees cited this as primary."
+      "enhanced": "A twenty twenty-four RAND Corporation study interviewed sixty-five data scientists and engineers to understand why. They identified multiple root causes. The leading cause was misunderstanding the problem to be solved. Eighty-four percent of interviewees cited this as primary."
     },
     {
       "index": 6,
@@ -54,17 +54,17 @@
     {
       "index": 10,
       "clean": "The LLM works. It just has no reason to exist.",
-      "enhanced": "The LLM works… It just has no reason to exist."
+      "enhanced": "The LLM works. It just has no reason to exist."
     },
     {
       "index": 11,
       "clean": "The Railroad Lesson",
-      "enhanced": "The Railroad Lesson"
+      "enhanced": "The Railroad Lesson."
     },
     {
       "index": 12,
       "clean": "This pattern has a name. Theodore Levitt identified it in 1960. He called it marketing myopia.",
-      "enhanced": "This pattern has a name. Theodore Levitt identified it in 1960. He called it marketing myopia."
+      "enhanced": "This pattern has a name. Theodore Levitt identified it in nineteen sixty. He called it marketing myopia."
     },
     {
       "index": 13,
@@ -74,7 +74,7 @@
     {
       "index": 14,
       "clean": "The railroads failed because they thought they were in the railroad business. They were actually in the transportation business. They defined themselves by what they produced, rather than by what customers needed (Levitt, 1960).",
-      "enhanced": "The railroads failed because they thought they were in the railroad business. They were actually in the TRANSPORTATION business. They defined themselves by what they produced, rather than by what customers needed (Levitt, 1960)."
+      "enhanced": "The railroads failed because they thought they were in the railroad business. They were actually in the transportation business. They defined themselves by what they produced, rather than by what customers needed (Levitt, 1960)."
     },
     {
       "index": 15,
@@ -84,7 +84,7 @@
     {
       "index": 16,
       "clean": "The parallel to AI deployment is direct. Organizations ask “What can we automate?” They should ask “What outcome are we pursuing?” The first question defines you by the tool. The second defines you by the purpose.",
-      "enhanced": "The parallel to AI deployment is direct. Organizations ask “What can we automate?” They should ask “What outcome are we pursuing?” The first question defines you by the tool… The second defines you by the purpose."
+      "enhanced": "The parallel to AI deployment is direct. Organizations ask “What can we automate?” They should ask “What outcome are we pursuing?” The first question defines you by the tool. The second defines you by the purpose."
     },
     {
       "index": 17,
@@ -94,12 +94,12 @@
     {
       "index": 18,
       "clean": "The organizations that fail are skilled at AI applied to the wrong problem. They stand on the wrong rung.",
-      "enhanced": "The organizations that fail are skilled at AI applied to the wrong problem… They stand on the wrong rung."
+      "enhanced": "The organizations that fail are skilled at AI applied to the wrong problem. They stand on the wrong rung."
     },
     {
       "index": 19,
       "clean": "The Four Rungs",
-      "enhanced": "The Four Rungs"
+      "enhanced": "The Four Rungs."
     },
     {
       "index": 20,
@@ -109,7 +109,7 @@
     {
       "index": 21,
       "clean": "At the top sits Outcome. What does success look like from the end-user perspective? The answer describes what will be different in the world when you succeed.",
-      "enhanced": "At the top sits Outcome… What does success look like from the end-user perspective? The answer describes what will be different in the world when you succeed."
+      "enhanced": "At the top sits Outcome. What does success look like from the end-user perspective? The answer describes what will be different in the world when you succeed."
     },
     {
       "index": 22,
@@ -119,7 +119,7 @@
     {
       "index": 23,
       "clean": "These top two rungs are strategic human territory. AI cannot tell you what problem deserves solving. AI cannot tell you what success looks like to your customer. AI cannot tell you why this outcome matters more than another.",
-      "enhanced": "These top two rungs are strategic human territory. AI cannot tell you what problem deserves solving… AI cannot tell you what success looks like to your customer… AI cannot tell you why this outcome matters more than another."
+      "enhanced": "These top two rungs are strategic human territory. AI cannot tell you what problem deserves solving. AI cannot tell you what success looks like to your customer. AI cannot tell you why this outcome matters more than another."
     },
     {
       "index": 24,
@@ -134,7 +134,7 @@
     {
       "index": 26,
       "clean": "These bottom two rungs are where AI excels. The technology is remarkable at method and execution. Give it a clear objective, and it will find efficient paths to reach it.",
-      "enhanced": "These bottom two rungs are where AI EXCELS. The technology is remarkable at method and execution. Give it a clear objective, and it will find efficient paths to reach it."
+      "enhanced": "These bottom two rungs are where AI excels. The technology is remarkable at method and execution. Give it a clear objective, and it will find efficient paths to reach it."
     },
     {
       "index": 27,
@@ -149,17 +149,17 @@
     {
       "index": 29,
       "clean": "The team stood on the Method rung. They built what was asked. They solved the wrong problem.",
-      "enhanced": "The team stood on the Method rung. They built what was asked… They solved the wrong problem."
+      "enhanced": "The team stood on the Method rung. They built what was asked. They solved the wrong problem."
     },
     {
       "index": 30,
       "clean": "Why Rungs Get Skipped",
-      "enhanced": "Why Rungs Get Skipped"
+      "enhanced": "Why Rungs Get Skipped."
     },
     {
       "index": 31,
       "clean": "Climbing takes effort. Jumping to solutions feels efficient.",
-      "enhanced": "Climbing takes effort… Jumping to solutions feels efficient."
+      "enhanced": "Climbing takes effort. Jumping to solutions feels efficient."
     },
     {
       "index": 32,
@@ -179,12 +179,12 @@
     {
       "index": 35,
       "clean": "The result is predictable. Projects succeed on their own terms and fail on the terms that matter. The AI works. It just works on the wrong problem.",
-      "enhanced": "The result is predictable. Projects succeed on their own terms and fail on the terms that matter. The AI works… It just works on the wrong problem."
+      "enhanced": "The result is predictable. Projects succeed on their own terms and fail on the terms that matter. The AI works. It just works on the wrong problem."
     },
     {
       "index": 36,
       "clean": "The policy researchers Horst Rittel and Melvin Webber formalized why this matters in 1973. For complex problems, there is no definitive formulation. The way you frame the problem determines what solutions become visible. You cannot fully understand the problem until you develop a solution. Yet you cannot develop the right solution until you understand the problem (Rittel & Webber, 1973).",
-      "enhanced": "The policy researchers Horst Rittel and Melvin Webber formalized why this matters in 1973. For complex problems, there is no definitive formulation. The way you frame the problem determines what solutions become visible. You cannot fully understand the problem until you develop a solution. Yet you cannot develop the right solution until you understand the problem (Rittel & Webber, 1973)."
+      "enhanced": "The policy researchers Horst Rittel and Melvin Webber formalized why this matters in nineteen seventy-three. For complex problems, there is no definitive formulation. The way you frame the problem determines what solutions become visible. You cannot fully understand the problem until you develop a solution. Yet you cannot develop the right solution until you understand the problem (Rittel & Webber, 1973)."
     },
     {
       "index": 37,
@@ -194,7 +194,7 @@
     {
       "index": 38,
       "clean": "The Front End",
-      "enhanced": "The Front End"
+      "enhanced": "The Front End."
     },
     {
       "index": 39,
@@ -224,12 +224,12 @@
     {
       "index": 44,
       "clean": "Wrong metrics. Wrong context. Wrong rung.",
-      "enhanced": "Wrong metrics… Wrong context… Wrong rung."
+      "enhanced": "Wrong metrics. Wrong context. Wrong rung."
     },
     {
       "index": 45,
       "clean": "The Diagnostic",
-      "enhanced": "The Diagnostic"
+      "enhanced": "The Diagnostic."
     },
     {
       "index": 46,
@@ -254,32 +254,32 @@
     {
       "index": 50,
       "clean": "Only then: How might we solve it? This is where AI enters. This is the Method rung. You cannot arrive here honestly without climbing the rungs above.",
-      "enhanced": "Only then: How might we solve it? This is where AI enters… This is the Method rung. You cannot arrive here honestly without climbing the rungs above."
+      "enhanced": "Only then: How might we solve it? This is where AI enters. This is the Method rung. You cannot arrive here honestly without climbing the rungs above."
     },
     {
       "index": 51,
       "clean": "The test is simple. If you cannot clearly articulate why this problem matters, you are standing on the wrong rung.",
-      "enhanced": "The test is simple… If you cannot clearly articulate why this problem matters, you are standing on the wrong rung."
+      "enhanced": "The test is simple. If you cannot clearly articulate why this problem matters, you are standing on the wrong rung."
     },
     {
       "index": 52,
       "clean": "The Question Before the Question",
-      "enhanced": "The Question Before the Question"
+      "enhanced": "The Question Before the Question."
     },
     {
       "index": 53,
       "clean": "The railroads failed because they optimized at the wrong level. They got efficient at moving trains. Customers stopped wanting trains.",
-      "enhanced": "The railroads failed because they optimized at the wrong level. They got efficient at moving trains… Customers stopped wanting trains."
+      "enhanced": "The railroads failed because they optimized at the wrong level. They got efficient at moving trains. Customers stopped wanting trains."
     },
     {
       "index": 54,
       "clean": "The AI system that automates support inquiries might succeed on its own terms. If the Outcome-level problem is customer confusion, the automation treats symptoms. The disease remains.",
-      "enhanced": "The AI system that automates support inquiries might succeed on its own terms. If the Outcome-level problem is customer confusion, the automation treats symptoms… The disease remains."
+      "enhanced": "The AI system that automates support inquiries might succeed on its own terms. If the Outcome-level problem is customer confusion, the automation treats symptoms. The disease remains."
     },
     {
       "index": 55,
       "clean": "The RAND data tells us something uncomfortable. Eight out of ten AI projects fail. Organizations skip the rungs that matter. They jump to Method and Execution while leaving Outcome and Approach undefined.",
-      "enhanced": "The RAND data tells us something uncomfortable. [exhales] Eight out of ten AI projects fail. Organizations skip the rungs that matter. They jump to Method and Execution while leaving Outcome and Approach undefined."
+      "enhanced": "The RAND data tells us something uncomfortable. Eight out of ten AI projects fail. Organizations skip the rungs that matter. They jump to Method and Execution while leaving Outcome and Approach undefined."
     },
     {
       "index": 56,
@@ -289,12 +289,12 @@
     {
       "index": 57,
       "clean": "One question defines the difference between the 80 percent that fail and the rest: What problem deserves a solution?",
-      "enhanced": "One question defines the difference between the 80 percent that fail and the rest… What problem deserves a solution?"
+      "enhanced": "One question defines the difference between the eighty percent that fail and the rest: What problem deserves a solution?"
     },
     {
       "index": 58,
       "clean": "That question lives on the top rung. Everything else follows from the answer.",
-      "enhanced": "That question lives on the top rung… Everything else follows from the answer."
+      "enhanced": "That question lives on the top rung. Everything else follows from the answer."
     },
     {
       "index": 59,

@@ -6,18 +6,16 @@ import admin from 'firebase-admin';
 
 import { parseArgs } from './lib/cli.js';
 import { extractBlocks } from './lib/extract.js';
-import { chunkBlocks, capBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
+import { segmentBlocks, capBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
 import { estimateCost } from './lib/cost.js';
 import { mapNarration } from './lib/map.js';
 import { pcmDurationSeconds } from './lib/pcm.js';
-import { encodeMp3FromPcm, concatMp3, probeDurationSeconds } from './lib/encode.js';
+import { encodeMp3FromPcm, concatMp3, probeDurationSeconds, silenceMp3, silencePcm } from './lib/encode.js';
 import {
   synthesizeWithTimestamps, synthesizeV3, createPodcast, pollProjectUntilDone, downloadPodcastAudio, fetchPodcastTranscript,
 } from './lib/elevenlabs.js';
 import { uploadArtifacts, buildManifest } from './lib/upload.js';
 import { loadEnhanced } from './lib/enhance.js';
-import { forcedAlign } from './lib/align.js';
-import { mapAlignedWords } from './lib/align-map.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ARTICLES_DIR = resolve(__dirname, '../../articles');
@@ -36,7 +34,8 @@ const NARRATION_OUTPUT_FORMAT = process.env.ELEVENLABS_NARRATION_OUTPUT_FORMAT |
 // v3's per-request limit is ~5000 chars; cap on the TAGGED length (tags inflate it).
 const V3_MAX_CHARS = 4500;
 const NARRATION_MODEL_ID = process.env.ELEVENLABS_NARRATION_MODEL_ID || 'eleven_v3';
-const ALIGNMENT_LOSS_MAX = 0.5;     // per-article quality gate (tune on first real run)
+// Breathing room inserted before each section heading (audiobook section break).
+const HEADING_PAUSE_SECONDS = 0.7;
 const round4 = (n) => +Number(n).toFixed(4);
 
 function env(name, required = true) {
@@ -65,20 +64,37 @@ async function buildNarration(slug, blocks, cfg) {
   // Per-block fallback to clean text on a missing/stale artifact (never desyncs).
   const enhanced = loadEnhanced(slug, blocks);
 
-  // (3) synthesize v3: chunk the ENHANCED text on block boundaries; no stitching.
-  const taggedBlocks = enhanced.map(t => ({ index: t.index, text: t.tagged }));
-  const chunkGroups = chunkBlocks(taggedBlocks, V3_MAX_CHARS);
-  const audioParts = [];
-  for (const group of chunkGroups) {
-    const text = group.map(b => b.text).join(JOIN_SEPARATOR);
+  // (3) synthesize v3: segment the ENHANCED text — consecutive prose grouped
+  // into chunks, each section heading standing alone — so headings can be
+  // bracketed with silence. No request stitching (eleven_v3 doesn't support it).
+  const tagByIndex = new Map(blocks.map(b => [b.index, b.tag]));
+  const taggedBlocks = enhanced.map(t => ({ index: t.index, text: t.tagged, tag: tagByIndex.get(t.index) }));
+  const segments = segmentBlocks(taggedBlocks, V3_MAX_CHARS);
+  const segAudio = [];
+  for (const seg of segments) {
+    // A heading-led segment carries the heading AND its following prose in one
+    // request, so v3 reads the heading in natural flow (it has no out-of-band
+    // context and reads lone fragments flat).
+    const text = seg.blocks.map(b => b.text).join(JOIN_SEPARATOR);
     const { audio } = await synthesizeV3(text, {
       apiKey: cfg.apiKey, voiceId: cfg.narrationVoiceId, modelId: cfg.narrationModelId,
       outputFormat: fmt, voiceSettings: NARRATION_VOICE_SETTINGS,
     });
-    audioParts.push(audio);
+    segAudio.push(audio);
   }
 
-  // (4) concat: gapless single file + true encoded duration.
+  // (4) concat: gapless single file, with a beat of silence BEFORE each section
+  // heading (the audiobook section break). The pause AFTER the heading is the
+  // natural in-request beat between the spoken title and its first sentence.
+  const silence = isPcm
+    ? silencePcm(HEADING_PAUSE_SECONDS, { sampleRate: 44100, channels: 1 })
+    : await silenceMp3(HEADING_PAUSE_SECONDS, { bitrate });
+  const audioParts = [];
+  for (let i = 0; i < segAudio.length; i++) {
+    if (i > 0 && segments[i].headingLed) audioParts.push(silence);
+    audioParts.push(segAudio[i]);
+  }
+
   const mp3 = isPcm
     ? await encodeMp3FromPcm(Buffer.concat(audioParts), { sampleRate: 44100, channels: 1, bitrate: '192k' })
     : await concatMp3(audioParts, { bitrate });
@@ -86,23 +102,12 @@ async function buildNarration(slug, blocks, cfg) {
     ? pcmDurationSeconds(Buffer.concat(audioParts).length)
     : await probeDurationSeconds(mp3);
 
-  // (5) align: full mp3 vs full CLEAN transcript (tag-free).
-  const cleanBlocks = enhanced.map(t => ({ index: t.index, text: t.clean }));
-  const transcript = cleanBlocks.map(b => b.text).join(JOIN_SEPARATOR);
-  const alignment = await forcedAlign({ apiKey: cfg.apiKey, audio: mp3, transcript, contentType: 'audio/mpeg' });
-
-  // quality gate: reject drifting karaoke rather than ship it.
-  if (typeof alignment.loss === 'number' && alignment.loss > ALIGNMENT_LOSS_MAX) {
-    throw new Error(`[${slug}] forced-alignment loss ${alignment.loss} > ${ALIGNMENT_LOSS_MAX}`);
-  }
-
-  // (6) map: aligned words -> narration.json (player-compatible shape).
-  const timings = mapAlignedWords(cleanBlocks, alignment.words);
-  const drift = Math.abs(timings.duration - encodedDuration);
-  if (drift > 2.0) {
-    console.warn(`[${slug}] alignment max-end ${timings.duration}s vs encoded ${encodedDuration.toFixed(2)}s (drift ${drift.toFixed(2)}s)`);
-  }
-  timings.duration = round4(encodedDuration); // trust the encoded file for total length
+  // (5) timings: karaoke is dormant (read-along dropped to maximize audio
+  // quality — the director is free to reshape spoken text, which would desync
+  // word-level highlight). We still emit a player-compatible narration.json so
+  // the player's timings fetch never 404s; `blocks: []` => no highlight, audio
+  // plays. Re-introduce forced-alignment here if word-sync is ever wanted.
+  const timings = { duration: round4(encodedDuration), blocks: [] };
 
   return { mp3, json: timings };
 }
@@ -158,7 +163,7 @@ async function main() {
     }
     console.log(`\n[${slug}] ${blocks.length} blocks. ${estimateCost(blocks).summary}`);
     if (args.dryRun) {
-      console.log(`[${slug}] v3 narration: ~${estimateCost(blocks).narrationChars} clean chars (enhanced adds a few tags/block); + 1 forced-alignment call (paid, per-file). No LLM tagging cost (committed transcripts).`);
+      console.log(`[${slug}] v3 narration: directed text is billed per character (tags + reshaping inflate it beyond the ~${estimateCost(blocks).narrationChars} clean chars). No forced-alignment call (karaoke dormant). No LLM tagging cost (committed transcripts).`);
       continue;
     }
 

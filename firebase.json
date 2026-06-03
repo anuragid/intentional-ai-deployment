@@ -4,6 +4,7 @@
     "ignore": [
       "firebase.json",
       ".firebaserc",
+      "audio/**",
       "firestore.rules",
       "firestore.indexes.json",
       "**/.*",

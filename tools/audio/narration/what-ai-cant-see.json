@@ -4,7 +4,7 @@
     {
       "index": 0,
       "clean": "Part 3 of the series: We Are Choosing By Not Choosing",
-      "enhanced": "Part 3 of the series: We Are Choosing By Not Choosing"
+      "enhanced": "Part three of the series. We Are Choosing By Not Choosing."
     },
     {
       "index": 1,
@@ -19,17 +19,17 @@
     {
       "index": 3,
       "clean": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see.",
-      "enhanced": "Here is a better question: Stop asking what AI cannot do… Start asking what AI cannot see."
+      "enhanced": "Here is a better question: Stop asking what AI cannot do. Start asking what AI cannot see."
     },
     {
       "index": 4,
       "clean": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential.",
-      "enhanced": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural… It does not improve with better models. And it determines where human judgment stays essential."
+      "enhanced": "Capability claims predict what AI will eventually accomplish. They are bets on technological progress, and history suggests you will lose them. Access claims describe what information reaches the system at all. Access is structural. It does not improve with better models. And it determines where human judgment stays essential."
     },
     {
       "index": 5,
       "clean": "The Streetlight Effect",
-      "enhanced": "The Streetlight Effect"
+      "enhanced": "The Streetlight Effect."
     },
     {
       "index": 6,
@@ -39,32 +39,32 @@
     {
       "index": 7,
       "clean": "The joke is ancient. Versions appear in Sufi folklore about Mulla Nasreddin. But it became a formal methodological concept through philosopher Abraham Kaplan in 1964. In The Conduct of Inquiry, Kaplan described how researchers \"formulate problems in a way which requires for their solution just those techniques in which he himself is especially skilled.\" He called this a systematic bias toward the accessible rather than the relevant.",
-      "enhanced": "The joke is ancient. Versions appear in Sufi folklore about Mulla Nasreddin. But it became a formal methodological concept through philosopher Abraham Kaplan in 1964. In The Conduct of Inquiry, Kaplan described how researchers \"formulate problems in a way which requires for their solution just those techniques in which he himself is especially skilled.\" He called this a systematic bias toward the accessible rather than the relevant."
+      "enhanced": "The joke is ancient. Versions appear in Sufi folklore about Mulla Nasreddin. But it became a formal methodological concept through philosopher Abraham Kaplan in nineteen sixty-four. In The Conduct of Inquiry, Kaplan described how researchers \"formulate problems in a way which requires for their solution just those techniques in which he himself is especially skilled.\" He called this a systematic bias toward the accessible rather than the relevant."
     },
     {
       "index": 8,
       "clean": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists.",
-      "enhanced": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there… It is the only light that exists."
+      "enhanced": "AI systems exhibit this bias acutely. They search where the data is because that is the only place they can search. The light is not just better there. It is the only light that exists."
     },
     {
       "index": 9,
       "clean": "A 2024 study made this concrete. Economists studying data-driven exploration found a paradox: access to data on past successes can narrow exploration and suppress breakthroughs. In laboratory experiments, revealing the value of medium-value projects reduced breakthrough likelihood by 56 percent. In genetic research, diseases with early promising evidence were 16 percentage points less likely to yield breakthroughs than diseases where early efforts had failed.",
-      "enhanced": "A 2024 study made this concrete. Economists studying data-driven exploration found a paradox: access to data on past successes can narrow exploration and suppress breakthroughs. In laboratory experiments, revealing the value of medium-value projects reduced breakthrough likelihood by 56 percent. In genetic research, diseases with early promising evidence were 16 percentage points less likely to yield breakthroughs than diseases where early efforts had failed."
+      "enhanced": "A twenty twenty-four study made this concrete. Economists studying data-driven exploration found a paradox: access to data on past successes can narrow exploration and suppress breakthroughs. In laboratory experiments, revealing the value of medium-value projects reduced breakthrough likelihood by fifty-six percent. In genetic research, diseases with early promising evidence were sixteen percentage points less likely to yield breakthroughs than diseases where early efforts had failed."
     },
     {
       "index": 10,
       "clean": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched.",
-      "enhanced": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated… The darkness goes unsearched."
+      "enhanced": "The explanation is precisely the streetlight dynamic. Attention concentrates on what is already illuminated. The darkness goes unsearched."
     },
     {
       "index": 11,
       "clean": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark.",
-      "enhanced": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light… The keys may be out in the dark."
+      "enhanced": "For AI systems in consequential decisions, this has immediate implications. The model optimizes for what is in the database. What is not in the database does not exist. The system is doing exactly what it was built to do: finding patterns in the available data. But the available data is the pool of light. The keys may be out in the dark."
     },
     {
       "index": 12,
       "clean": "What Lies in the Dark",
-      "enhanced": "What Lies in the Dark"
+      "enhanced": "What Lies in the Dark."
     },
     {
       "index": 13,
@@ -84,32 +84,32 @@
     {
       "index": 16,
       "clean": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave.",
-      "enhanced": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee… or something grave."
+      "enhanced": "The model might know that a grandfather was incarcerated thirty years ago. That looks risky in the data. But the model does not know what the current allegation involves. It does not know why someone called. It does not know whether the concern is a scraped knee or something grave."
     },
     {
       "index": 17,
       "clean": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark.",
-      "enhanced": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light… and can also see into the dark."
+      "enhanced": "This is the dark zone outside the streetlight. The model cannot see it because the information was never entered into any database. The human case worker, who reads the intake call and speaks with the family, sees both zones. The worker stands in the light and can also see into the dark."
     },
     {
       "index": 18,
       "clean": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective.",
-      "enhanced": "Research confirms that this dual vision matters. A 2022 study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from 20 percent to 9 percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead… It was the corrective."
+      "enhanced": "Research confirms that this dual vision matters. A twenty twenty-two study found that when child welfare workers exercised judgment beyond algorithmic recommendations, they reduced racial disparity in screen-in rates from twenty percent to nine percent. The workers accessed contextual information the algorithm could not touch. Their judgment was not overhead. It was the corrective."
     },
     {
       "index": 19,
       "clean": "The classic formulation of this problem comes from Paul Meehl's 1954 work on clinical versus statistical prediction. A formula might accurately predict whether someone will attend the movies on a given Friday. But if you know the person broke their leg that morning, you beat the formula instantly. The broken leg is the unobservable: situational information that never made it into the dataset.",
-      "enhanced": "The classic formulation of this problem comes from Paul Meehl's 1954 work on clinical versus statistical prediction. A formula might accurately predict whether someone will attend the movies on a given Friday. But if you know the person broke their leg that morning, you beat the formula instantly. The broken leg is the unobservable: situational information that never made it into the dataset."
+      "enhanced": "The classic formulation of this problem comes from Paul Meehl's nineteen fifty-four work on clinical versus statistical prediction. A formula might accurately predict whether someone will attend the movies on a given Friday. But if you know the person broke their leg that morning, you beat the formula instantly. The broken leg is the unobservable: situational information that never made it into the dataset."
     },
     {
       "index": 20,
       "clean": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it.",
-      "enhanced": "The streetlight cannot illuminate the broken leg… Only the human, present in the situation, can see it."
+      "enhanced": "The streetlight cannot illuminate the broken leg. Only the human, present in the situation, can see it."
     },
     {
       "index": 21,
       "clean": "Mapping the Light and the Dark",
-      "enhanced": "Mapping the Light and the Dark"
+      "enhanced": "Mapping the Light and the Dark."
     },
     {
       "index": 22,
@@ -144,17 +144,17 @@
     {
       "index": 28,
       "clean": "The healthcare algorithm that Obermeyer and colleagues analyzed in Science operated in this fourth zone without anyone realizing it. The system optimized for healthcare costs rather than healthcare needs, using cost as a proxy for health. Because Black patients systematically have lower costs at equivalent health levels (due to unequal access to care), the algorithm falsely concluded Black patients were healthier. Correcting the bias would have increased Black patient enrollment from 17.7 percent to 46.5 percent. The bias was invisible until researchers specifically looked for it.",
-      "enhanced": "The healthcare algorithm that Obermeyer and colleagues analyzed in Science operated in this fourth zone without anyone realizing it. The system optimized for healthcare costs rather than healthcare needs, using cost as a proxy for health. Because Black patients systematically have lower costs at equivalent health levels (due to unequal access to care), the algorithm falsely concluded Black patients were healthier. Correcting the bias would have increased Black patient enrollment from 17.7 percent to 46.5 percent. The bias was invisible until researchers specifically looked for it."
+      "enhanced": "The healthcare algorithm that Obermeyer and colleagues analyzed in Science operated in this fourth zone without anyone realizing it. The system optimized for healthcare costs rather than healthcare needs, using cost as a proxy for health. Because Black patients systematically have lower costs at equivalent health levels (due to unequal access to care), the algorithm falsely concluded Black patients were healthier. Correcting the bias would have increased Black patient enrollment from seventeen point seven percent to forty-six point five percent. The bias was invisible until researchers specifically looked for it."
     },
     {
       "index": 29,
       "clean": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing.",
-      "enhanced": "The streetlight illuminated costs… Health remained in the dark. The system optimized brilliantly for the WRONG thing."
+      "enhanced": "The streetlight illuminated costs. Health remained in the dark. The system optimized brilliantly for the wrong thing."
     },
     {
       "index": 30,
       "clean": "Why Some Things Stay Dark",
-      "enhanced": "Why Some Things Stay Dark"
+      "enhanced": "Why Some Things Stay Dark."
     },
     {
       "index": 31,
@@ -174,7 +174,7 @@
     {
       "index": 34,
       "clean": "The philosopher Michael Polanyi articulated this in 1966. \"We can know more than we can tell,\" he wrote in The Tacit Dimension. His example was face recognition. We identify faces among thousands but cannot state the rules by which we do so. Making tacit knowledge explicit often destroys it. The cyclist who thinks consciously about balance falls off.",
-      "enhanced": "The philosopher Michael Polanyi articulated this in 1966. \"We can know more than we can tell,\" he wrote in The Tacit Dimension. His example was face recognition. We identify faces among thousands but cannot state the rules by which we do so. Making tacit knowledge explicit often destroys it. The cyclist who thinks consciously about balance falls off."
+      "enhanced": "The philosopher Michael Polanyi articulated this in nineteen sixty-six. \"We can know more than we can tell,\" he wrote in The Tacit Dimension. His example was face recognition. We identify faces among thousands but cannot state the rules by which we do so. Making tacit knowledge explicit often destroys it. The cyclist who thinks consciously about balance falls off."
     },
     {
       "index": 35,
@@ -189,22 +189,22 @@
     {
       "index": 37,
       "clean": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness.",
-      "enhanced": "Every layer of abstraction loses information. The lived experience becomes the interview transcript… The transcript becomes the coded theme… The theme becomes the training data… The AI operates on that final abstraction, the most removed from the original richness."
+      "enhanced": "Every layer of abstraction loses information. The lived experience becomes the interview transcript. The transcript becomes the coded theme. The theme becomes the training data. The AI operates on that final abstraction, the most removed from the original richness."
     },
     {
       "index": 38,
       "clean": "Some keys are not just outside the light. They are made of material the light cannot illuminate.",
-      "enhanced": "Some keys are not just outside the light… They are made of material the light cannot illuminate."
+      "enhanced": "Some keys are not just outside the light. They are made of material the light cannot illuminate."
     },
     {
       "index": 39,
       "clean": "Three Questions for Any Deployment",
-      "enhanced": "Three Questions for Any Deployment"
+      "enhanced": "Three Questions for Any Deployment."
     },
     {
       "index": 40,
       "clean": "Understanding what AI cannot see is not a limitation to work around. It is a design specification.",
-      "enhanced": "Understanding what AI cannot see is not a limitation to work around… It is a design specification."
+      "enhanced": "Understanding what AI cannot see is not a limitation to work around. It is a design specification."
     },
     {
       "index": 41,
@@ -239,12 +239,12 @@
     {
       "index": 47,
       "clean": "Their judgment was the feature, not the overhead.",
-      "enhanced": "Their judgment was the feature… not the overhead."
+      "enhanced": "Their judgment was the feature, not the overhead."
     },
     {
       "index": 48,
       "clean": "Stable Ground",
-      "enhanced": "Stable Ground"
+      "enhanced": "Stable Ground."
     },
     {
       "index": 49,
@@ -259,7 +259,7 @@
     {
       "index": 51,
       "clean": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see.",
-      "enhanced": "That question is answerable now… And the answer determines where human judgment remains essential. Not as a placeholder until AI improves… As the only access point to information the system was never designed to see."
+      "enhanced": "That question is answerable now. And the answer determines where human judgment remains essential. Not as a placeholder until AI improves. As the only access point to information the system was never designed to see."
     },
     {
       "index": 52,
@@ -269,12 +269,12 @@
     {
       "index": 53,
       "clean": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there.",
-      "enhanced": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy… But his keys are not there."
+      "enhanced": "The man searching under the streetlight is optimizing for convenience. He looks where looking is easy. But his keys are not there."
     },
     {
       "index": 54,
       "clean": "They never were.",
-      "enhanced": "…They never were."
+      "enhanced": "They never were."
     }
   ]
 }

@@ -35,10 +35,16 @@ export function sameWords(a, b) {
 
 // Load the committed enhanced transcript for `slug` and align it to the LIVE
 // article blocks. Returns [{ index, clean, tagged }] where `clean` is always
-// the live block text (so downstream alignment + DOM mapping use the current
-// article). A missing file, missing index, or word-altered (stale) entry falls
-// that block back to `tagged = clean` (+ warning) so a build never desyncs the
-// karaoke highlight.
+// the live block text and `tagged` is the director's spoken text fed to v3.
+//
+// Karaoke is dormant, so `enhanced` is FREE to reshape for delivery — split a
+// clause, repeat a word, recast punctuation — it no longer has to preserve the
+// article's word sequence. The guard is now a STALENESS check: each artifact
+// block stores `clean`, a snapshot of the article text when the transcript was
+// authored. If the LIVE article text no longer matches that snapshot, the
+// article was edited since authoring, so the directed text may be out of date —
+// we fall that block back to `tagged = clean` (+ warning) rather than speak
+// stale content. A missing file or missing index also falls back to clean.
 export function loadEnhanced(slug, blocks, { dir = DEFAULT_DIR, onWarn = console.warn, readImpl } = {}) {
   const read = readImpl || ((p) => readFileSync(p, 'utf8'));
   const byIndex = new Map();
@@ -50,10 +56,14 @@ export function loadEnhanced(slug, blocks, { dir = DEFAULT_DIR, onWarn = console
   }
   return blocks.map((b) => {
     const entry = byIndex.get(b.index);
-    if (entry && typeof entry.enhanced === 'string' && sameWords(entry.enhanced, b.text)) {
+    if (entry && typeof entry.enhanced === 'string') {
+      if (typeof entry.clean === 'string' && !sameWords(entry.clean, b.text)) {
+        onWarn(`[enhance] ${slug} block ${b.index}: article text changed since transcript was authored; using clean (re-author this block)`);
+        return { index: b.index, clean: b.text, tagged: b.text };
+      }
       return { index: b.index, clean: b.text, tagged: entry.enhanced };
     }
-    if (byIndex.size) onWarn(`[enhance] ${slug} block ${b.index}: missing/stale enhanced text; using clean`);
+    if (byIndex.size) onWarn(`[enhance] ${slug} block ${b.index}: missing enhanced text; using clean`);
     return { index: b.index, clean: b.text, tagged: b.text };
   });
 }

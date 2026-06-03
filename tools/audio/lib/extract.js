@@ -13,7 +13,8 @@ export function extractBlocks(html) {
     if (el.closest('figure')) continue;
     const text = blockNarrationText(el);
     if (!text) continue;
-    blocks.push({ index: blocks.length, text });
+    const tag = (el.tagName || el.rawTagName || '').toLowerCase();
+    blocks.push({ index: blocks.length, text, tag });
   }
   return blocks;
 }
