@@ -20,3 +20,14 @@ service-account*.json
 
 # Locally-generated audio for dev verification (prod assets live in Firebase Storage)
 /audio/
+
+# macOS junk
+.DS_Store
+
+# Claude Code / skills tooling — local plugin installs, session dumps, worktrees
+.agents/
+.superpowers/
+.claude/skills/
+.claude/worktrees/
+.claude/settings.local.json
+skills-lock.json
