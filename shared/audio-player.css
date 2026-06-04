@@ -1,37 +1,283 @@
-/* Contemplative audio player — aligns with shared/design-system.css */
-.aw-player {
-  position: fixed; left: 50%; bottom: 1.5rem; transform: translateX(-50%);
-  display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.5rem 0.9rem; border-radius: 999px;
-  background: rgba(16,16,20,0.82); backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 6px 30px rgba(0,0,0,0.35);
-  font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #e8e6e0;
-  z-index: 50; max-width: min(92vw, 560px);
-}
-.aw-play { width: 2.1rem; height: 2.1rem; border-radius: 50%; border: none;
-  background: #e8e6e0; color: #16161e; cursor: pointer; font-size: 0.8rem; }
-.aw-seek { flex: 1; accent-color: #c9a86a; cursor: pointer; }
-.aw-time { font-variant-numeric: tabular-nums; font-size: 0.8rem; opacity: 0.8; min-width: 2.6rem; }
-.aw-speed { background: transparent; color: inherit; border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px; padding: 0.1rem 0.3rem; }
-.aw-follow { background: #c9a86a; color: #16161e; border: none; border-radius: 999px;
-  padding: 0.15rem 0.6rem; font-size: 0.78rem; cursor: pointer; }
-.aw-follow[hidden] { display: none; }
-.aw-modes { display: flex; gap: 0.25rem; }
-.aw-mode { text-transform: capitalize; background: transparent; color: inherit;
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 999px; padding: 0.15rem 0.6rem;
-  font-size: 0.78rem; cursor: pointer; }
-.aw-mode[aria-selected="true"] { background: #c9a86a; color: #16161e; border-color: #c9a86a; }
+/* ───────────────────────────────────────────────────────────────────────────
+   Contemplative audio dock — "quiet awe like stargazing"
+   An obsidian-glass dock inspired by the macOS Dock: deep translucent slab,
+   heavy backdrop blur, a faint inner top sheen, warm-gold accent. Motion is
+   driven by GSAP when available (shared/audio-player.js) and falls back to the
+   CSS transitions below, so the dock looks and behaves well with no dependency.
+   Aligns with shared/design-system.css tokens (var(--font-*), gold #c9a86a).
+   ─────────────────────────────────────────────────────────────────────────── */
 
-/* Karaoke highlight via CSS Custom Highlight API */
+.aw-player {
+  /* Local palette — references design-system vars with self-contained fallbacks */
+  --aw-text: #e8e6e0;
+  --aw-dim: rgba(232, 230, 224, 0.52);
+  --aw-gold: var(--color-accent, #c9a86a);
+  --aw-glass: rgba(12, 12, 16, 0.86);
+  --aw-stroke: rgba(255, 255, 255, 0.12);
+  --aw-hairline: rgba(255, 255, 255, 0.09);
+  --aw-hover: rgba(255, 255, 255, 0.07);
+  --aw-font: var(--font-body, 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  --aw-mono: var(--font-mono, 'JetBrains Mono', ui-monospace, 'SF Mono', monospace);
+
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1rem, 4vh, 2rem);
+  transform: translateX(-50%);   /* centering only — motion lives on .aw-dock */
+  z-index: 50;
+  pointer-events: none;          /* the dock itself re-enables pointer events */
+  font-family: var(--aw-font);
+  color: var(--aw-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The visible slab. GSAP (or the fallback classes) animate THIS element's
+   transform/opacity, never .aw-player, so centering is never clobbered. */
+.aw-dock {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  max-width: min(94vw, 600px);
+  border-radius: 20px;
+  background: var(--aw-glass);
+  border: 1px solid var(--aw-stroke);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+  backdrop-filter: blur(26px) saturate(1.4);
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.50),
+    0 4px 14px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),   /* top sheen */
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30);
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  position: relative;
+  overflow: visible;
+  /* Fallback motion (used when GSAP is unavailable) */
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease;
+}
+
+/* Faint reflective gradient across the top — the glass catching light */
+.aw-dock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
+}
+
+/* ── Fallback motion states (GSAP, when present, drives these inline instead) ── */
+.aw-player.is-hover .aw-dock { transform: translateY(-5px) scale(1.02); }
+.aw-player.is-scrolling .aw-dock { transform: scale(0.93); opacity: 0.72; }
+/* When GSAP is active it sets transform every frame — drop the CSS transition so
+   the two don't fight (GSAP supplies its own easing). */
+.aw-player.aw-gsap .aw-dock { transition: none; }
+
+/* ── Controls ───────────────────────────────────────────────────────────────── */
+
+.aw-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--aw-text);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 10px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease;
+}
+.aw-btn svg { display: block; width: 100%; height: 100%; }
+.aw-btn:focus-visible {
+  outline: 2px solid var(--aw-gold);
+  outline-offset: 2px;
+}
+
+/* Play / pause — the one filled, gold affordance */
+.aw-play {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--aw-text);
+  color: #16161e;
+  flex: 0 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.aw-play svg { width: 56%; height: 56%; }
+.aw-play:hover { transform: scale(1.08); }
+.aw-play:active { transform: scale(0.96); }
+
+/* Vertical hairline separators */
+.aw-sep {
+  width: 1px;
+  height: 1.4rem;
+  background: var(--aw-hairline);
+  flex: 0 0 auto;
+}
+
+/* Seek bar — thin elegant track with a gold progress fill */
+.aw-seek {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 6rem;
+  height: 16px;            /* hit area */
+  background: transparent;
+  cursor: pointer;
+  margin: 0;
+}
+.aw-seek::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--aw-gold) var(--aw-pct, 0%), rgba(255, 255, 255, 0.15) var(--aw-pct, 0%));
+}
+.aw-seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--aw-text);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease;
+}
+.aw-seek:hover::-webkit-slider-thumb,
+.aw-seek:active::-webkit-slider-thumb { transform: scale(1.3); }
+.aw-seek::-moz-range-track { height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.15); }
+.aw-seek::-moz-range-progress { height: 3px; border-radius: 2px; background: var(--aw-gold); }
+.aw-seek::-moz-range-thumb {
+  width: 11px; height: 11px; border: none; border-radius: 50%;
+  background: var(--aw-text); box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+.aw-seek:focus-visible { outline: none; }
+.aw-seek:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgba(201, 168, 106, 0.5); }
+
+/* Time — mono, tabular, dim */
+.aw-time {
+  font-family: var(--aw-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  letter-spacing: 0.01em;
+  color: var(--aw-dim);
+  flex: 0 0 auto;
+  min-width: 5.6rem;
+  text-align: center;
+  white-space: nowrap;
+}
+.aw-time .aw-time-total { opacity: 0.6; }
+
+/* Speed control — a custom menu button (NOT a native <select>, so the type
+   renders identically everywhere) */
+.aw-speed-wrap { position: relative; flex: 0 0 auto; }
+.aw-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-family: var(--aw-font);
+  font-size: 0.76rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--aw-text);
+  background: transparent;
+  border: 1px solid var(--aw-hairline);
+  border-radius: 9px;
+  padding: 0.25rem 0.45rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.aw-speed:hover { background: var(--aw-hover); }
+.aw-speed[aria-expanded="true"] { background: var(--aw-hover); border-color: var(--aw-stroke); }
+.aw-speed .aw-caret { width: 8px; height: 8px; opacity: 0.6; transition: transform 0.2s ease; }
+.aw-speed[aria-expanded="true"] .aw-caret { transform: rotate(180deg); }
+
+/* Speed popover */
+.aw-speed-menu {
+  position: absolute;
+  bottom: calc(100% + 0.55rem);
+  right: 0;
+  min-width: 4.2rem;
+  padding: 0.3rem;
+  border-radius: 13px;
+  background: var(--aw-glass);
+  border: 1px solid var(--aw-stroke);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4);
+  backdrop-filter: blur(26px) saturate(1.4);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  transform-origin: bottom right;
+  z-index: 2;
+}
+.aw-speed-menu[hidden] { display: none; }
+.aw-speed-opt {
+  font-family: var(--aw-font);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  color: var(--aw-text);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.34rem 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  transition: background-color 0.15s ease;
+}
+.aw-speed-opt:hover { background: var(--aw-hover); }
+.aw-speed-opt[aria-checked="true"] { color: var(--aw-gold); }
+.aw-speed-opt .aw-check { width: 11px; height: 11px; opacity: 0; }
+.aw-speed-opt[aria-checked="true"] .aw-check { opacity: 1; }
+
+/* Follow toggle — ALWAYS visible. Lit gold when the dock is keeping the spoken
+   line in view; dimmed when you've taken scroll control. */
+.aw-follow {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  color: var(--aw-dim);
+  flex: 0 0 auto;
+}
+.aw-follow svg { width: 1.05rem; height: 1.05rem; }
+.aw-follow:hover { background: var(--aw-hover); color: var(--aw-text); }
+.aw-follow[aria-pressed="true"] {
+  color: var(--aw-gold);
+  background: rgba(201, 168, 106, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(201, 168, 106, 0.30);
+}
+.aw-follow[aria-pressed="true"]:hover { background: rgba(201, 168, 106, 0.20); }
+/* The "current line" marker pulses softly while actively following */
+.aw-follow[aria-pressed="true"] .aw-follow-mark { animation: aw-follow-pulse 2.4s ease-in-out infinite; }
+@keyframes aw-follow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ── Word-highlight (read-along) via CSS Custom Highlight API ──────────────────── */
 ::highlight(aw-active) {
-  background: rgba(201,168,106,0.28);
+  background-color: rgba(201, 168, 106, 0.20);
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(201,168,106,0.9);
+  text-decoration-color: rgba(201, 168, 106, 0.85);
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 0.18em;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .aw-player * { scroll-behavior: auto; }
+  .aw-dock,
+  .aw-btn,
+  .aw-speed,
+  .aw-speed .aw-caret,
+  .aw-follow .aw-follow-mark { transition: none; animation: none; }
+}
+
+/* Tighten on small screens: total time and a separator can fall away */
+@media (max-width: 30rem) {
+  .aw-dock { gap: 0.35rem; padding: 0.45rem 0.55rem; }
+  .aw-time { min-width: 2.8rem; }
+  .aw-time .aw-time-total, .aw-time .aw-time-slash { display: none; }
 }

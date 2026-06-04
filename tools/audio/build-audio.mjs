@@ -8,7 +8,8 @@ import { parseArgs } from './lib/cli.js';
 import { extractBlocks } from './lib/extract.js';
 import { segmentBlocks, capBlocks, JOIN_SEPARATOR } from './lib/chunk.js';
 import { estimateCost } from './lib/cost.js';
-import { mapNarration } from './lib/map.js';
+import { forcedAlign } from './lib/align.js';
+import { mapAlignedWordsLoose } from './lib/align-map.js';
 import { pcmDurationSeconds } from './lib/pcm.js';
 import { encodeMp3FromPcm, concatMp3, probeDurationSeconds, silenceMp3, silencePcm } from './lib/encode.js';
 import {
@@ -102,12 +103,18 @@ async function buildNarration(slug, blocks, cfg) {
     ? pcmDurationSeconds(Buffer.concat(audioParts).length)
     : await probeDurationSeconds(mp3);
 
-  // (5) timings: karaoke is dormant (read-along dropped to maximize audio
-  // quality — the director is free to reshape spoken text, which would desync
-  // word-level highlight). We still emit a player-compatible narration.json so
-  // the player's timings fetch never 404s; `blocks: []` => no highlight, audio
-  // plays. Re-introduce forced-alignment here if word-sync is ever wanted.
-  const timings = { duration: round4(encodedDuration), blocks: [] };
+  // (5) timings: forced-align the rendered audio against the CLEAN transcript to
+  // recover word-level start/end times, then map them onto the article's blocks
+  // for read-along highlight + auto-scroll. The director's expressive reshaping
+  // only adds tags/pacing; the narrator skips inline citations, so the aligner
+  // returns a SUBSEQUENCE of the clean tokens. mapAlignedWordsLoose gives those
+  // unspoken tokens a zero-width timing so the highlight glides past them.
+  const transcript = blocks.map(b => b.text).join(JOIN_SEPARATOR);
+  const aligned = await forcedAlign({ apiKey: cfg.apiKey, audio: mp3, transcript });
+  const { skipped, ...timings } = mapAlignedWordsLoose(blocks, aligned.words);
+  if (!timings.duration) timings.duration = round4(encodedDuration);
+  const wordCount = timings.blocks.reduce((n, b) => n + b.words.length, 0);
+  console.log(`[${slug}] forced-alignment: ${wordCount} words (${skipped} unspoken/citations)`);
 
   return { mp3, json: timings };
 }
@@ -163,7 +170,7 @@ async function main() {
     }
     console.log(`\n[${slug}] ${blocks.length} blocks. ${estimateCost(blocks).summary}`);
     if (args.dryRun) {
-      console.log(`[${slug}] v3 narration: directed text is billed per character (tags + reshaping inflate it beyond the ~${estimateCost(blocks).narrationChars} clean chars). No forced-alignment call (karaoke dormant). No LLM tagging cost (committed transcripts).`);
+      console.log(`[${slug}] v3 narration: directed text is billed per character (tags + reshaping inflate it beyond the ~${estimateCost(blocks).narrationChars} clean chars). One forced-alignment call per article powers read-along word-sync. No LLM tagging cost (committed transcripts).`);
       continue;
     }
 
